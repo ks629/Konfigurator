@@ -1,0 +1,26 @@
+import { CalcParams } from '@/lib/types';
+
+export const defaultCalcParams: CalcParams = {
+  energy_buy_price: 1.12,
+  energy_sell_price_rce: 0.279,
+  energy_sell_price_netmetering: 0.80,
+  energy_price_growth: 0.04,
+  pv_production_per_kwp: 980,
+  pv_degradation_yearly: 0.01,
+  self_consumption_without_battery: 0.30,
+  self_consumption_with_battery_new: 0.70,
+  self_consumption_with_battery_retrofit: 0.50,
+  battery_cycles_per_year: 300,
+  battery_efficiency: 0.92,
+  battery_degradation_yearly: 0.02,
+  subsidy_pme_netbilling_percent: 0.30,
+  subsidy_pme_netbilling_per_kwh: 800,
+  subsidy_pme_netbilling_max: 16000,
+  subsidy_pme_netmetering_max: 8000,
+  tax_relief_thermomodernization: 0.12,
+  installation_cost_base: 2500,
+  installation_cost_per_kwh: 200,
+  backup_installation_cost: 2000,
+  financing_rrso: 0.099,
+  financing_periods: [12, 24, 36, 48, 60],
+};
