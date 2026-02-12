@@ -1,28 +1,22 @@
 import type { Metadata } from 'next';
-import { Montserrat, Open_Sans } from 'next/font/google';
+import { Geist } from 'next/font/google';
 import { Toaster } from '@/components/ui/sonner';
 import './globals.css';
 
-const montserrat = Montserrat({
-  variable: '--font-heading',
-  subsets: ['latin', 'latin-ext'],
-  weight: ['400', '500', '600', '700', '800'],
-});
-
-const openSans = Open_Sans({
+const geist = Geist({
   variable: '--font-sans',
   subsets: ['latin', 'latin-ext'],
-  weight: ['300', '400', '500', '600', '700'],
+  weight: ['300', '400', '500', '600', '700', '800'],
 });
 
 export const metadata: Metadata = {
-  title: 'Konfigurator Magazynu Energii | NEXBE',
+  title: 'Konfigurator Magazynu Energii | Nexbe',
   description:
-    'Dobierz magazyn energii do swojej instalacji PV. Kalkulator oszczednosci, dotacje, raty. Bezplatny audyt.',
+    'Dobierz magazyn energii do swojej instalacji PV. Kalkulator oszczędności, dotacje Mój Prąd do 16 000 zł, raty. Bezpłatny audyt.',
   openGraph: {
-    title: 'Sprawdz ile zaoszczedzisz z magazynem energii',
+    title: 'Sprawdź ile zaoszczędzisz z magazynem energii | Nexbe',
     description:
-      'Konfigurator magazynu energii NEXBE - dobierz system, oblicz oszczednosci, uzyskaj dotacje.',
+      'Konfigurator magazynu energii Nexbe — dobierz system, oblicz oszczędności, uzyskaj dotacje.',
     type: 'website',
   },
 };
@@ -34,9 +28,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pl">
-      <body
-        className={`${montserrat.variable} ${openSans.variable} antialiased`}
-      >
+      <body className={`${geist.variable} antialiased`}>
         {children}
         <Toaster position="top-right" richColors />
       </body>

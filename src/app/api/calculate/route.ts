@@ -17,6 +17,14 @@ export async function POST(req: NextRequest) {
         needs_inverter_upgrade: body.needs_inverter_upgrade || false,
         inverter_price_gross: body.inverter_price_gross || 0,
         needs_backup: body.needs_backup || false,
+        // Nowe pola (opcjonalne)
+        user_profile: body.user_profile,
+        energy_operator: body.energy_operator,
+        tariff: body.tariff,
+        pv_orientation: body.pv_orientation,
+        wants_subsidy: body.wants_subsidy,
+        thermomodernization_used_percent: body.thermomodernization_used_percent,
+        tax_bracket: body.tax_bracket,
       },
       defaultCalcParams
     );

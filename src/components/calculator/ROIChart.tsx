@@ -91,7 +91,7 @@ export function ROIChart({ projection, roiYear }: ROIChartProps) {
       </div>
 
       <p className="text-xs text-muted-foreground text-center">
-        Projekcja uwzglednia 4% roczny wzrost cen energii, degradacje paneli PV (1%/rok) i magazynu (2%/rok)
+        Projekcja uwzględnia 5% roczny wzrost cen energii, degradację paneli PV (1%/rok) i magazynu (2,5%/rok)
       </p>
     </div>
   );

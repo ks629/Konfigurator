@@ -40,18 +40,18 @@ export default function AdminPage() {
           <h1 className="font-heading text-lg text-center mb-6">Panel administracyjny</h1>
           <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="password">Haslo</Label>
+              <Label htmlFor="password">Hasło</Label>
               <Input
                 id="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Wpisz haslo"
+                placeholder="Wpisz hasło"
                 className="h-11"
               />
             </div>
             <Button type="submit" className="w-full" size="lg">
-              Zaloguj sie
+              Zaloguj się
             </Button>
           </form>
         </div>
@@ -60,16 +60,16 @@ export default function AdminPage() {
   }
 
   const stats = [
-    { label: 'Leady dzis', value: '12', icon: Users, color: 'text-blue-600 bg-blue-50' },
+    { label: 'Leady dziś', value: '12', icon: Users, color: 'text-blue-600 bg-blue-50' },
     { label: 'Leady w tygodniu', value: '47', icon: TrendingUp, color: 'text-green-600 bg-green-50' },
     { label: 'Pobrane PDF', value: '31', icon: FileText, color: 'text-purple-600 bg-purple-50' },
-    { label: 'Umowione audyty', value: '8', icon: CalendarCheck, color: 'text-orange-600 bg-orange-50' },
+    { label: 'Umówione audyty', value: '8', icon: CalendarCheck, color: 'text-orange-600 bg-orange-50' },
   ];
 
   const menuItems = [
     { label: 'Dashboard', href: '/admin', icon: LayoutDashboard, active: true },
-    { label: 'Cennik produktow', href: '/admin/cennik', icon: Package },
-    { label: 'Lista leadow', href: '/admin/leady', icon: Users },
+    { label: 'Cennik produktów', href: '/admin/cennik', icon: Package },
+    { label: 'Lista leadów', href: '/admin/leady', icon: Users },
     { label: 'Ustawienia', href: '/admin/ustawienia', icon: Settings },
   ];
 
@@ -138,10 +138,10 @@ export default function AdminPage() {
           <div className="space-y-4">
             {[
               { label: 'Wizyty na stronie', value: 1240, percent: 100 },
-              { label: 'Rozpoczete konfiguracje', value: 380, percent: 30.6 },
-              { label: 'Ukonczone konfiguracje', value: 185, percent: 14.9 },
+              { label: 'Rozpoczęte konfiguracje', value: 380, percent: 30.6 },
+              { label: 'Ukończone konfiguracje', value: 185, percent: 14.9 },
               { label: 'Pobrane oferty (leady)', value: 47, percent: 3.8 },
-              { label: 'Umowione audyty', value: 8, percent: 0.6 },
+              { label: 'Umówione audyty', value: 8, percent: 0.6 },
             ].map((item) => (
               <div key={item.label} className="space-y-1">
                 <div className="flex items-center justify-between text-sm">

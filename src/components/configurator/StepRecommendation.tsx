@@ -32,7 +32,7 @@ export function StepRecommendation() {
     return (
       <div className="text-center p-8">
         <p className="text-muted-foreground">
-          Nie udalo sie dobrac produktu. Skontaktuj sie z nami.
+          Nie udało się dobrać produktu. Skontaktuj się z nami.
         </p>
       </div>
     );
@@ -56,11 +56,11 @@ export function StepRecommendation() {
         <div className="flex items-center justify-center gap-2 text-primary">
           <Sparkles className="h-6 w-6" />
           <h2 className="font-heading text-2xl md:text-3xl">
-            Mamy dla Ciebie idealne rozwiazanie!
+            Mamy dla Ciebie idealne rozwiązanie!
           </h2>
         </div>
         <p className="text-muted-foreground">
-          Na podstawie Twoich danych dobralismy optymalne konfiguracje
+          Na podstawie Twoich danych dobraliśmy optymalną konfigurację
         </p>
       </div>
 
@@ -68,8 +68,8 @@ export function StepRecommendation() {
         <div className="flex items-start gap-2 p-4 rounded-lg bg-green-50 border border-green-200 text-sm max-w-3xl mx-auto">
           <Info className="h-4 w-4 text-green-700 mt-0.5 shrink-0" />
           <span className="text-green-800">
-            Magazyn AC mozna podlaczyc do kazdego istniejacego falownika stringowego.
-            Nie musisz wymieniac swojego obecnego falownika.
+            Magazyn AC można podłączyć do każdego istniejącego falownika stringowego.
+            Nie musisz wymieniać swojego obecnego falownika.
           </span>
         </div>
       )}
@@ -80,7 +80,7 @@ export function StepRecommendation() {
           <ProductCard
             product={economic.product}
             inverter={economic.inverter}
-            badge="Nizszy koszt"
+            badge="Niższy koszt"
             badgeVariant="secondary"
             isRecommended={false}
             isSelected={selectedProductId === economic.product.id}
@@ -92,7 +92,7 @@ export function StepRecommendation() {
         <ProductCard
           product={recommended.product}
           inverter={recommended.inverter}
-          badge="Najlepszy wybor"
+          badge="Najlepszy wybór"
           badgeVariant="default"
           isRecommended={true}
           isSelected={selectedProductId === recommended.product.id}
@@ -104,7 +104,7 @@ export function StepRecommendation() {
           <ProductCard
             product={premium.product}
             inverter={premium.inverter}
-            badge="Maksimum korzysci"
+            badge="Maksimum korzyści"
             badgeVariant="outline"
             isRecommended={false}
             isSelected={selectedProductId === premium.product.id}

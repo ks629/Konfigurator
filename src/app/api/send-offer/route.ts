@@ -1,23 +1,42 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { generateOfferPdfBuffer, type PdfOfferData } from '@/lib/pdf-generator';
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
 
-    const { name, email, phone, postalCode, config, product, calculation } = body;
+    const { name, email, phone, postalCode, config, product, inverter, calculation } = body;
 
     // Generate lead ID
     const leadId = `NEXBE-${Date.now()}-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
 
-    // TODO: Generate PDF using jsPDF
-    // const pdf = generateOfferPDF({ name, product, calculation, leadId });
+    // Generuj PDF
+    const pdfData: PdfOfferData = {
+      clientName: name || '',
+      clientEmail: email || '',
+      clientPhone: phone || '',
+      clientPostalCode: postalCode || '',
+      product,
+      inverter,
+      calculation,
+      config,
+      offerNumber: leadId,
+    };
+
+    let pdfBuffer: ArrayBuffer | null = null;
+    try {
+      pdfBuffer = generateOfferPdfBuffer(pdfData);
+    } catch (pdfError) {
+      console.error('PDF generation failed:', pdfError);
+      // Continue without PDF — don't block the offer sending
+    }
 
     // TODO: Send email via Resend/Nodemailer
     // await resend.emails.send({
     //   from: 'oferty@nexbe.pl',
     //   to: email,
     //   subject: `Twoja oferta magazynu energii - ${product.name}`,
-    //   attachments: [{ filename: `oferta-${leadId}.pdf`, content: pdf }],
+    //   attachments: pdfBuffer ? [{ filename: `oferta-${leadId}.pdf`, content: Buffer.from(pdfBuffer) }] : [],
     // });
 
     // TODO: Send copy to NEXBE
@@ -28,17 +47,23 @@ export async function POST(req: NextRequest) {
     //   ...
     // });
 
-    console.log('Offer sent:', { leadId, name, email, product: config?.selectedProductId });
+    console.log('Offer sent:', {
+      leadId,
+      name,
+      email,
+      product: product?.name,
+      pdfGenerated: !!pdfBuffer,
+    });
 
     return NextResponse.json({
       success: true,
       leadId,
-      message: 'Oferta wyslana pomyslnie',
+      message: 'Oferta wysłana pomyślnie',
     });
   } catch (error) {
     console.error('Send offer error:', error);
     return NextResponse.json(
-      { error: 'Blad wysylki oferty' },
+      { error: 'Błąd wysyłki oferty' },
       { status: 500 }
     );
   }

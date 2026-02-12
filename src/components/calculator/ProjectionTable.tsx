@@ -9,18 +9,21 @@ import { cn } from '@/lib/utils';
 
 interface ProjectionTableProps {
   projection: YearProjection[];
+  horizonYears?: number;
 }
 
-export function ProjectionTable({ projection }: ProjectionTableProps) {
+export function ProjectionTable({ projection, horizonYears }: ProjectionTableProps) {
+  const horizon = horizonYears ?? projection.length;
   const [expanded, setExpanded] = useState(false);
+  const keyYears = [1, 2, 3, 5, 7, 10, 15, horizon].filter((y) => y <= horizon);
   const displayData = expanded ? projection : projection.filter((p) =>
-    [1, 2, 3, 5, 7, 10, 15, 20].includes(p.year)
+    keyYears.includes(p.year)
   );
 
   return (
     <div className="rounded-xl border bg-card overflow-hidden">
       <div className="p-4 border-b flex items-center justify-between">
-        <h3 className="font-heading text-lg">Tabela projekcji 20-letniej</h3>
+        <h3 className="font-heading text-lg">Tabela projekcji {horizon}-letniej</h3>
         <Button
           variant="ghost"
           size="sm"
@@ -28,9 +31,9 @@ export function ProjectionTable({ projection }: ProjectionTableProps) {
           className="text-xs"
         >
           {expanded ? (
-            <>Pokaz skrocona <ChevronUp className="h-3 w-3 ml-1" /></>
+            <>Pokaż skróconą <ChevronUp className="h-3 w-3 ml-1" /></>
           ) : (
-            <>Pokaz pelna <ChevronDown className="h-3 w-3 ml-1" /></>
+            <>Pokaż pełną <ChevronDown className="h-3 w-3 ml-1" /></>
           )}
         </Button>
       </div>
@@ -42,8 +45,8 @@ export function ProjectionTable({ projection }: ProjectionTableProps) {
               <th className="text-left p-3 font-medium">Rok</th>
               <th className="text-right p-3 font-medium">Produkcja PV</th>
               <th className="text-right p-3 font-medium hidden md:table-cell">Autokonsumpcja</th>
-              <th className="text-right p-3 font-medium hidden md:table-cell">Sprzedaz</th>
-              <th className="text-right p-3 font-medium">Oszczednosc</th>
+              <th className="text-right p-3 font-medium hidden md:table-cell">Sprzedaż</th>
+              <th className="text-right p-3 font-medium">Oszczędność</th>
               <th className="text-right p-3 font-medium">Suma</th>
             </tr>
           </thead>

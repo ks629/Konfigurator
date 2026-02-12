@@ -7,6 +7,10 @@ import {
   Tariff,
   BackupPreference,
   Priority,
+  UserProfile,
+  EnergyOperator,
+  PVOrientation,
+  TaxBracket,
 } from '@/lib/types';
 
 interface ConfiguratorStore extends ConfiguratorState {
@@ -30,6 +34,13 @@ interface ConfiguratorStore extends ConfiguratorState {
   togglePriority: (priority: Priority) => void;
   setSelectedProductId: (id: string | null) => void;
   setSelectedInverterId: (id: string | null) => void;
+  // Nowe settery
+  setUserProfile: (profile: UserProfile) => void;
+  setEnergyOperator: (operator: EnergyOperator) => void;
+  setPvOrientation: (orientation: PVOrientation) => void;
+  setWantsSubsidy: (val: boolean) => void;
+  setThermomodernizationUsedPercent: (percent: number) => void;
+  setTaxBracket: (bracket: TaxBracket) => void;
   reset: () => void;
 }
 
@@ -51,6 +62,13 @@ const initialState: ConfiguratorState = {
   priorities: [],
   selectedProductId: null,
   selectedInverterId: null,
+  // Nowe pola
+  userProfile: 'standard',
+  energyOperator: 'tauron',
+  pvOrientation: 'south',
+  wantsSubsidy: true,
+  thermomodernizationUsedPercent: 0,
+  taxBracket: 12,
 };
 
 export const useConfigurator = create<ConfiguratorStore>()(
@@ -84,10 +102,29 @@ export const useConfigurator = create<ConfiguratorStore>()(
         })),
       setSelectedProductId: (id) => set({ selectedProductId: id }),
       setSelectedInverterId: (id) => set({ selectedInverterId: id }),
+      // Nowe settery
+      setUserProfile: (profile) => set({ userProfile: profile }),
+      setEnergyOperator: (operator) => set({ energyOperator: operator }),
+      setPvOrientation: (orientation) => set({ pvOrientation: orientation }),
+      setWantsSubsidy: (val) => set({ wantsSubsidy: val }),
+      setThermomodernizationUsedPercent: (percent) =>
+        set({ thermomodernizationUsedPercent: percent }),
+      setTaxBracket: (bracket) => set({ taxBracket: bracket }),
       reset: () => set(initialState),
     }),
     {
       name: 'nexbe-configurator',
+      version: 2,
+      migrate: (persistedState, version) => {
+        if (version < 2) {
+          // Merge nowych domyślnych pól ze starym stanem
+          return {
+            ...initialState,
+            ...(persistedState as Partial<ConfiguratorState>),
+          };
+        }
+        return persistedState as ConfiguratorState;
+      },
     }
   )
 );

@@ -27,8 +27,8 @@ export default function CennikPage() {
 
   const menuItems = [
     { label: 'Dashboard', href: '/admin', icon: LayoutDashboard },
-    { label: 'Cennik produktow', href: '/admin/cennik', icon: Package, active: true },
-    { label: 'Lista leadow', href: '/admin/leady', icon: Users },
+    { label: 'Cennik produktów', href: '/admin/cennik', icon: Package, active: true },
+    { label: 'Lista leadów', href: '/admin/leady', icon: Users },
     { label: 'Ustawienia', href: '/admin/ustawienia', icon: Settings },
   ];
 
@@ -63,8 +63,8 @@ export default function CennikPage() {
         <thead>
           <tr className="bg-muted/50">
             <th className="text-left p-3 font-medium">Produkt</th>
-            <th className="text-right p-3 font-medium">Pojemnosc</th>
-            <th className="text-right p-3 font-medium">Moc ciagla</th>
+            <th className="text-right p-3 font-medium">Pojemność</th>
+            <th className="text-right p-3 font-medium">Moc ciągła</th>
             <th className="text-right p-3 font-medium">Gwarancja</th>
             <th className="text-right p-3 font-medium">Cena brutto</th>
             <th className="text-right p-3 font-medium">Akcje</th>
@@ -150,7 +150,7 @@ export default function CennikPage() {
           <div className="bg-card rounded-xl border overflow-hidden">
             <div className="p-4 border-b">
               <h2 className="font-heading text-lg">Magazyny AC (Retrofit)</h2>
-              <p className="text-sm text-muted-foreground">Dyness - kompatybilne z kazdym falownikiem stringowym</p>
+              <p className="text-sm text-muted-foreground">Dyness - kompatybilne z każdym falownikiem stringowym</p>
             </div>
             {renderProductTable(acProducts, 'ac')}
           </div>
@@ -159,7 +159,7 @@ export default function CennikPage() {
           <div className="bg-card rounded-xl border overflow-hidden">
             <div className="p-4 border-b">
               <h2 className="font-heading text-lg">Magazyny DC (Hybrid)</h2>
-              <p className="text-sm text-muted-foreground">Huawei LUNA - wymagaja falownika hybrydowego</p>
+              <p className="text-sm text-muted-foreground">Huawei LUNA - wymagają falownika hybrydowego</p>
             </div>
             {renderProductTable(dcProducts, 'dc')}
           </div>

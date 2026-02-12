@@ -13,9 +13,18 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Tariff, BillingSystem } from '@/lib/types';
+import { Tariff, BillingSystem, UserProfile, EnergyOperator } from '@/lib/types';
 import { calculateMonthlyFromBill } from '@/lib/calculations';
+import { operatorPricing } from '@/data/energy-prices';
 import { cn } from '@/lib/utils';
+import { Home, Thermometer, Laptop, Car } from 'lucide-react';
+
+const userProfileOptions: { value: UserProfile; label: string; icon: React.ElementType }[] = [
+  { value: 'standard', label: 'Standardowe gospodarstwo', icon: Home },
+  { value: 'heat_pump', label: 'Z pompą ciepła', icon: Thermometer },
+  { value: 'work_from_home', label: 'Praca zdalna z domu', icon: Laptop },
+  { value: 'heat_pump_ev', label: 'Pompa ciepła + EV', icon: Car },
+];
 
 const tariffOptions: { value: Tariff; label: string; desc: string }[] = [
   { value: 'G11', label: 'G11', desc: 'Calodobowa jednakowa cena' },
@@ -55,6 +64,10 @@ export function StepConsumption() {
     setTariff,
     billingSystem,
     setBillingSystem,
+    userProfile,
+    setUserProfile,
+    energyOperator,
+    setEnergyOperator,
   } = useConfigurator();
 
   const effectiveConsumption =
@@ -71,16 +84,16 @@ export function StepConsumption() {
     >
       <div className="text-center space-y-2">
         <h2 className="font-heading text-2xl md:text-3xl">
-          Zuzycie energii
+          Zużycie energii
         </h2>
         <p className="text-muted-foreground">
-          Podaj informacje o swoim zuzuciu energii elektrycznej
+          Podaj informacje o swoim zużyciu energii elektrycznej
         </p>
       </div>
 
       {/* Toggle: kWh vs rachunek */}
       <div className="space-y-4">
-        <Label className="text-base font-medium">Jak chcesz podac zuzycie?</Label>
+        <Label className="text-base font-medium">Jak chcesz podać zużycie?</Label>
         <div className="grid grid-cols-2 gap-2">
           <button
             onClick={() => setConsumptionMode('kwh')}
@@ -91,7 +104,7 @@ export function StepConsumption() {
                 : 'border-border hover:border-primary/30'
             )}
           >
-            Znam roczne zuzycie w kWh
+            Znam roczne zużycie w kWh
           </button>
           <button
             onClick={() => setConsumptionMode('bill')}
@@ -102,7 +115,7 @@ export function StepConsumption() {
                 : 'border-border hover:border-primary/30'
             )}
           >
-            Podam miesieczny rachunek za prad
+            Podam miesięczny rachunek za prąd
           </button>
         </div>
       </div>
@@ -111,7 +124,7 @@ export function StepConsumption() {
       {consumptionMode === 'kwh' ? (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <Label className="text-base font-medium">Roczne zuzycie energii</Label>
+            <Label className="text-base font-medium">Roczne zużycie energii</Label>
             <span className="text-2xl font-heading text-primary">
               {annualConsumptionKwh.toLocaleString('pl-PL')} kWh
             </span>
@@ -132,7 +145,7 @@ export function StepConsumption() {
       ) : (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <Label className="text-base font-medium">Miesieczny rachunek za prad</Label>
+            <Label className="text-base font-medium">Miesięczny rachunek za prąd</Label>
             <span className="text-lg font-heading text-primary">
               ≈ {effectiveConsumption.toLocaleString('pl-PL')} kWh/rok
             </span>
@@ -152,6 +165,60 @@ export function StepConsumption() {
           </div>
         </div>
       )}
+
+      {/* Profil gospodarstwa domowego */}
+      <div className="space-y-3">
+        <div>
+          <Label className="text-base font-medium">Profil gospodarstwa domowego</Label>
+          <p className="text-sm text-muted-foreground mt-1">
+            Profil określa poziom autokonsumpcji energii
+          </p>
+        </div>
+        <RadioGroup
+          value={userProfile}
+          onValueChange={(val) => setUserProfile(val as UserProfile)}
+          className="grid grid-cols-2 gap-2"
+        >
+          {userProfileOptions.map(({ value, label, icon: Icon }) => (
+            <label
+              key={value}
+              className={cn(
+                'flex items-center gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all',
+                userProfile === value
+                  ? 'border-primary bg-primary/5'
+                  : 'border-border hover:border-primary/30'
+              )}
+            >
+              <RadioGroupItem value={value} />
+              <Icon className={cn(
+                'h-4 w-4',
+                userProfile === value ? 'text-primary' : 'text-muted-foreground'
+              )} />
+              <span className="text-sm font-medium">{label}</span>
+            </label>
+          ))}
+        </RadioGroup>
+      </div>
+
+      {/* Operator energii */}
+      <div className="space-y-3">
+        <Label className="text-base font-medium">Operator energii</Label>
+        <Select
+          value={energyOperator}
+          onValueChange={(val) => setEnergyOperator(val as EnergyOperator)}
+        >
+          <SelectTrigger className="h-12">
+            <SelectValue placeholder="Wybierz operatora" />
+          </SelectTrigger>
+          <SelectContent>
+            {operatorPricing.map((op) => (
+              <SelectItem key={op.operator} value={op.operator}>
+                {op.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
 
       {/* Taryfa */}
       <div className="space-y-3">

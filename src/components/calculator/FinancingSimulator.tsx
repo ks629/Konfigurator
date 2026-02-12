@@ -57,12 +57,12 @@ export function FinancingSimulator({ result }: FinancingSimulatorProps) {
       </div>
 
       <div className="bg-primary/10 rounded-lg p-4 text-center space-y-1">
-        <p className="text-sm text-muted-foreground">Rata miesieczna</p>
+        <p className="text-sm text-muted-foreground">Rata miesięczna</p>
         <p className="text-3xl font-heading text-primary">
           {formatCurrency(monthlyPayment)}
         </p>
         <p className="text-xs text-muted-foreground">
-          dla {selectedPeriod} miesiecy
+          dla {selectedPeriod} miesięcy
         </p>
       </div>
 
@@ -70,15 +70,19 @@ export function FinancingSimulator({ result }: FinancingSimulatorProps) {
         <Lightbulb className="h-4 w-4 text-green-700 mt-0.5 shrink-0" />
         <div className="text-sm">
           <p className="text-green-800">
-            Twoja oszczednosc: <strong>~{formatCurrency(monthlySavings)}/mies.</strong>
+            Twoja oszczędność: <strong>~{formatCurrency(monthlySavings)}/mies.</strong>
           </p>
           {monthlySavings >= monthlyPayment * 0.5 && (
             <p className="text-green-700 mt-1">
-              Rata praktycznie &ldquo;splaca sie sama&rdquo;!
+              Rata praktycznie &ldquo;spłaca się sama&rdquo;!
             </p>
           )}
         </div>
       </div>
+
+      <p className="text-xs text-muted-foreground text-center">
+        Inbank: oprocentowanie stałe 8,99%, opłata 10&nbsp;zł/mies.
+      </p>
     </div>
   );
 }

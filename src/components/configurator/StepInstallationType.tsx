@@ -14,20 +14,20 @@ const options: {
 }[] = [
   {
     type: 'retrofit',
-    title: 'Mam juz instalacje PV i chce dodac magazyn',
-    description: 'Twoj obecny falownik zostaje, dodajemy magazyn AC',
+    title: 'Mam już instalację PV i chcę dodać magazyn',
+    description: 'Twój obecny falownik zostaje, dodajemy magazyn AC',
     icon: Battery,
   },
   {
     type: 'hybrid',
-    title: 'Planuje nowa instalacje PV z magazynem',
+    title: 'Planuję nową instalację PV z magazynem',
     description: 'Kompletny system: panele + falownik hybrydowy + magazyn DC',
     icon: Sun,
   },
   {
     type: 'upgrade',
-    title: 'Chce wymienic falownik na hybrydowy i dodac magazyn',
-    description: 'Modernizacja istniejacej instalacji do systemu hybrydowego',
+    title: 'Chcę wymienić falownik na hybrydowy i dodać magazyn',
+    description: 'Modernizacja istniejącej instalacji do systemu hybrydowego',
     icon: RefreshCw,
   },
 ];
@@ -52,7 +52,7 @@ export function StepInstallationType() {
           Jaka jest Twoja sytuacja?
         </h2>
         <p className="text-muted-foreground">
-          To pomoze nam dobrac najlepsze rozwiazanie
+          To pomoże nam dobrać najlepsze rozwiązanie
         </p>
       </div>
 

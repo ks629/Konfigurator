@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { Product, Inverter } from '@/lib/types';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -45,10 +46,20 @@ export function ProductCard({
         </Badge>
       </div>
 
-      {/* Image placeholder */}
-      <div className="relative h-48 bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center">
-        <Battery className="h-20 w-20 text-muted-foreground/30" />
-        <div className="absolute bottom-2 left-2">
+      {/* Product image */}
+      <div className="relative h-48 bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center overflow-hidden">
+        {product.image ? (
+          <Image
+            src={product.image}
+            alt={product.name}
+            fill
+            className="object-contain p-3"
+            sizes="(max-width: 768px) 100vw, 33vw"
+          />
+        ) : (
+          <Battery className="h-20 w-20 text-muted-foreground/30" />
+        )}
+        <div className="absolute bottom-2 left-2 z-10">
           <span className="text-xs bg-black/50 text-white px-2 py-1 rounded">
             {product.brand}
           </span>
@@ -72,7 +83,7 @@ export function ProductCard({
             <Battery className="h-4 w-4 text-primary" />
             <div>
               <p className="font-medium">{product.capacity_kwh} kWh</p>
-              <p className="text-xs text-muted-foreground">Pojemnosc</p>
+              <p className="text-xs text-muted-foreground">Pojemność</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -81,7 +92,7 @@ export function ProductCard({
               <p className="font-medium">
                 {product.power_continuous_kw} / {product.power_peak_kw} kW
               </p>
-              <p className="text-xs text-muted-foreground">Ciagla / Szczyt</p>
+              <p className="text-xs text-muted-foreground">Ciągła / Szczyt</p>
             </div>
           </div>
           <div className="flex items-center gap-2">

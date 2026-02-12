@@ -1,3 +1,5 @@
+// ───────────────────────── Istniejące typy ─────────────────────────
+
 export type InstallationType = 'retrofit' | 'hybrid' | 'upgrade';
 
 export type BillingSystem = 'net-billing' | 'net-metering' | 'unknown';
@@ -12,6 +14,54 @@ export type Priority =
   | 'blackout'
   | 'ecology'
   | 'subsidy';
+
+// ───────────────────────── Nowe typy ─────────────────────────
+
+export type UserProfile = 'standard' | 'heat_pump' | 'work_from_home' | 'heat_pump_ev';
+
+export type EnergyOperator = 'tauron' | 'pge' | 'enea' | 'energa' | 'innogy';
+
+export type PVOrientation = 'south' | 'east_west' | 'east' | 'west';
+
+export type TaxBracket = 12 | 32;
+
+export interface OperatorPricing {
+  operator: EnergyOperator;
+  label: string;
+  g11: number;
+  g12_day: number;
+  g12_night: number;
+}
+
+export interface DistributionFees {
+  variable: number;
+  quality: number;
+  transition: number;
+  oze: number;
+  cogeneration: number;
+  capacity: number;
+  total: number;
+}
+
+export interface SelfConsumptionProfile {
+  profile: UserProfile;
+  label: string;
+  without_battery: number;
+  with_battery: number;
+}
+
+export interface FinancingConfig {
+  nominal_rate: number;
+  rrso: number;
+  min_amount: number;
+  max_amount: number;
+  min_months: number;
+  max_months: number;
+  monthly_fee: number;
+  periods: number[];
+}
+
+// ───────────────────────── Produkty ─────────────────────────
 
 export interface Product {
   id: string;
@@ -38,6 +88,8 @@ export interface Inverter {
   compatible_batteries: string[];
 }
 
+// ───────────────────────── Konfigurator ─────────────────────────
+
 export interface ConfiguratorState {
   currentStep: number;
   installationType: InstallationType | null;
@@ -56,6 +108,13 @@ export interface ConfiguratorState {
   priorities: Priority[];
   selectedProductId: string | null;
   selectedInverterId: string | null;
+  // Nowe pola
+  userProfile: UserProfile;
+  energyOperator: EnergyOperator;
+  pvOrientation: PVOrientation;
+  wantsSubsidy: boolean;
+  thermomodernizationUsedPercent: number;
+  taxBracket: TaxBracket;
 }
 
 export interface RecommendedOption {
@@ -65,6 +124,36 @@ export interface RecommendedOption {
   badgeVariant: 'default' | 'secondary' | 'outline';
   description: string;
   isRecommended: boolean;
+}
+
+// ───────────────────────── Kalkulacja ─────────────────────────
+
+export interface CalcInput {
+  pv_power_kwp: number;
+  annual_consumption_kwh: number;
+  billing_system: BillingSystem;
+  battery_capacity_kwh: number;
+  battery_price_gross: number;
+  installation_type: InstallationType;
+  needs_inverter_upgrade: boolean;
+  inverter_price_gross: number;
+  needs_backup: boolean;
+  // Nowe pola (opcjonalne — backward compatible)
+  user_profile?: UserProfile;
+  energy_operator?: EnergyOperator;
+  tariff?: Tariff;
+  pv_orientation?: PVOrientation;
+  wants_subsidy?: boolean;
+  thermomodernization_used_percent?: number;
+  tax_bracket?: TaxBracket;
+}
+
+export interface ThermomodernizationDetails {
+  pool_total: number;
+  pool_used: number;
+  pool_available: number;
+  deduction: number;
+  tax_bracket: TaxBracket;
 }
 
 export interface InvestmentBreakdown {
@@ -77,6 +166,7 @@ export interface InvestmentBreakdown {
   tax_relief: number;
   total_subsidies: number;
   net_cost: number;
+  thermomodernization_details?: ThermomodernizationDetails;
 }
 
 export interface YearProjection {
@@ -93,6 +183,8 @@ export interface CalculationResult {
   annual_savings: number;
   roi_years: number | null;
   total_savings_20y: number;
+  total_savings: number;
+  horizon_years: number;
   projection: YearProjection[];
   monthly_installment: Record<number, number>;
 }
@@ -140,4 +232,8 @@ export interface CalcParams {
   backup_installation_cost: number;
   financing_rrso: number;
   financing_periods: number[];
+  // Nowe pola (opcjonalne)
+  distribution_fees?: DistributionFees;
+  analysis_horizon?: number;
+  financing_config?: FinancingConfig;
 }

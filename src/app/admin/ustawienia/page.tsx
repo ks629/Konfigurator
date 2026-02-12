@@ -21,14 +21,14 @@ export default function UstawieniaPage() {
 
   const menuItems = [
     { label: 'Dashboard', href: '/admin', icon: LayoutDashboard },
-    { label: 'Cennik produktow', href: '/admin/cennik', icon: Package },
-    { label: 'Lista leadow', href: '/admin/leady', icon: Users },
+    { label: 'Cennik produktów', href: '/admin/cennik', icon: Package },
+    { label: 'Lista leadów', href: '/admin/leady', icon: Users },
     { label: 'Ustawienia', href: '/admin/ustawienia', icon: Settings, active: true },
   ];
 
   const handleSave = () => {
     // In production, save to API/database
-    toast.success('Parametry zapisane pomyslnie');
+    toast.success('Parametry zapisane pomyślnie');
   };
 
   const updateParam = (key: keyof typeof params, value: string) => {
@@ -42,8 +42,8 @@ export default function UstawieniaPage() {
     {
       title: 'Ceny energii',
       fields: [
-        { key: 'energy_buy_price' as const, label: 'Cena zakupu energii (zl/kWh)', step: '0.01' },
-        { key: 'energy_sell_price_rce' as const, label: 'Cena sprzedazy RCE (zl/kWh)', step: '0.001' },
+        { key: 'energy_buy_price' as const, label: 'Cena zakupu energii (zł/kWh)', step: '0.01' },
+        { key: 'energy_sell_price_rce' as const, label: 'Cena sprzedaży RCE (zł/kWh)', step: '0.001' },
         { key: 'energy_price_growth' as const, label: 'Roczny wzrost cen (%)', step: '0.01' },
       ],
     },
@@ -66,18 +66,18 @@ export default function UstawieniaPage() {
       title: 'Dotacje',
       fields: [
         { key: 'subsidy_pme_netbilling_percent' as const, label: 'Dotacja PME - procent (%)', step: '0.01' },
-        { key: 'subsidy_pme_netbilling_per_kwh' as const, label: 'Dotacja PME - za kWh (zl)', step: '100' },
-        { key: 'subsidy_pme_netbilling_max' as const, label: 'Dotacja PME - max (zl)', step: '1000' },
-        { key: 'subsidy_pme_netmetering_max' as const, label: 'Dotacja PME net-metering max (zl)', step: '1000' },
+        { key: 'subsidy_pme_netbilling_per_kwh' as const, label: 'Dotacja PME - za kWh (zł)', step: '100' },
+        { key: 'subsidy_pme_netbilling_max' as const, label: 'Dotacja PME - max (zł)', step: '1000' },
+        { key: 'subsidy_pme_netmetering_max' as const, label: 'Dotacja PME net-metering max (zł)', step: '1000' },
         { key: 'tax_relief_thermomodernization' as const, label: 'Ulga termomodernizacyjna (%)', step: '0.01' },
       ],
     },
     {
-      title: 'Koszty montazu',
+      title: 'Koszty montażu',
       fields: [
-        { key: 'installation_cost_base' as const, label: 'Bazowy koszt montazu (zl)', step: '100' },
-        { key: 'installation_cost_per_kwh' as const, label: 'Koszt montazu za kWh (zl)', step: '50' },
-        { key: 'backup_installation_cost' as const, label: 'Koszt instalacji backup (zl)', step: '100' },
+        { key: 'installation_cost_base' as const, label: 'Bazowy koszt montażu (zł)', step: '100' },
+        { key: 'installation_cost_per_kwh' as const, label: 'Koszt montażu za kWh (zł)', step: '50' },
+        { key: 'backup_installation_cost' as const, label: 'Koszt instalacji backup (zł)', step: '100' },
       ],
     },
     {

@@ -5,7 +5,8 @@ import { useConfigurator } from '@/hooks/useConfigurator';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { BackupPreference, Priority } from '@/lib/types';
+import { BackupPreference, Priority, TaxBracket } from '@/lib/types';
+import { Slider } from '@/components/ui/slider';
 import { cn } from '@/lib/utils';
 import {
   Thermometer,
@@ -20,8 +21,8 @@ import {
 } from 'lucide-react';
 
 const priorityOptions: { value: Priority; label: string; icon: React.ElementType }[] = [
-  { value: 'savings', label: 'Maksymalne oszczednosci na rachunkach', icon: Wallet },
-  { value: 'independence', label: 'Niezaleznosc energetyczna', icon: Zap },
+  { value: 'savings', label: 'Maksymalne oszczędności na rachunkach', icon: Wallet },
+  { value: 'independence', label: 'Niezależność energetyczna', icon: Zap },
   { value: 'blackout', label: 'Ochrona przed blackoutem', icon: ShieldCheck },
   { value: 'ecology', label: 'Ekologia i slad weglowy', icon: Leaf },
   { value: 'subsidy', label: 'Wykorzystanie dotacji', icon: Gift },
@@ -37,7 +38,15 @@ export function StepAdditionalNeeds() {
     setBackupPreference,
     priorities,
     togglePriority,
+    wantsSubsidy,
+    setWantsSubsidy,
+    taxBracket,
+    setTaxBracket,
+    thermomodernizationUsedPercent,
+    setThermomodernizationUsedPercent,
   } = useConfigurator();
+
+  const thermomodernizationRemaining = Math.round(53000 * (1 - thermomodernizationUsedPercent / 100));
 
   return (
     <motion.div
@@ -51,7 +60,7 @@ export function StepAdditionalNeeds() {
           Dodatkowe potrzeby
         </h2>
         <p className="text-muted-foreground">
-          Powiedz nam wiecej o swoich potrzebach energetycznych
+          Powiedz nam więcej o swoich potrzebach energetycznych
         </p>
       </div>
 
@@ -78,7 +87,7 @@ export function StepAdditionalNeeds() {
               </Label>
             </div>
             <p className="text-sm text-muted-foreground mt-1 ml-9">
-              Pompa ciepla znaczaco zwieksza zuzycie energii, szczegolnie zima
+              Pompa ciepła znacząco zwiększa zużycie energii, szczególnie zimą
             </p>
           </div>
         </div>
@@ -129,7 +138,7 @@ export function StepAdditionalNeeds() {
           {[
             { value: 'yes', label: 'Tak, to dla mnie wazne' },
             { value: 'no', label: 'Nie, nie potrzebuje' },
-            { value: 'unknown', label: 'Nie wiem, chce sie dowiedziec wiecej' },
+            { value: 'unknown', label: 'Nie wiem, chcę się dowiedzieć więcej' },
           ].map((opt) => (
             <label
               key={opt.value}
@@ -148,7 +157,7 @@ export function StepAdditionalNeeds() {
         <div className="flex items-start gap-2 p-3 rounded-lg bg-muted/50 text-sm">
           <Info className="h-4 w-4 text-primary mt-0.5 shrink-0" />
           <span className="text-muted-foreground">
-            Backup pozwala zasilac wybrane urzadzenia podczas awarii sieci
+            Backup pozwala zasilać wybrane urządzenia podczas awarii sieci
           </span>
         </div>
       </div>
@@ -182,6 +191,83 @@ export function StepAdditionalNeeds() {
               <span className="text-sm font-medium">{label}</span>
             </div>
           ))}
+        </div>
+      </div>
+
+      {/* Dotacje i ulgi */}
+      <div className="space-y-6">
+        <div className="flex items-center gap-2">
+          <Gift className="h-5 w-5 text-primary" />
+          <Label className="text-base font-medium">Dotacje i ulgi</Label>
+        </div>
+
+        {/* Dotacja Mój Prąd 6.0 */}
+        <div
+          className={cn(
+            'flex items-center gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all',
+            wantsSubsidy ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/30'
+          )}
+          onClick={() => setWantsSubsidy(!wantsSubsidy)}
+        >
+          <Checkbox
+            checked={wantsSubsidy}
+            onCheckedChange={(val) => setWantsSubsidy(val as boolean)}
+          />
+          <span className="text-sm font-medium">
+            Chcę skorzystać z dotacji Mój Prąd 6.0
+          </span>
+        </div>
+
+        {/* Próg podatkowy */}
+        <div className="space-y-3">
+          <Label className="text-base font-medium">Próg podatkowy</Label>
+          <RadioGroup
+            value={taxBracket.toString()}
+            onValueChange={(val) => setTaxBracket(parseInt(val) as TaxBracket)}
+            className="grid grid-cols-2 gap-2"
+          >
+            {[
+              { value: '12', label: '12% (I próg)' },
+              { value: '32', label: '32% (II próg)' },
+            ].map((opt) => (
+              <label
+                key={opt.value}
+                className={cn(
+                  'flex items-center gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all',
+                  taxBracket.toString() === opt.value
+                    ? 'border-primary bg-primary/5'
+                    : 'border-border hover:border-primary/30'
+                )}
+              >
+                <RadioGroupItem value={opt.value} />
+                <span className="text-sm font-medium">{opt.label}</span>
+              </label>
+            ))}
+          </RadioGroup>
+        </div>
+
+        {/* Wykorzystana ulga termomodernizacyjna */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <Label className="text-base font-medium">
+              Wykorzystana ulga termomodernizacyjna
+            </Label>
+            <span className="text-sm font-heading text-primary">
+              {thermomodernizationUsedPercent}% z 53 000 zł (pozostało: {thermomodernizationRemaining.toLocaleString('pl-PL')} zł)
+            </span>
+          </div>
+          <Slider
+            value={[thermomodernizationUsedPercent]}
+            onValueChange={([val]) => setThermomodernizationUsedPercent(val)}
+            min={0}
+            max={100}
+            step={1}
+            className="py-4"
+          />
+          <div className="flex justify-between text-xs text-muted-foreground">
+            <span>0%</span>
+            <span>100%</span>
+          </div>
         </div>
       </div>
     </motion.div>

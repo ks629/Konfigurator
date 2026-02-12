@@ -13,7 +13,17 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { inverterBrands } from '@/data/products';
-import { Info } from 'lucide-react';
+import { Info, Sun, ArrowLeftRight, Sunrise, Sunset } from 'lucide-react';
+import { PVOrientation } from '@/lib/types';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { cn } from '@/lib/utils';
+
+const pvOrientationOptions: { value: PVOrientation; label: string; icon: React.ElementType }[] = [
+  { value: 'south', label: 'Południe', icon: Sun },
+  { value: 'east_west', label: 'Wschód + Zachód', icon: ArrowLeftRight },
+  { value: 'east', label: 'Wschód', icon: Sunrise },
+  { value: 'west', label: 'Zachód', icon: Sunset },
+];
 
 export function StepPVData() {
   const {
@@ -25,6 +35,8 @@ export function StepPVData() {
     setInverterModel,
     installationYear,
     setInstallationYear,
+    pvOrientation,
+    setPvOrientation,
   } = useConfigurator();
 
   const years = Array.from({ length: 8 }, (_, i) => 2018 + i);
@@ -68,9 +80,43 @@ export function StepPVData() {
         <div className="flex items-start gap-2 p-3 rounded-lg bg-muted/50 text-sm">
           <Info className="h-4 w-4 text-primary mt-0.5 shrink-0" />
           <span className="text-muted-foreground">
-            Nie wiesz? Sprawdz na fakturze od instalatora lub w aplikacji falownika
+            Nie wiesz? Sprawdź na fakturze od instalatora lub w aplikacji falownika
           </span>
         </div>
+      </div>
+
+      {/* Orientacja paneli PV */}
+      <div className="space-y-3">
+        <div>
+          <Label className="text-base font-medium">Orientacja paneli PV</Label>
+          <p className="text-sm text-muted-foreground mt-1">
+            Orientacja wpływa na profil produkcji energii w ciągu dnia
+          </p>
+        </div>
+        <RadioGroup
+          value={pvOrientation}
+          onValueChange={(val) => setPvOrientation(val as PVOrientation)}
+          className="grid grid-cols-2 gap-2"
+        >
+          {pvOrientationOptions.map(({ value, label, icon: Icon }) => (
+            <label
+              key={value}
+              className={cn(
+                'flex items-center gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all',
+                pvOrientation === value
+                  ? 'border-primary bg-primary/5'
+                  : 'border-border hover:border-primary/30'
+              )}
+            >
+              <RadioGroupItem value={value} />
+              <Icon className={cn(
+                'h-4 w-4',
+                pvOrientation === value ? 'text-primary' : 'text-muted-foreground'
+              )} />
+              <span className="text-sm font-medium">{label}</span>
+            </label>
+          ))}
+        </RadioGroup>
       </div>
 
       {/* Marka falownika */}
@@ -78,7 +124,7 @@ export function StepPVData() {
         <Label className="text-base font-medium">Marka falownika</Label>
         <Select value={inverterBrand} onValueChange={setInverterBrand}>
           <SelectTrigger className="h-12">
-            <SelectValue placeholder="Wybierz marke falownika" />
+            <SelectValue placeholder="Wybierz markę falownika" />
           </SelectTrigger>
           <SelectContent>
             {inverterBrands.map((brand) => (

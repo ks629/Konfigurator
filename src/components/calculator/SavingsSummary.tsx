@@ -9,7 +9,7 @@ interface SavingsSummaryProps {
 }
 
 export function SavingsSummary({ result }: SavingsSummaryProps) {
-  const { investment, annual_savings, roi_years, total_savings_20y } = result;
+  const { investment, annual_savings, roi_years, total_savings, horizon_years } = result;
 
   return (
     <div className="space-y-6">
@@ -34,7 +34,7 @@ export function SavingsSummary({ result }: SavingsSummaryProps) {
             </div>
           )}
           <div className="flex justify-between">
-            <span className="text-muted-foreground">Montaz i uruchomienie</span>
+            <span className="text-muted-foreground">Montaż i uruchomienie</span>
             <span className="font-medium">{formatCurrency(investment.installation)}</span>
           </div>
           {investment.backup > 0 && (
@@ -58,13 +58,25 @@ export function SavingsSummary({ result }: SavingsSummaryProps) {
           </div>
           <div className="space-y-1.5 text-sm">
             <div className="flex justify-between text-green-700">
-              <span>Dotacja Moj Prad (PME)</span>
+              <span>Dotacja Mój Prąd (PME)</span>
               <span>- {formatCurrency(investment.subsidy_pme)}</span>
             </div>
             <div className="flex justify-between text-green-700">
-              <span>Ulga termomodernizacyjna (12%)</span>
+              <span>Ulga termomodernizacyjna ({investment.thermomodernization_details?.tax_bracket ?? 12}%)</span>
               <span>- {formatCurrency(investment.tax_relief)}</span>
             </div>
+            {investment.thermomodernization_details && (
+              <div className="mt-2 pt-2 border-t border-green-200 space-y-1 text-xs text-green-700">
+                <div className="flex justify-between">
+                  <span>Ulga termomodernizacyjna ({investment.thermomodernization_details.tax_bracket}%)</span>
+                  <span>{formatCurrency(investment.thermomodernization_details.deduction)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Wykorzystano {formatCurrency(investment.thermomodernization_details.pool_used)} z puli {formatCurrency(investment.thermomodernization_details.pool_total)}</span>
+                  <span>Dostępne: {formatCurrency(investment.thermomodernization_details.pool_available)}</span>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -86,20 +98,20 @@ export function SavingsSummary({ result }: SavingsSummaryProps) {
       <div className="rounded-xl border bg-card p-6 space-y-4">
         <div className="flex items-center gap-2">
           <TrendingUp className="h-5 w-5 text-primary" />
-          <h3 className="font-heading text-lg">Twoje oszczednosci</h3>
+          <h3 className="font-heading text-lg">Twoje oszczędności</h3>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
           <div className="bg-green-50 rounded-lg p-4 text-center">
-            <p className="text-sm text-muted-foreground mb-1">Roczna oszczednosc</p>
+            <p className="text-sm text-muted-foreground mb-1">Roczna oszczędność</p>
             <p className="text-2xl font-heading text-green-700">
               {formatCurrency(annual_savings)}
             </p>
           </div>
           <div className="bg-green-50 rounded-lg p-4 text-center">
-            <p className="text-sm text-muted-foreground mb-1">Przez 20 lat</p>
+            <p className="text-sm text-muted-foreground mb-1">Przez {horizon_years} lat</p>
             <p className="text-2xl font-heading text-green-700">
-              {formatCurrency(total_savings_20y)}
+              {formatCurrency(total_savings)}
             </p>
           </div>
         </div>
@@ -116,7 +128,7 @@ export function SavingsSummary({ result }: SavingsSummaryProps) {
               <div className="w-full bg-muted rounded-full h-4 overflow-hidden">
                 <div
                   className="h-full bg-gradient-to-r from-primary to-green-400 rounded-full transition-all duration-1000"
-                  style={{ width: `${Math.min((roi_years / 20) * 100, 100)}%` }}
+                  style={{ width: `${Math.min((roi_years / horizon_years) * 100, 100)}%` }}
                 />
               </div>
               <div className="flex items-baseline gap-2">
@@ -124,12 +136,12 @@ export function SavingsSummary({ result }: SavingsSummaryProps) {
                 <span className="text-lg text-muted-foreground">lat</span>
               </div>
               <p className="text-sm text-muted-foreground">
-                Po {roi_years} latach zaczynasz zarabiac!
+                Po {roi_years} latach zaczynasz zarabiać!
               </p>
             </>
           ) : (
             <p className="text-sm text-muted-foreground">
-              Zwrot inwestycji poza horyzontem 20-letnim. Skontaktuj sie z nami po indywidualna kalkulacje.
+              Zwrot inwestycji poza horyzontem {horizon_years}-letnim. Skontaktuj się z nami po indywidualną kalkulację.
             </p>
           )}
         </div>

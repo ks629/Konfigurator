@@ -55,9 +55,17 @@ export default function KonfiguratorPage() {
       battery_capacity_kwh: selectedProduct.capacity_kwh,
       battery_price_gross: selectedProduct.price_gross,
       installation_type: store.installationType,
-      needs_inverter_upgrade: store.installationType !== 'retrofit',
-      inverter_price_gross: selectedInverter?.price_gross || 0,
-      needs_backup: store.backupPreference === 'yes',
+      needs_inverter_upgrade: false, // falownik wliczony w cenę zestawu
+      inverter_price_gross: 0, // falownik wliczony w cenę zestawu
+      needs_backup: true, // backup/SZR wliczony w cenę zestawu
+      // Nowe pola
+      user_profile: store.userProfile,
+      energy_operator: store.energyOperator,
+      tariff: store.tariff,
+      pv_orientation: store.pvOrientation,
+      wants_subsidy: store.wantsSubsidy,
+      thermomodernization_used_percent: store.thermomodernizationUsedPercent,
+      tax_bracket: store.taxBracket,
     });
   }, [selectedProduct, selectedInverter, store]);
 
@@ -144,10 +152,10 @@ export default function KonfiguratorPage() {
             <div className="max-w-5xl mx-auto mt-12 space-y-8">
               <div className="text-center space-y-2">
                 <h2 className="font-heading text-2xl md:text-3xl">
-                  Twoja kalkulacja oszczednosci
+                  Twoja kalkulacja oszczędności
                 </h2>
                 <p className="text-muted-foreground">
-                  Szczegolowa analiza opplacalnosci inwestycji w magazyn energii
+                  Szczegółowa analiza opłacalności inwestycji w magazyn energii
                 </p>
               </div>
 
@@ -163,7 +171,7 @@ export default function KonfiguratorPage() {
                 roiYear={calculation.roi_years}
               />
 
-              <ProjectionTable projection={calculation.projection} />
+              <ProjectionTable projection={calculation.projection} horizonYears={calculation.horizon_years} />
 
               {/* CTA */}
               <div className="flex flex-col sm:flex-row gap-4 items-center justify-center pt-8 pb-4 no-print">
@@ -173,7 +181,7 @@ export default function KonfiguratorPage() {
                   onClick={() => setContactFormOpen(true)}
                 >
                   <FileText className="h-5 w-5 mr-2" />
-                  Pobierz szczegolowa oferte
+                  Pobierz szczegółową ofertę
                 </Button>
                 <Button
                   variant="outline"
@@ -182,7 +190,7 @@ export default function KonfiguratorPage() {
                   onClick={() => setContactFormOpen(true)}
                 >
                   <CalendarCheck className="h-5 w-5 mr-2" />
-                  Umow bezplatny audyt
+                  Umów bezpłatny audyt
                 </Button>
               </div>
             </div>

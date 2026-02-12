@@ -11,7 +11,7 @@ interface ProgressBarProps {
 const stepLabels = [
   'Typ instalacji',
   'Dane PV',
-  'Zuzycie energii',
+  'Zużycie energii',
   'Dodatkowe potrzeby',
   'Rekomendacja',
 ];

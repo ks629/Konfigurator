@@ -25,7 +25,7 @@ interface ContactFormProps {
   title?: string;
 }
 
-export function ContactForm({ open, onOpenChange, onSubmit, title = 'Wyslij oferte na e-mail' }: ContactFormProps) {
+export function ContactForm({ open, onOpenChange, onSubmit, title = 'Wyślij ofertę na e-mail' }: ContactFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
@@ -46,9 +46,9 @@ export function ContactForm({ open, onOpenChange, onSubmit, title = 'Wyslij ofer
     try {
       await onSubmit(data);
       setIsSuccess(true);
-      toast.success('Oferta zostala wyslana!');
+      toast.success('Oferta została wysłana!');
     } catch {
-      toast.error('Wystapil blad. Sprobuj ponownie.');
+      toast.error('Wystąpił błąd. Spróbuj ponownie.');
     } finally {
       setIsSubmitting(false);
     }
@@ -62,9 +62,9 @@ export function ContactForm({ open, onOpenChange, onSubmit, title = 'Wyslij ofer
             <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
               <CheckCircle className="h-8 w-8 text-green-600" />
             </div>
-            <h3 className="font-heading text-xl">Oferta wyslana!</h3>
+            <h3 className="font-heading text-xl">Oferta wysłana!</h3>
             <p className="text-sm text-muted-foreground">
-              Sprawdz swoją skrzynke e-mail. Nasz doradca skontaktuje sie z Toba w ciagu 24 godzin.
+              Sprawdź swoją skrzynkę e-mail. Nasz doradca skontaktuje się z Tobą w ciągu 24 godzin.
             </p>
             <Button onClick={() => onOpenChange(false)} className="w-full">
               Zamknij
@@ -81,13 +81,13 @@ export function ContactForm({ open, onOpenChange, onSubmit, title = 'Wyslij ofer
         <DialogHeader>
           <DialogTitle className="font-heading">{title}</DialogTitle>
           <DialogDescription>
-            Podaj dane kontaktowe, a my wyslemy Ci szczegolowa oferte
+            Podaj dane kontaktowe, a my wyślemy Ci szczegółową ofertę
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="name">Imie i nazwisko *</Label>
+            <Label htmlFor="name">Imię i nazwisko *</Label>
             <Input
               id="name"
               placeholder="Jan Kowalski"
@@ -147,7 +147,7 @@ export function ContactForm({ open, onOpenChange, onSubmit, title = 'Wyslij ofer
                 }
               />
               <Label htmlFor="consentContact" className="text-xs text-muted-foreground leading-relaxed cursor-pointer">
-                Wyrazam zgode na kontakt w sprawie oferty
+                Wyrażam zgodę na kontakt w sprawie oferty
               </Label>
             </div>
             {form.formState.errors.consentContact && (
@@ -163,7 +163,7 @@ export function ContactForm({ open, onOpenChange, onSubmit, title = 'Wyslij ofer
                 }
               />
               <Label htmlFor="consentPrivacy" className="text-xs text-muted-foreground leading-relaxed cursor-pointer">
-                Akceptuje polityke prywatnosci NEXBE
+                Akceptuję politykę prywatności NEXBE
               </Label>
             </div>
             {form.formState.errors.consentPrivacy && (
@@ -175,19 +175,19 @@ export function ContactForm({ open, onOpenChange, onSubmit, title = 'Wyslij ofer
             {isSubmitting ? (
               <>
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Wysylanie...
+                Wysyłanie...
               </>
             ) : (
               <>
                 <Send className="h-4 w-4 mr-2" />
-                Wyslij oferte
+                Wyślij ofertę
               </>
             )}
           </Button>
 
           <div className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
             <Lock className="h-3 w-3" />
-            Twoje dane sa bezpieczne. Nie udostepniamy ich osobom trzecim.
+            Twoje dane są bezpieczne. Nie udostępniamy ich osobom trzecim.
           </div>
         </form>
       </DialogContent>

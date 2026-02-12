@@ -1,15 +1,15 @@
 import { z } from 'zod';
 
 export const contactFormSchema = z.object({
-  name: z.string().min(2, 'Imie i nazwisko jest wymagane'),
-  email: z.string().email('Podaj prawidlowy adres e-mail'),
-  phone: z.string().min(9, 'Podaj prawidlowy numer telefonu'),
+  name: z.string().min(2, 'Imię i nazwisko jest wymagane'),
+  email: z.string().email('Podaj prawidłowy adres e-mail'),
+  phone: z.string().min(9, 'Podaj prawidłowy numer telefonu'),
   postalCode: z.string().optional(),
   consentContact: z.boolean().refine((val) => val === true, {
-    message: 'Wyrazenie zgody jest wymagane',
+    message: 'Wyrażenie zgody jest wymagane',
   }),
   consentPrivacy: z.boolean().refine((val) => val === true, {
-    message: 'Akceptacja polityki prywatnosci jest wymagana',
+    message: 'Akceptacja polityki prywatności jest wymagana',
   }),
 });
 

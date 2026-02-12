@@ -1,7 +1,7 @@
 import { InstallationType, Product, Inverter } from './types';
 import { productsAC, productsDC, inverters } from '@/data/products';
 
-const availableCapacities = [5, 7, 10, 12, 15, 20];
+const availableCapacities = [9, 10, 11, 12, 14, 15, 17, 18, 20, 21, 23];
 
 export function roundToNearestCapacity(capacity: number): number {
   let nearest = availableCapacities[0];
@@ -68,7 +68,21 @@ function findBestProduct(
   return sorted[0];
 }
 
-function findBestInverter(pvPowerKwp: number): Inverter {
+function findBestInverter(pvPowerKwp: number, batteryId?: string): Inverter {
+  // Find inverter compatible with chosen battery
+  if (batteryId) {
+    const compatible = inverters.filter((inv) =>
+      inv.compatible_batteries.includes(batteryId)
+    );
+    if (compatible.length > 0) {
+      return compatible.sort(
+        (a, b) =>
+          Math.abs(a.power_kw - pvPowerKwp) -
+          Math.abs(b.power_kw - pvPowerKwp)
+      )[0];
+    }
+  }
+  // Fallback: closest by power
   const sorted = [...inverters].sort(
     (a, b) =>
       Math.abs(a.power_kw - pvPowerKwp) -
@@ -115,24 +129,27 @@ export function getRecommendations(
   const recProduct = findBestProduct(products, recCapacity);
   if (!recProduct) return null;
 
-  const inverter = needsInverter ? findBestInverter(pvPowerKwp) : undefined;
+  const recInverter = needsInverter ? findBestInverter(pvPowerKwp, recProduct.id) : undefined;
 
   const econProduct = smaller
     ? findBestProduct(products, smaller)
     : null;
+  const econInverter = econProduct && needsInverter ? findBestInverter(pvPowerKwp, econProduct.id) : undefined;
+
   const premProduct = larger
     ? findBestProduct(products, larger)
     : null;
+  const premInverter = premProduct && needsInverter ? findBestInverter(pvPowerKwp, premProduct.id) : undefined;
 
   return {
-    recommended: { product: recProduct, inverter },
+    recommended: { product: recProduct, inverter: recInverter },
     economic:
       econProduct && econProduct.id !== recProduct.id
-        ? { product: econProduct, inverter }
+        ? { product: econProduct, inverter: econInverter }
         : null,
     premium:
       premProduct && premProduct.id !== recProduct.id
-        ? { product: premProduct, inverter }
+        ? { product: premProduct, inverter: premInverter }
         : null,
   };
 }
@@ -142,7 +159,7 @@ export function isACCompatible(): boolean {
 }
 
 export function isDCCompatible(inverterBrand: string): boolean {
-  const dcBrands = ['Huawei'];
+  const dcBrands = ['Huawei', 'Sigenergy', 'GoodWe', 'FoxESS'];
   return dcBrands.includes(inverterBrand);
 }
 
@@ -151,14 +168,14 @@ export function getCompatibilityMessage(
   inverterBrand: string
 ): string | null {
   if (installationType === 'retrofit') {
-    return 'Magazyn AC mozna podlaczyc do kazdego istniejacego falownika stringowego. Nie musisz wymieniac swojego obecnego falownika.';
+    return 'Magazyn AC można podłączyć do każdego istniejącego falownika stringowego. Nie musisz wymieniać swojego obecnego falownika.';
   }
 
   if (
     (installationType === 'hybrid' || installationType === 'upgrade') &&
     !isDCCompatible(inverterBrand)
   ) {
-    return `Twoj obecny falownik ${inverterBrand} nie obsluguje bezposrednio magazynow DC. Rekomendujemy rozwiazanie AC Retrofit lub wymiane falownika na hybrydowy.`;
+    return `Twój obecny falownik ${inverterBrand} nie obsługuje bezpośrednio magazynów DC. Rekomendujemy rozwiązanie AC Retrofit lub wymianę falownika na hybrydowy.`;
   }
 
   return null;
