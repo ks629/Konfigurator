@@ -21,9 +21,9 @@ export function ProjectionTable({ projection, horizonYears }: ProjectionTablePro
   );
 
   return (
-    <div className="rounded-xl border bg-card overflow-hidden">
+    <div className="rounded-xl border bg-card overflow-hidden text-card-foreground">
       <div className="p-4 border-b flex items-center justify-between">
-        <h3 className="font-heading text-lg">Tabela projekcji {horizon}-letniej</h3>
+        <h3 className="font-heading text-lg text-white">Tabela projekcji {horizon}-letniej</h3>
         <Button
           variant="ghost"
           size="sm"
@@ -41,13 +41,13 @@ export function ProjectionTable({ projection, horizonYears }: ProjectionTablePro
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="bg-muted/50">
-              <th className="text-left p-3 font-medium">Rok</th>
-              <th className="text-right p-3 font-medium">Produkcja PV</th>
-              <th className="text-right p-3 font-medium hidden md:table-cell">Autokonsumpcja</th>
-              <th className="text-right p-3 font-medium hidden md:table-cell">Sprzedaż</th>
-              <th className="text-right p-3 font-medium">Oszczędność</th>
-              <th className="text-right p-3 font-medium">Suma</th>
+            <tr className="bg-white/5">
+              <th className="text-left p-3 font-medium text-white/80">Rok</th>
+              <th className="text-right p-3 font-medium text-white/80">Produkcja PV</th>
+              <th className="text-right p-3 font-medium text-white/80 hidden md:table-cell">Autokonsumpcja</th>
+              <th className="text-right p-3 font-medium text-white/80 hidden md:table-cell">Sprzedaż</th>
+              <th className="text-right p-3 font-medium text-white/80">Oszczędność</th>
+              <th className="text-right p-3 font-medium text-white/80">Suma</th>
             </tr>
           </thead>
           <tbody>
@@ -55,20 +55,20 @@ export function ProjectionTable({ projection, horizonYears }: ProjectionTablePro
               <tr
                 key={p.year}
                 className={cn(
-                  'border-t hover:bg-muted/30 transition-colors',
+                  'border-t border-white/5 hover:bg-white/5 transition-colors',
                   p.cumulative >= 0 && 'bg-green-50/50'
                 )}
               >
-                <td className="p-3 font-medium">{p.year}</td>
-                <td className="p-3 text-right">{formatNumber(p.production)} kWh</td>
-                <td className="p-3 text-right hidden md:table-cell">{formatNumber(p.selfConsumption)} kWh</td>
-                <td className="p-3 text-right hidden md:table-cell">{formatNumber(p.sold)} kWh</td>
-                <td className="p-3 text-right text-green-700 font-medium">
+                <td className="p-3 font-medium text-white">{p.year}</td>
+                <td className="p-3 text-right text-white/80">{formatNumber(p.production)} kWh</td>
+                <td className="p-3 text-right text-white/80 hidden md:table-cell">{formatNumber(p.selfConsumption)} kWh</td>
+                <td className="p-3 text-right text-white/80 hidden md:table-cell">{formatNumber(p.sold)} kWh</td>
+                <td className="p-3 text-right text-green-400 font-medium">
                   {formatCurrency(p.savings)}
                 </td>
                 <td className={cn(
                   'p-3 text-right font-heading',
-                  p.cumulative >= 0 ? 'text-green-700' : 'text-red-600'
+                  p.cumulative >= 0 ? 'text-green-400' : 'text-red-400'
                 )}>
                   {formatCurrency(p.cumulative)}
                 </td>

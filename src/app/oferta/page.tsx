@@ -164,7 +164,7 @@ export default function OfertaPage() {
 
   if (!activeProduct || !calculation) {
     return (
-      <div className="min-h-screen flex flex-col">
+      <div className="nexbe-dark dark min-h-screen flex flex-col bg-[#0f0520]">
         <Header />
         <main className="flex-1 flex items-center justify-center">
           <motion.div
@@ -271,10 +271,15 @@ export default function OfertaPage() {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="nexbe-dark dark min-h-screen flex flex-col bg-[#0f0520]">
       <Header />
 
-      <main className="flex-1">
+      <main className="flex-1 relative">
+        {/* Animated energy pulse orbs */}
+        <div className="energy-orb energy-orb-1" />
+        <div className="energy-orb energy-orb-2" />
+        <div className="energy-orb energy-orb-3" />
+
         {/* ===== HERO SECTION with gradient ===== */}
         <section className="relative overflow-hidden bg-gradient-to-br from-[#230045] via-[#350066] to-[#4a0080]">
           {/* Decorative elements */}

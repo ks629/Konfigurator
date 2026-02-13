@@ -22,7 +22,7 @@ export function FinancingSimulator({ result }: FinancingSimulatorProps) {
     <div className="rounded-xl border bg-card p-6 space-y-4">
       <div className="flex items-center gap-2">
         <Landmark className="h-5 w-5 text-primary" />
-        <h3 className="font-heading text-lg">Finansowanie na raty</h3>
+        <h3 className="font-heading text-lg text-white">Finansowanie na raty</h3>
       </div>
 
       <div className="space-y-3">

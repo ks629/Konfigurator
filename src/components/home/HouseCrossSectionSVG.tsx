@@ -1,321 +1,458 @@
 'use client';
 
 /**
- * Hi-Tech house cross-section SVG illustration
- * Shows energy storage system integrated into a modern home
- * Animated energy flows with glowing effects
+ * Hi-Tech Energy Ecosystem Animation
+ * Premium schematic visualization of energy storage system
+ * Animated particle flows with glowing nodes — NEXBE brand palette
  */
 export function HouseCrossSectionSVG() {
   return (
-    <div className="w-full max-w-4xl mx-auto">
-      <svg viewBox="0 0 900 500" className="w-full h-auto" style={{ minHeight: '300px' }}>
+    <div className="w-full max-w-5xl mx-auto relative">
+      {/* Ambient glow behind SVG */}
+      <div className="absolute inset-0 bg-[#B5005D]/5 blur-[80px] rounded-full scale-75" />
+
+      <svg viewBox="0 0 1000 520" className="w-full h-auto relative z-10" style={{ minHeight: '280px' }}>
         <defs>
-          {/* Gradients */}
-          <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#1a103a" />
-            <stop offset="100%" stopColor="#2d1a5e" />
-          </linearGradient>
-          <linearGradient id="roofGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#4a3080" />
-            <stop offset="100%" stopColor="#350066" />
-          </linearGradient>
-          <linearGradient id="wallGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#f8f6ff" />
-            <stop offset="100%" stopColor="#ede8f5" />
-          </linearGradient>
-          <linearGradient id="panelGrad" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="#1a237e" />
-            <stop offset="100%" stopColor="#0d1442" />
-          </linearGradient>
-          <linearGradient id="batteryGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#B5005D" />
-            <stop offset="100%" stopColor="#8a0047" />
-          </linearGradient>
-          <linearGradient id="energyGlow" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="#FF004E" stopOpacity="0" />
-            <stop offset="50%" stopColor="#FF004E" stopOpacity="0.8" />
-            <stop offset="100%" stopColor="#FF004E" stopOpacity="0" />
-          </linearGradient>
-          <linearGradient id="solarGlow" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="#FFB300" stopOpacity="0" />
-            <stop offset="50%" stopColor="#FFB300" stopOpacity="0.8" />
-            <stop offset="100%" stopColor="#FFB300" stopOpacity="0" />
-          </linearGradient>
-          <linearGradient id="groundGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#e8e0f0" />
-            <stop offset="100%" stopColor="#d4cae5" />
+          {/* ===== GRADIENTS ===== */}
+          <linearGradient id="hcs-bg" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#0f0520" stopOpacity="0" />
+            <stop offset="50%" stopColor="#150830" stopOpacity="0.3" />
+            <stop offset="100%" stopColor="#0f0520" stopOpacity="0" />
           </linearGradient>
 
-          {/* Glow filters */}
-          <filter id="glow">
-            <feGaussianBlur stdDeviation="3" result="coloredBlur" />
-            <feMerge><feMergeNode in="coloredBlur" /><feMergeNode in="SourceGraphic" /></feMerge>
+          <radialGradient id="hcs-nodeGlow-magenta" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="#B5005D" stopOpacity="0.6" />
+            <stop offset="60%" stopColor="#B5005D" stopOpacity="0.15" />
+            <stop offset="100%" stopColor="#B5005D" stopOpacity="0" />
+          </radialGradient>
+          <radialGradient id="hcs-nodeGlow-amber" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="#FFB300" stopOpacity="0.6" />
+            <stop offset="60%" stopColor="#FFB300" stopOpacity="0.15" />
+            <stop offset="100%" stopColor="#FFB300" stopOpacity="0" />
+          </radialGradient>
+          <radialGradient id="hcs-nodeGlow-green" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="#00C853" stopOpacity="0.5" />
+            <stop offset="60%" stopColor="#00C853" stopOpacity="0.12" />
+            <stop offset="100%" stopColor="#00C853" stopOpacity="0" />
+          </radialGradient>
+          <radialGradient id="hcs-nodeGlow-blue" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="#4FC3F7" stopOpacity="0.5" />
+            <stop offset="60%" stopColor="#4FC3F7" stopOpacity="0.12" />
+            <stop offset="100%" stopColor="#4FC3F7" stopOpacity="0" />
+          </radialGradient>
+          <radialGradient id="hcs-nodeGlow-red" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="#FF004E" stopOpacity="0.6" />
+            <stop offset="60%" stopColor="#FF004E" stopOpacity="0.15" />
+            <stop offset="100%" stopColor="#FF004E" stopOpacity="0" />
+          </radialGradient>
+
+          <linearGradient id="hcs-batteryFill" x1="0" y1="1" x2="0" y2="0">
+            <stop offset="0%" stopColor="#8B0048" />
+            <stop offset="100%" stopColor="#FF004E" />
+          </linearGradient>
+
+          {/* Filters */}
+          <filter id="hcs-glow-sm">
+            <feGaussianBlur stdDeviation="2" result="blur" />
+            <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
           </filter>
-          <filter id="softGlow">
-            <feGaussianBlur stdDeviation="6" result="coloredBlur" />
-            <feMerge><feMergeNode in="coloredBlur" /><feMergeNode in="SourceGraphic" /></feMerge>
+          <filter id="hcs-glow-md">
+            <feGaussianBlur stdDeviation="4" result="blur" />
+            <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+          </filter>
+          <filter id="hcs-glow-lg">
+            <feGaussianBlur stdDeviation="8" result="blur" />
+            <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
           </filter>
         </defs>
 
         {/* Background */}
-        <rect width="900" height="500" fill="url(#skyGrad)" rx="16" />
+        <rect width="1000" height="520" fill="url(#hcs-bg)" rx="20" />
 
-        {/* Stars */}
-        {[
-          [80, 30], [150, 55], [250, 20], [380, 45], [520, 25], [650, 50], [750, 30], [830, 55],
-          [120, 70], [300, 65], [460, 38], [700, 68], [180, 42], [600, 58],
-        ].map(([cx, cy], i) => (
-          <circle key={`star-${i}`} cx={cx} cy={cy} r={i % 3 === 0 ? 1.5 : 1} fill="white" opacity={0.3 + (i % 3) * 0.2}>
-            <animate attributeName="opacity" values={`${0.2 + (i % 3) * 0.15};${0.5 + (i % 2) * 0.2};${0.2 + (i % 3) * 0.15}`} dur={`${2 + i * 0.3}s`} repeatCount="indefinite" />
+        {/* Circuit board trace grid (very subtle) */}
+        <g opacity="0.04">
+          {Array.from({ length: 15 }, (_, i) => (
+            <line key={`hgrid-${i}`} x1="0" y1={35 * i} x2="1000" y2={35 * i} stroke="#B5005D" strokeWidth="0.5" />
+          ))}
+          {Array.from({ length: 20 }, (_, i) => (
+            <line key={`vgrid-${i}`} x1={50 * i} y1="0" x2={50 * i} y2="520" stroke="#B5005D" strokeWidth="0.5" />
+          ))}
+        </g>
+
+        {/* ============================================================
+            ENERGY FLOW PATHS — drawn as circuit traces
+            ============================================================ */}
+
+        {/* PATH: Sun → PV Panels (amber) */}
+        <path d="M 130 130 L 130 180 Q 130 195 145 195 L 270 195"
+              fill="none" stroke="#FFB300" strokeWidth="1.5" strokeDasharray="8 6" opacity="0.3" />
+
+        {/* PATH: PV → Inverter (amber) */}
+        <path d="M 370 195 L 430 195 Q 445 195 445 210 L 445 240 Q 445 255 460 255 L 500 255"
+              fill="none" stroke="#FFB300" strokeWidth="1.5" strokeDasharray="8 6" opacity="0.3" />
+
+        {/* PATH: Inverter → Battery (magenta) */}
+        <path d="M 500 290 L 500 340 Q 500 355 485 355 L 370 355"
+              fill="none" stroke="#B5005D" strokeWidth="1.5" strokeDasharray="8 6" opacity="0.3" />
+
+        {/* PATH: Battery → Home (magenta) */}
+        <path d="M 270 355 L 200 355 Q 185 355 185 340 L 185 290"
+              fill="none" stroke="#FF004E" strokeWidth="1.5" strokeDasharray="8 6" opacity="0.3" />
+
+        {/* PATH: Inverter → Grid (green) */}
+        <path d="M 550 255 L 620 255 Q 635 255 635 240 L 635 170"
+              fill="none" stroke="#00C853" strokeWidth="1.5" strokeDasharray="8 6" opacity="0.3" />
+
+        {/* PATH: Inverter → EV (green) */}
+        <path d="M 550 280 L 620 280 Q 635 280 635 295 L 635 355 Q 635 370 650 370 L 720 370"
+              fill="none" stroke="#00C853" strokeWidth="1.5" strokeDasharray="8 6" opacity="0.3" />
+
+        {/* PATH: EMS → Monitoring (blue IoT) */}
+        <path d="M 550 420 L 620 420 Q 635 420 635 405 L 635 390 Q 635 375 650 380 L 850 420 Q 870 425 870 405 L 870 180"
+              fill="none" stroke="#4FC3F7" strokeWidth="1" strokeDasharray="4 4" opacity="0.2" />
+
+        {/* ============================================================
+            ANIMATED PARTICLES on paths
+            ============================================================ */}
+
+        {/* Sun → PV particles (amber) */}
+        {[0, 0.5].map((delay, i) => (
+          <circle key={`p-sun-${i}`} r="3" fill="#FFB300" filter="url(#hcs-glow-sm)">
+            <animateMotion dur="2.5s" repeatCount="indefinite" begin={`${delay}s`}
+              path="M 130 130 L 130 180 Q 130 195 145 195 L 270 195" />
+            <animate attributeName="opacity" values="0;1;1;0" dur="2.5s" repeatCount="indefinite" begin={`${delay}s`} />
           </circle>
         ))}
 
-        {/* Ground */}
-        <rect x="0" y="420" width="900" height="80" fill="url(#groundGrad)" />
+        {/* PV → Inverter particles (amber) */}
+        {[0, 0.7].map((delay, i) => (
+          <circle key={`p-pv-inv-${i}`} r="3" fill="#FFB300" filter="url(#hcs-glow-sm)">
+            <animateMotion dur="2s" repeatCount="indefinite" begin={`${delay}s`}
+              path="M 370 195 L 430 195 Q 445 195 445 210 L 445 240 Q 445 255 460 255 L 500 255" />
+            <animate attributeName="opacity" values="0;1;1;0" dur="2s" repeatCount="indefinite" begin={`${delay}s`} />
+          </circle>
+        ))}
 
-        {/* ===== HOUSE STRUCTURE ===== */}
-        {/* House walls (cross-section) */}
-        <rect x="200" y="200" width="500" height="220" fill="url(#wallGrad)" stroke="#c4b5d9" strokeWidth="2" rx="3" />
+        {/* Inverter → Battery particles (magenta) */}
+        {[0.2, 1].map((delay, i) => (
+          <circle key={`p-inv-bat-${i}`} r="3" fill="#B5005D" filter="url(#hcs-glow-sm)">
+            <animateMotion dur="2s" repeatCount="indefinite" begin={`${delay}s`}
+              path="M 500 290 L 500 340 Q 500 355 485 355 L 370 355" />
+            <animate attributeName="opacity" values="0;1;1;0" dur="2s" repeatCount="indefinite" begin={`${delay}s`} />
+          </circle>
+        ))}
 
-        {/* Wall thickness indicator */}
-        <rect x="200" y="200" width="12" height="220" fill="#d4cae5" />
-        <rect x="688" y="200" width="12" height="220" fill="#d4cae5" />
+        {/* Battery → Home particles (red/pink) */}
+        {[0.3, 1.2].map((delay, i) => (
+          <circle key={`p-bat-home-${i}`} r="3" fill="#FF004E" filter="url(#hcs-glow-sm)">
+            <animateMotion dur="2s" repeatCount="indefinite" begin={`${delay}s`}
+              path="M 270 355 L 200 355 Q 185 355 185 340 L 185 290" />
+            <animate attributeName="opacity" values="0;1;1;0" dur="2s" repeatCount="indefinite" begin={`${delay}s`} />
+          </circle>
+        ))}
 
-        {/* Floor line */}
-        <line x1="200" y1="330" x2="700" y2="330" stroke="#c4b5d9" strokeWidth="1.5" strokeDasharray="8 4" />
-        <text x="215" y="345" fill="#8a7aaa" fontSize="8" fontWeight="600">PIWNICA / GARAŻ</text>
-        <text x="215" y="225" fill="#8a7aaa" fontSize="8" fontWeight="600">PARTER</text>
+        {/* Inverter → Grid particles (green) */}
+        <circle r="2.5" fill="#00C853" filter="url(#hcs-glow-sm)">
+          <animateMotion dur="2s" repeatCount="indefinite"
+            path="M 550 255 L 620 255 Q 635 255 635 240 L 635 170" />
+          <animate attributeName="opacity" values="0;1;1;0" dur="2s" repeatCount="indefinite" />
+        </circle>
 
-        {/* Roof */}
-        <polygon points="180,200 450,100 720,200" fill="url(#roofGrad)" stroke="#5a3d8a" strokeWidth="2" />
+        {/* Inverter → EV particles (green) */}
+        <circle r="2.5" fill="#00C853" filter="url(#hcs-glow-sm)">
+          <animateMotion dur="3s" repeatCount="indefinite" begin="0.5s"
+            path="M 550 280 L 620 280 Q 635 280 635 295 L 635 355 Q 635 370 650 370 L 720 370" />
+          <animate attributeName="opacity" values="0;1;1;0" dur="3s" repeatCount="indefinite" begin="0.5s" />
+        </circle>
 
-        {/* ===== SOLAR PANELS ON ROOF ===== */}
-        {[0, 1, 2, 3, 4, 5].map((i) => {
-          const x = 270 + i * 55;
-          const y1 = 200 - ((x - 180) / (450 - 180)) * 100;
-          const y2 = 200 - ((x + 45 - 180) / (450 - 180)) * 100;
-          const yMid = (y1 + y2) / 2;
-          if (x + 45 > 450) return null;
-          return (
-            <g key={`panel-${i}`}>
-              <rect x={x} y={yMid - 5} width="45" height="18" fill="url(#panelGrad)" stroke="#3949ab" strokeWidth="1" rx="1"
-                transform={`rotate(${-Math.atan2(100, 270) * (180 / Math.PI)}, ${x + 22}, ${yMid + 4})`} />
-              {/* Panel grid lines */}
-              <line x1={x + 15} y1={yMid - 4} x2={x + 15} y2={yMid + 12} stroke="#3949ab" strokeWidth="0.5" opacity="0.5"
-                transform={`rotate(${-Math.atan2(100, 270) * (180 / Math.PI)}, ${x + 22}, ${yMid + 4})`} />
-              <line x1={x + 30} y1={yMid - 4} x2={x + 30} y2={yMid + 12} stroke="#3949ab" strokeWidth="0.5" opacity="0.5"
-                transform={`rotate(${-Math.atan2(100, 270) * (180 / Math.PI)}, ${x + 22}, ${yMid + 4})`} />
-              {/* Solar shimmer */}
-              <rect x={x} y={yMid - 5} width="45" height="18" fill="#FFB300" opacity="0" rx="1"
-                transform={`rotate(${-Math.atan2(100, 270) * (180 / Math.PI)}, ${x + 22}, ${yMid + 4})`}>
-                <animate attributeName="opacity" values="0;0.15;0" dur={`${2 + i * 0.4}s`} repeatCount="indefinite" />
+        {/* IoT signal pulse (blue) */}
+        <circle r="2" fill="#4FC3F7" filter="url(#hcs-glow-sm)">
+          <animateMotion dur="5s" repeatCount="indefinite"
+            path="M 550 420 L 620 420 Q 635 420 635 405 L 635 390 Q 635 375 650 380 L 850 420 Q 870 425 870 405 L 870 180" />
+          <animate attributeName="opacity" values="0;0.8;0.8;0" dur="5s" repeatCount="indefinite" />
+        </circle>
+
+
+        {/* ============================================================
+            NODE: SUN
+            ============================================================ */}
+        <g>
+          <circle cx="130" cy="90" r="50" fill="url(#hcs-nodeGlow-amber)" />
+          <circle cx="130" cy="90" r="22" fill="#FFB300" opacity="0.15" />
+          <circle cx="130" cy="90" r="16" fill="#FFCA28" opacity="0.8" filter="url(#hcs-glow-md)">
+            <animate attributeName="r" values="14;18;14" dur="3s" repeatCount="indefinite" />
+          </circle>
+          <circle cx="130" cy="90" r="12" fill="#FFD54F" />
+          {/* Sun rays */}
+          {[0, 60, 120, 180, 240, 300].map((angle, i) => (
+            <line key={`hcs-ray-${i}`}
+              x1={130 + Math.cos(angle * Math.PI / 180) * 20}
+              y1={90 + Math.sin(angle * Math.PI / 180) * 20}
+              x2={130 + Math.cos(angle * Math.PI / 180) * 28}
+              y2={90 + Math.sin(angle * Math.PI / 180) * 28}
+              stroke="#FFB300" strokeWidth="2" strokeLinecap="round" opacity="0.5">
+              <animate attributeName="opacity" values="0.2;0.7;0.2" dur={`${2 + i * 0.3}s`} repeatCount="indefinite" />
+            </line>
+          ))}
+          <text x="130" y="60" textAnchor="middle" fill="#FFB300" fontSize="10" fontWeight="700" letterSpacing="1">SŁOŃCE</text>
+        </g>
+
+
+        {/* ============================================================
+            NODE: PV PANELS
+            ============================================================ */}
+        <g>
+          <circle cx="320" cy="195" r="55" fill="url(#hcs-nodeGlow-amber)" />
+          {/* Panel frame */}
+          <rect x="270" y="165" width="100" height="60" rx="8" fill="#150830" stroke="#FFB300" strokeWidth="1.5" opacity="0.9" />
+          {/* Solar cells grid */}
+          {[0, 1, 2].map(row =>
+            [0, 1, 2, 3].map(col => (
+              <rect key={`cell-${row}-${col}`}
+                x={278 + col * 22} y={172 + row * 17}
+                width="18" height="13" rx="1.5"
+                fill="#1a237e" stroke="#283593" strokeWidth="0.5">
+                <animate attributeName="fill" values="#1a237e;#2a3aae;#1a237e"
+                  dur={`${2 + (row * 4 + col) * 0.2}s`} repeatCount="indefinite" />
+              </rect>
+            ))
+          )}
+          {/* Shimmer effect */}
+          <rect x="270" y="165" width="100" height="60" rx="8" fill="#FFB300" opacity="0">
+            <animate attributeName="opacity" values="0;0.08;0" dur="3s" repeatCount="indefinite" />
+          </rect>
+          <text x="320" y="242" textAnchor="middle" fill="#FFB300" fontSize="10" fontWeight="700" letterSpacing="0.5">PANELE PV</text>
+          <text x="320" y="254" textAnchor="middle" fill="#8a7aaa" fontSize="8">10 kWp</text>
+        </g>
+
+
+        {/* ============================================================
+            NODE: HYBRID INVERTER
+            ============================================================ */}
+        <g>
+          <circle cx="525" cy="270" r="55" fill="url(#hcs-nodeGlow-magenta)" />
+          {/* Inverter body */}
+          <rect x="485" y="237" width="80" height="65" rx="8" fill="#150830" stroke="#B5005D" strokeWidth="1.5" />
+          {/* Display */}
+          <rect x="495" y="245" width="60" height="28" rx="4" fill="#0a0418" stroke="#350066" strokeWidth="0.5" />
+          {/* Display data */}
+          <text x="525" y="256" textAnchor="middle" fill="#FF004E" fontSize="7" fontWeight="600">AC/DC</text>
+          <text x="525" y="267" textAnchor="middle" fill="#B5005D" fontSize="11" fontWeight="700">3.2 kW</text>
+          {/* LED indicators */}
+          <circle cx="505" cy="285" r="3" fill="#00C853" opacity="0.8">
+            <animate attributeName="opacity" values="0.4;1;0.4" dur="1.5s" repeatCount="indefinite" />
+          </circle>
+          <circle cx="515" cy="285" r="3" fill="#FFB300" opacity="0.5" />
+          <circle cx="525" cy="285" r="3" fill="#B5005D" opacity="0.6">
+            <animate attributeName="opacity" values="0.3;0.8;0.3" dur="2s" repeatCount="indefinite" />
+          </circle>
+          {/* Heat sink lines */}
+          {[0, 1, 2, 3, 4].map(i => (
+            <line key={`hs-${i}`} x1={540 + i * 4} y1="280" x2={540 + i * 4} y2="295" stroke="#350066" strokeWidth="1" opacity="0.4" />
+          ))}
+          <text x="525" y="318" textAnchor="middle" fill="#B5005D" fontSize="10" fontWeight="700" letterSpacing="0.5">FALOWNIK</text>
+          <text x="525" y="330" textAnchor="middle" fill="#8a7aaa" fontSize="8">hybrydowy 10 kW</text>
+        </g>
+
+
+        {/* ============================================================
+            NODE: BATTERY STORAGE (hero element — largest)
+            ============================================================ */}
+        <g>
+          <circle cx="320" cy="370" r="70" fill="url(#hcs-nodeGlow-red)" />
+          {/* Battery body */}
+          <rect x="260" y="330" width="120" height="75" rx="10" fill="#150830" stroke="#FF004E" strokeWidth="2" />
+          {/* Inner glow */}
+          <rect x="265" y="335" width="110" height="65" rx="7" fill="#B5005D" opacity="0.05" />
+          {/* Battery terminals */}
+          <rect x="295" y="325" width="15" height="8" rx="2" fill="#FF004E" opacity="0.6" />
+          <rect x="330" y="325" width="15" height="8" rx="2" fill="#FF004E" opacity="0.6" />
+          {/* Charge level bars */}
+          {[0, 1, 2, 3, 4].map(i => (
+            <g key={`hcs-bar-${i}`}>
+              <rect x={272 + i * 21} y={345} width="17" height="45" rx="3"
+                fill="#FF004E" opacity={0.15 + i * 0.05} />
+              <rect x={272 + i * 21} y={345 + (45 - (10 + i * 8))} width="17" height={10 + i * 8} rx="3"
+                fill="url(#hcs-batteryFill)" opacity={0.5 + i * 0.1}>
+                <animate attributeName="height" values={`${8 + i * 6};${12 + i * 8};${8 + i * 6}`}
+                  dur={`${3 + i * 0.3}s`} repeatCount="indefinite" />
+                <animate attributeName="y" values={`${345 + 45 - (8 + i * 6)};${345 + 45 - (12 + i * 8)};${345 + 45 - (8 + i * 6)}`}
+                  dur={`${3 + i * 0.3}s`} repeatCount="indefinite" />
               </rect>
             </g>
-          );
-        })}
-
-        {/* Sun indicator */}
-        <circle cx="100" cy="100" r="25" fill="#FFB300" opacity="0.8" filter="url(#softGlow)">
-          <animate attributeName="r" values="23;27;23" dur="3s" repeatCount="indefinite" />
-        </circle>
-        <circle cx="100" cy="100" r="18" fill="#FFCA28" />
-        {/* Sun rays */}
-        {[0, 45, 90, 135, 180, 225, 270, 315].map((angle, i) => (
-          <line key={`ray-${i}`} x1={100 + Math.cos(angle * Math.PI / 180) * 30} y1={100 + Math.sin(angle * Math.PI / 180) * 30}
-            x2={100 + Math.cos(angle * Math.PI / 180) * 38} y2={100 + Math.sin(angle * Math.PI / 180) * 38}
-            stroke="#FFB300" strokeWidth="2" strokeLinecap="round" opacity="0.6">
-            <animate attributeName="opacity" values="0.3;0.7;0.3" dur={`${1.5 + i * 0.2}s`} repeatCount="indefinite" />
-          </line>
-        ))}
-
-        {/* Solar energy arrow: Sun → Panels */}
-        <path d="M 130 115 Q 200 130 280 155" fill="none" stroke="#FFB300" strokeWidth="2" strokeDasharray="6 4" opacity="0.5" />
-        <circle r="4" fill="#FFB300" filter="url(#glow)">
-          <animateMotion dur="2s" repeatCount="indefinite" path="M 130 115 Q 200 130 280 155" />
-          <animate attributeName="opacity" values="0.3;1;0.3" dur="2s" repeatCount="indefinite" />
-        </circle>
-
-        {/* ===== BATTERY STORAGE (Basement) ===== */}
-        <g>
-          {/* Battery unit */}
-          <rect x="280" y="350" width="80" height="55" rx="6" fill="url(#batteryGrad)" stroke="#FF004E" strokeWidth="1.5" />
-          <rect x="285" y="355" width="70" height="8" rx="2" fill="#FF004E" opacity="0.4" />
-          <rect x="285" y="355" width="50" height="8" rx="2" fill="#FF004E" opacity="0.7">
-            <animate attributeName="width" values="20;55;35;50" dur="8s" repeatCount="indefinite" />
-          </rect>
-          {/* Battery charge level bars */}
-          {[0, 1, 2, 3].map(i => (
-            <rect key={`bar-${i}`} x={290 + i * 16} y={370} width="12" height="28" rx="2" fill="#FF004E" opacity={0.3 + i * 0.15}>
-              <animate attributeName="opacity" values={`${0.2 + i * 0.1};${0.5 + i * 0.12};${0.2 + i * 0.1}`} dur={`${3 + i * 0.5}s`} repeatCount="indefinite" />
-            </rect>
           ))}
-          <text x="320" y="415" textAnchor="middle" fill="#230045" fontSize="10" fontWeight="700">Magazyn energii</text>
-          <text x="320" y="427" textAnchor="middle" fill="#8a7aaa" fontSize="8">15 kWh · LFP</text>
+          {/* Percentage text */}
+          <text x="320" y="404" textAnchor="middle" fill="#FF004E" fontSize="9" fontWeight="600" opacity="0.7">
+            <animate attributeName="opacity" values="0.5;0.9;0.5" dur="4s" repeatCount="indefinite" />
+            87%
+          </text>
+          <text x="320" y="422" textAnchor="middle" fill="#FF004E" fontSize="11" fontWeight="700" letterSpacing="0.5">MAGAZYN ENERGII</text>
+          <text x="320" y="435" textAnchor="middle" fill="#8a7aaa" fontSize="8">15 kWh · LFP</text>
         </g>
 
-        {/* ===== INVERTER (Basement) ===== */}
+
+        {/* ============================================================
+            NODE: HOME
+            ============================================================ */}
         <g>
-          <rect x="420" y="355" width="55" height="45" rx="4" fill="#350066" stroke="#5a3d8a" strokeWidth="1.5" />
-          {/* Display screen */}
-          <rect x="428" y="360" width="40" height="20" rx="2" fill="#0d1442" />
-          <text x="448" y="374" textAnchor="middle" fill="#00E676" fontSize="8" fontWeight="600">3.2 kW</text>
-          {/* Status LED */}
-          <circle cx="438" cy="390" r="3" fill="#00E676">
-            <animate attributeName="opacity" values="0.5;1;0.5" dur="1.5s" repeatCount="indefinite" />
-          </circle>
-          <circle cx="458" cy="390" r="3" fill="#FFB300" opacity="0.4" />
-          <text x="448" y="415" textAnchor="middle" fill="#230045" fontSize="10" fontWeight="700">Falownik</text>
-          <text x="448" y="427" textAnchor="middle" fill="#8a7aaa" fontSize="8">hybrydowy 10kW</text>
-        </g>
-
-        {/* ===== EMS CONTROLLER ===== */}
-        <g>
-          <rect x="530" y="360" width="45" height="35" rx="4" fill="#0066CC" stroke="#3388DD" strokeWidth="1" />
-          <text x="552" y="373" textAnchor="middle" fill="white" fontSize="7" fontWeight="700">KENO</text>
-          <text x="552" y="383" textAnchor="middle" fill="white" fontSize="6">EMS</text>
-          {/* Signal waves */}
-          <path d="M 575 370 Q 585 365 585 378" fill="none" stroke="#4FC3F7" strokeWidth="1" opacity="0.5">
-            <animate attributeName="opacity" values="0.2;0.7;0.2" dur="2s" repeatCount="indefinite" />
-          </path>
-          <path d="M 575 370 Q 590 362 590 382" fill="none" stroke="#4FC3F7" strokeWidth="1" opacity="0.3">
-            <animate attributeName="opacity" values="0.1;0.5;0.1" dur="2s" repeatCount="indefinite" begin="0.3s" />
-          </path>
-          <text x="552" y="410" textAnchor="middle" fill="#230045" fontSize="9" fontWeight="700">Keno EMS</text>
-        </g>
-
-        {/* ===== ENERGY FLOW LINES ===== */}
-        {/* Battery → Inverter */}
-        <line x1="360" y1="375" x2="420" y2="375" stroke="#FF004E" strokeWidth="2" strokeDasharray="6 4" opacity="0.4" />
-        <circle r="3" fill="#FF004E" filter="url(#glow)">
-          <animateMotion dur="1.5s" repeatCount="indefinite" path="M 360 375 L 420 375" />
-        </circle>
-
-        {/* Inverter → EMS */}
-        <line x1="475" y1="375" x2="530" y2="375" stroke="#4FC3F7" strokeWidth="1.5" strokeDasharray="4 3" opacity="0.4" />
-
-        {/* Panels → Inverter (through wall) */}
-        <path d="M 350 180 L 350 200 L 448 200 L 448 355" fill="none" stroke="#FFB300" strokeWidth="2" strokeDasharray="6 4" opacity="0.35" />
-        <circle r="3" fill="#FFB300" filter="url(#glow)">
-          <animateMotion dur="3s" repeatCount="indefinite" path="M 350 180 L 350 200 L 448 200 L 448 355" />
-          <animate attributeName="opacity" values="0.3;1;0.3" dur="3s" repeatCount="indefinite" />
-        </circle>
-
-        {/* Inverter → Home (up) */}
-        <path d="M 448 355 L 448 330 L 500 280" fill="none" stroke="#B5005D" strokeWidth="2" strokeDasharray="6 4" opacity="0.35" />
-        <circle r="3" fill="#B5005D" filter="url(#glow)">
-          <animateMotion dur="2s" repeatCount="indefinite" path="M 448 355 L 448 330 L 500 280" />
-        </circle>
-
-        {/* ===== LIVING ROOM (inside house) ===== */}
-        {/* Kitchen / appliances area */}
-        <g opacity="0.7">
-          {/* Fridge */}
-          <rect x="230" y="240" width="25" height="45" rx="3" fill="#e0d8ee" stroke="#c4b5d9" strokeWidth="1" />
-          <line x1="230" y1="262" x2="255" y2="262" stroke="#c4b5d9" strokeWidth="0.5" />
-          {/* Stove/Oven */}
-          <rect x="265" y="265" width="30" height="20" rx="2" fill="#e0d8ee" stroke="#c4b5d9" strokeWidth="1" />
-          <circle cx="275" cy="275" r="4" fill="none" stroke="#B5005D" strokeWidth="1" opacity="0.5" />
-          <circle cx="288" cy="275" r="3" fill="none" stroke="#B5005D" strokeWidth="1" opacity="0.3" />
-        </g>
-
-        {/* Living area */}
-        <g opacity="0.7">
-          {/* Sofa */}
-          <rect x="480" y="290" width="60" height="20" rx="4" fill="#d4cae5" stroke="#c4b5d9" strokeWidth="1" />
-          <rect x="475" y="285" width="10" height="25" rx="3" fill="#d4cae5" stroke="#c4b5d9" strokeWidth="1" />
-          <rect x="535" y="285" width="10" height="25" rx="3" fill="#d4cae5" stroke="#c4b5d9" strokeWidth="1" />
-          {/* TV */}
-          <rect x="490" y="240" width="40" height="25" rx="2" fill="#0d1442" stroke="#3949ab" strokeWidth="1" />
-          <rect x="507" y="265" width="6" height="8" fill="#c4b5d9" />
-          {/* TV glow */}
-          <rect x="492" y="242" width="36" height="21" rx="1" fill="#4FC3F7" opacity="0.1">
-            <animate attributeName="opacity" values="0.05;0.15;0.05" dur="4s" repeatCount="indefinite" />
+          <circle cx="140" cy="260" r="50" fill="url(#hcs-nodeGlow-red)" />
+          {/* House shape */}
+          <polygon points="140,215 100,245 100,295 180,295 180,245" fill="#150830" stroke="#FF004E" strokeWidth="1.5" />
+          <polygon points="140,215 100,245 180,245" fill="#1a0a35" stroke="#FF004E" strokeWidth="1.5" />
+          {/* Door */}
+          <rect x="128" y="270" width="24" height="25" rx="3" fill="#0a0418" stroke="#5a3d8a" strokeWidth="0.8" />
+          <circle cx="147" cy="283" r="1.5" fill="#FFB300" />
+          {/* Windows with warm glow */}
+          <rect x="108" y="252" width="16" height="12" rx="1.5" fill="#FFB300" opacity="0.15">
+            <animate attributeName="opacity" values="0.1;0.25;0.1" dur="4s" repeatCount="indefinite" />
           </rect>
-        </g>
-
-        {/* Lights */}
-        {[350, 500, 620].map((cx, i) => (
-          <g key={`light-${i}`}>
-            <line x1={cx} y1="200" x2={cx} y2="215" stroke="#c4b5d9" strokeWidth="1" />
-            <circle cx={cx} cy="218" r="5" fill="#FFF9C4" opacity="0.6">
-              <animate attributeName="opacity" values="0.4;0.8;0.4" dur={`${3 + i}s`} repeatCount="indefinite" />
-            </circle>
-            <circle cx={cx} cy="218" r="10" fill="#FFF9C4" opacity="0.1">
-              <animate attributeName="opacity" values="0.05;0.15;0.05" dur={`${3 + i}s`} repeatCount="indefinite" />
-            </circle>
-          </g>
-        ))}
-
-        {/* ===== WINDOW ===== */}
-        <rect x="380" y="230" width="50" height="50" rx="2" fill="#1a103a" stroke="#c4b5d9" strokeWidth="2" opacity="0.6" />
-        <line x1="405" y1="230" x2="405" y2="280" stroke="#c4b5d9" strokeWidth="1" />
-        <line x1="380" y1="255" x2="430" y2="255" stroke="#c4b5d9" strokeWidth="1" />
-
-        {/* ===== EV CHARGER (outside) ===== */}
-        <g>
-          <rect x="740" y="370" width="30" height="50" rx="4" fill="#350066" stroke="#5a3d8a" strokeWidth="1.5" />
-          <circle cx="755" cy="385" r="6" fill="none" stroke="#00E676" strokeWidth="1.5">
-            <animate attributeName="strokeOpacity" values="0.3;1;0.3" dur="2s" repeatCount="indefinite" />
-          </circle>
-          <path d="M 753 383 L 757 385 L 753 388" fill="none" stroke="#00E676" strokeWidth="1.5" />
-          {/* Cable to car area */}
-          <path d="M 755 420 C 755 435 780 440 800 435" fill="none" stroke="#5a3d8a" strokeWidth="2" />
-          <text x="755" y="440" textAnchor="middle" fill="#230045" fontSize="9" fontWeight="700">Ładowarka EV</text>
-        </g>
-
-        {/* Connection from house to EV */}
-        <line x1="700" y1="380" x2="740" y2="380" stroke="#00E676" strokeWidth="1.5" strokeDasharray="4 3" opacity="0.4" />
-
-        {/* ===== GRID CONNECTION ===== */}
-        <g>
-          {/* Power pole simplified */}
-          <rect x="140" y="320" width="6" height="100" fill="#5a3d8a" />
-          <line x1="130" y1="335" x2="158" y2="335" stroke="#5a3d8a" strokeWidth="2" />
-          <line x1="134" y1="350" x2="154" y2="350" stroke="#5a3d8a" strokeWidth="1.5" />
-          {/* Wire to house */}
-          <path d="M 158 335 Q 180 330 200 340" fill="none" stroke="#5a3d8a" strokeWidth="1.5" strokeDasharray="4 3" opacity="0.4" />
-          <text x="143" y="440" textAnchor="middle" fill="#230045" fontSize="9" fontWeight="700">Sieć</text>
-        </g>
-
-        {/* ===== SMARTPHONE/MONITORING ===== */}
-        <g>
-          <rect x="790" y="190" width="55" height="90" rx="8" fill="#1a103a" stroke="#5a3d8a" strokeWidth="2" />
-          <rect x="795" y="200" width="45" height="65" rx="3" fill="#0d1442" />
-          {/* Phone screen content */}
-          <text x="817" y="215" textAnchor="middle" fill="#4FC3F7" fontSize="7" fontWeight="600">NEXBE</text>
-          <rect x="800" y="222" width="35" height="4" rx="1" fill="#00E676" opacity="0.6" />
-          <rect x="800" y="222" width="25" height="4" rx="1" fill="#00E676">
-            <animate attributeName="width" values="15;30;20;25" dur="5s" repeatCount="indefinite" />
+          <rect x="156" y="252" width="16" height="12" rx="1.5" fill="#FFB300" opacity="0.15">
+            <animate attributeName="opacity" values="0.1;0.25;0.1" dur="3.5s" repeatCount="indefinite" begin="0.5s" />
           </rect>
-          <text x="817" y="237" textAnchor="middle" fill="#FFB300" fontSize="6">87% naład.</text>
-          <rect x="800" y="242" width="35" height="3" rx="1" fill="#B5005D" opacity="0.3" />
-          <text x="817" y="255" textAnchor="middle" fill="#4FC3F7" fontSize="6">+342 zł/msc</text>
-          {/* Home button */}
-          <circle cx="817" cy="275" r="3" fill="none" stroke="#5a3d8a" strokeWidth="1" />
-          {/* WiFi signal from EMS */}
-          <path d="M 575 370 Q 680 300 790 240" fill="none" stroke="#4FC3F7" strokeWidth="1" strokeDasharray="3 3" opacity="0.2" />
-          <text x="817" y="300" textAnchor="middle" fill="#230045" fontSize="9" fontWeight="700">Monitoring</text>
-          <text x="817" y="312" textAnchor="middle" fill="#8a7aaa" fontSize="7">aplikacja 24/7</text>
+          {/* Window cross lines */}
+          <line x1="116" y1="252" x2="116" y2="264" stroke="#5a3d8a" strokeWidth="0.5" />
+          <line x1="108" y1="258" x2="124" y2="258" stroke="#5a3d8a" strokeWidth="0.5" />
+          <line x1="164" y1="252" x2="164" y2="264" stroke="#5a3d8a" strokeWidth="0.5" />
+          <line x1="156" y1="258" x2="172" y2="258" stroke="#5a3d8a" strokeWidth="0.5" />
+          <text x="140" y="312" textAnchor="middle" fill="#FF004E" fontSize="10" fontWeight="700" letterSpacing="0.5">DOM</text>
+          <text x="140" y="324" textAnchor="middle" fill="#8a7aaa" fontSize="8">zużycie 8 000 kWh/r</text>
         </g>
 
-        {/* ===== LABELS ===== */}
-        {/* PV label */}
+
+        {/* ============================================================
+            NODE: GRID
+            ============================================================ */}
         <g>
-          <rect x="315" y="110" width="95" height="22" rx="11" fill="#FFB300" opacity="0.15" />
-          <text x="362" y="125" textAnchor="middle" fill="#FFB300" fontSize="9" fontWeight="700">Panele PV 10kWp</text>
+          <circle cx="635" cy="130" r="45" fill="url(#hcs-nodeGlow-green)" />
+          {/* Pylon shape */}
+          <line x1="635" y1="100" x2="635" y2="165" stroke="#00C853" strokeWidth="2.5" opacity="0.7" />
+          <line x1="615" y1="115" x2="655" y2="115" stroke="#00C853" strokeWidth="2" opacity="0.6" />
+          <line x1="620" y1="130" x2="650" y2="130" stroke="#00C853" strokeWidth="1.5" opacity="0.5" />
+          <line x1="625" y1="145" x2="645" y2="145" stroke="#00C853" strokeWidth="1" opacity="0.4" />
+          {/* Wires */}
+          <line x1="615" y1="115" x2="605" y2="108" stroke="#00C853" strokeWidth="1" opacity="0.3" />
+          <line x1="655" y1="115" x2="665" y2="108" stroke="#00C853" strokeWidth="1" opacity="0.3" />
+          <text x="635" y="182" textAnchor="middle" fill="#00C853" fontSize="10" fontWeight="700" letterSpacing="0.5">SIEĆ</text>
+          <text x="635" y="194" textAnchor="middle" fill="#8a7aaa" fontSize="8">sprzedaż nadwyżek</text>
         </g>
 
-        {/* Energy flow legend */}
-        <g transform="translate(30, 460)">
+
+        {/* ============================================================
+            NODE: EV CHARGER
+            ============================================================ */}
+        <g>
+          <circle cx="780" cy="370" r="45" fill="url(#hcs-nodeGlow-green)" />
+          {/* Charger body */}
+          <rect x="758" y="345" width="44" height="55" rx="6" fill="#150830" stroke="#00C853" strokeWidth="1.5" />
+          {/* Screen */}
+          <rect x="765" y="352" width="30" height="18" rx="3" fill="#0a0418" />
+          <text x="780" y="364" textAnchor="middle" fill="#00C853" fontSize="7" fontWeight="600">
+            <animate attributeName="opacity" values="0.5;1;0.5" dur="2s" repeatCount="indefinite" />
+            7.4 kW
+          </text>
+          {/* Plug symbol */}
+          <circle cx="780" cy="382" r="8" fill="none" stroke="#00C853" strokeWidth="1.5" opacity="0.6">
+            <animate attributeName="strokeOpacity" values="0.3;0.8;0.3" dur="2s" repeatCount="indefinite" />
+          </circle>
+          <path d="M 777 380 L 783 382 L 777 384" fill="none" stroke="#00C853" strokeWidth="1.5" />
+          {/* Cable */}
+          <path d="M 780 400 Q 780 415 795 418 Q 810 420 820 415" fill="none" stroke="#00C853" strokeWidth="2" opacity="0.3" />
+          <text x="780" y="415" textAnchor="middle" fill="#00C853" fontSize="10" fontWeight="700" letterSpacing="0.5">ŁADOWARKA</text>
+          <text x="780" y="427" textAnchor="middle" fill="#8a7aaa" fontSize="8">EV 7.4 kW</text>
+        </g>
+
+
+        {/* ============================================================
+            NODE: KENO EMS
+            ============================================================ */}
+        <g>
+          <circle cx="525" cy="430" r="45" fill="url(#hcs-nodeGlow-blue)" />
+          {/* EMS body */}
+          <rect x="497" y="408" width="56" height="38" rx="6" fill="#150830" stroke="#4FC3F7" strokeWidth="1.5" />
+          <text x="525" y="424" textAnchor="middle" fill="#4FC3F7" fontSize="9" fontWeight="700">KENO</text>
+          <text x="525" y="436" textAnchor="middle" fill="#4FC3F7" fontSize="7" opacity="0.7">EMS</text>
+          {/* Signal arcs */}
+          {[0, 1, 2].map(i => (
+            <path key={`sig-${i}`}
+              d={`M ${555 + i * 6} ${418 - i * 3} Q ${560 + i * 8} ${413 - i * 4} ${557 + i * 6} ${430 + i * 3}`}
+              fill="none" stroke="#4FC3F7" strokeWidth="1" opacity={0.15 + i * 0.1}>
+              <animate attributeName="opacity" values={`${0.1 + i * 0.05};${0.4 + i * 0.1};${0.1 + i * 0.05}`}
+                dur={`${2 + i * 0.3}s`} repeatCount="indefinite" />
+            </path>
+          ))}
+          {/* Connection to inverter */}
+          <path d="M 525 408 L 525 340" fill="none" stroke="#4FC3F7" strokeWidth="1" strokeDasharray="4 3" opacity="0.2" />
+          <text x="525" y="462" textAnchor="middle" fill="#4FC3F7" fontSize="10" fontWeight="700" letterSpacing="0.5">KENO EMS</text>
+          <text x="525" y="474" textAnchor="middle" fill="#8a7aaa" fontSize="8">monitoring + AI</text>
+        </g>
+
+
+        {/* ============================================================
+            NODE: MONITORING APP (smartphone)
+            ============================================================ */}
+        <g>
+          <circle cx="870" cy="140" r="45" fill="url(#hcs-nodeGlow-blue)" />
+          {/* Phone body */}
+          <rect x="849" y="105" width="42" height="72" rx="7" fill="#150830" stroke="#4FC3F7" strokeWidth="1.5" />
+          {/* Screen */}
+          <rect x="854" y="115" width="32" height="48" rx="3" fill="#0a0418" />
+          {/* Screen content */}
+          <text x="870" y="128" textAnchor="middle" fill="#4FC3F7" fontSize="6" fontWeight="600" letterSpacing="0.5">NEXBE</text>
+          {/* Battery indicator */}
+          <rect x="858" y="133" width="24" height="4" rx="1" fill="#FF004E" opacity="0.3" />
+          <rect x="858" y="133" width="18" height="4" rx="1" fill="#FF004E" opacity="0.7">
+            <animate attributeName="width" values="12;20;15;18" dur="6s" repeatCount="indefinite" />
+          </rect>
+          {/* Savings text */}
+          <text x="870" y="147" textAnchor="middle" fill="#FFB300" fontSize="6" fontWeight="600">87%</text>
+          <text x="870" y="156" textAnchor="middle" fill="#00C853" fontSize="5">+342 zł/msc</text>
+          {/* Home button dot */}
+          <circle cx="870" cy="170" r="2.5" fill="none" stroke="#5a3d8a" strokeWidth="0.8" />
+          <text x="870" y="195" textAnchor="middle" fill="#4FC3F7" fontSize="10" fontWeight="700" letterSpacing="0.5">MONITORING</text>
+          <text x="870" y="207" textAnchor="middle" fill="#8a7aaa" fontSize="8">aplikacja 24/7</text>
+        </g>
+
+
+        {/* ============================================================
+            FLOW DIRECTION ARROWS on paths
+            ============================================================ */}
+        {/* Arrow indicators (small triangles along paths) */}
+        <polygon points="200,195 208,190 208,200" fill="#FFB300" opacity="0.4">
+          <animate attributeName="opacity" values="0.2;0.6;0.2" dur="2s" repeatCount="indefinite" />
+        </polygon>
+        <polygon points="470,255 478,250 478,260" fill="#FFB300" opacity="0.4">
+          <animate attributeName="opacity" values="0.2;0.6;0.2" dur="2s" repeatCount="indefinite" begin="0.5s" />
+        </polygon>
+        <polygon points="430,355 422,350 422,360" fill="#B5005D" opacity="0.4">
+          <animate attributeName="opacity" values="0.2;0.6;0.2" dur="2s" repeatCount="indefinite" begin="0.3s" />
+        </polygon>
+        <polygon points="185,320 180,328 190,328" fill="#FF004E" opacity="0.4">
+          <animate attributeName="opacity" values="0.2;0.6;0.2" dur="2s" repeatCount="indefinite" begin="0.7s" />
+        </polygon>
+        <polygon points="635,200 630,208 640,208" fill="#00C853" opacity="0.4">
+          <animate attributeName="opacity" values="0.2;0.6;0.2" dur="2s" repeatCount="indefinite" begin="0.4s" />
+        </polygon>
+        <polygon points="680,370 688,365 688,375" fill="#00C853" opacity="0.4">
+          <animate attributeName="opacity" values="0.2;0.6;0.2" dur="2s" repeatCount="indefinite" begin="0.6s" />
+        </polygon>
+
+
+        {/* ============================================================
+            LEGEND
+            ============================================================ */}
+        <g transform="translate(40, 495)">
           <circle cx="0" cy="0" r="4" fill="#FFB300" />
-          <text x="10" y="4" fill="#8a7aaa" fontSize="8">Energia słoneczna</text>
-          <circle cx="130" cy="0" r="4" fill="#FF004E" />
-          <text x="140" y="4" fill="#8a7aaa" fontSize="8">Energia z magazynu</text>
-          <circle cx="280" cy="0" r="4" fill="#00E676" />
-          <text x="290" y="4" fill="#8a7aaa" fontSize="8">Ładowanie EV</text>
-          <circle cx="400" cy="0" r="4" fill="#4FC3F7" />
-          <text x="410" y="4" fill="#8a7aaa" fontSize="8">Komunikacja IoT</text>
+          <text x="10" y="4" fill="#8a7aaa" fontSize="8" fontWeight="500">Energia słoneczna</text>
+          <circle cx="140" cy="0" r="4" fill="#FF004E" />
+          <text x="150" y="4" fill="#8a7aaa" fontSize="8" fontWeight="500">Z magazynu</text>
+          <circle cx="250" cy="0" r="4" fill="#00C853" />
+          <text x="260" y="4" fill="#8a7aaa" fontSize="8" fontWeight="500">Sieć / EV</text>
+          <circle cx="340" cy="0" r="4" fill="#4FC3F7" />
+          <text x="350" y="4" fill="#8a7aaa" fontSize="8" fontWeight="500">IoT monitoring</text>
+          <circle cx="450" cy="0" r="4" fill="#B5005D" />
+          <text x="460" y="4" fill="#8a7aaa" fontSize="8" fontWeight="500">Ładowanie magazynu</text>
         </g>
+
       </svg>
     </div>
   );

@@ -48,7 +48,7 @@ export function StepInstallationType() {
       className="space-y-6"
     >
       <div className="text-center space-y-2">
-        <h2 className="font-heading text-2xl md:text-3xl">
+        <h2 className="font-heading text-2xl md:text-3xl text-white">
           Jaka jest Twoja sytuacja?
         </h2>
         <p className="text-muted-foreground">
@@ -78,7 +78,7 @@ export function StepInstallationType() {
             >
               <Icon className="h-8 w-8" />
             </div>
-            <h3 className="font-heading text-sm md:text-base mb-2">{title}</h3>
+            <h3 className="font-heading text-sm md:text-base mb-2 text-white">{title}</h3>
             <p className="text-xs md:text-sm text-muted-foreground">
               {description}
             </p>

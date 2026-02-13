@@ -49,7 +49,7 @@ export function StepPVData() {
       className="space-y-8 max-w-2xl mx-auto"
     >
       <div className="text-center space-y-2">
-        <h2 className="font-heading text-2xl md:text-3xl">
+        <h2 className="font-heading text-2xl md:text-3xl text-white">
           Dane Twojej instalacji PV
         </h2>
         <p className="text-muted-foreground">

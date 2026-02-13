@@ -185,10 +185,12 @@ export function calculateROI(
   const subsidy = calculateSubsidy(input, totalInvestment, params);
 
   // 3. ULGA TERMOMODERNIZACYJNA
+  // Ulga liczona od kwoty po odjęciu dotacji (wydatek poniesiony przez podatnika)
   const taxBracket = input.tax_bracket || 12;
   const usedPercent = input.thermomodernization_used_percent || 0;
+  const costAfterSubsidy = totalInvestment - subsidy;
   const thermoResult = calculateThermoRelief(
-    totalInvestment,
+    costAfterSubsidy,
     taxBracket,
     usedPercent
   );

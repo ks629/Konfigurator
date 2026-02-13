@@ -141,16 +141,48 @@ export function getRecommendations(
     : null;
   const premInverter = premProduct && needsInverter ? findBestInverter(pvPowerKwp, premProduct.id) : undefined;
 
+  const hasValidEconomic = econProduct && econProduct.id !== recProduct.id;
+  const hasValidPremium = premProduct && premProduct.id !== recProduct.id;
+
+  // Always try to return 3 options: economic + recommended + premium
+  // If economic not available, try finding a second premium option
+  // If premium not available, try finding a second economic option
+  let econResult: { product: Product; inverter?: Inverter } | null = null;
+  let premResult: { product: Product; inverter?: Inverter } | null = null;
+
+  if (hasValidEconomic) {
+    econResult = { product: econProduct!, inverter: econInverter };
+  }
+  if (hasValidPremium) {
+    premResult = { product: premProduct!, inverter: premInverter };
+  }
+
+  // If we don't have an economic option, try finding one from a different brand
+  if (!econResult && products.length > 1) {
+    const altProduct = products
+      .filter(p => p.id !== recProduct.id && p.id !== premProduct?.id)
+      .sort((a, b) => a.price_gross - b.price_gross)[0];
+    if (altProduct) {
+      const altInverter = needsInverter ? findBestInverter(pvPowerKwp, altProduct.id) : undefined;
+      econResult = { product: altProduct, inverter: altInverter };
+    }
+  }
+
+  // If we don't have a premium option, try finding one from a different brand
+  if (!premResult && products.length > 1) {
+    const altProduct = products
+      .filter(p => p.id !== recProduct.id && p.id !== econResult?.product.id)
+      .sort((a, b) => b.price_gross - a.price_gross)[0];
+    if (altProduct && altProduct.id !== recProduct.id) {
+      const altInverter = needsInverter ? findBestInverter(pvPowerKwp, altProduct.id) : undefined;
+      premResult = { product: altProduct, inverter: altInverter };
+    }
+  }
+
   return {
     recommended: { product: recProduct, inverter: recInverter },
-    economic:
-      econProduct && econProduct.id !== recProduct.id
-        ? { product: econProduct, inverter: econInverter }
-        : null,
-    premium:
-      premProduct && premProduct.id !== recProduct.id
-        ? { product: premProduct, inverter: premInverter }
-        : null,
+    economic: econResult,
+    premium: premResult,
   };
 }
 

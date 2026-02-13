@@ -87,10 +87,28 @@ export default function KonfiguratorPage() {
   }, [currentStep, store, selectedProductId]);
 
   const handleContactSubmit = async (data: ContactFormData) => {
-    // In production, this would send to /api/send-offer
-    console.log('Lead data:', { ...data, config: store, selectedProduct, calculation });
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    try {
+      const response = await fetch('/api/send-offer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: data.name,
+          email: data.email,
+          phone: data.phone,
+          postalCode: data.postalCode,
+          config: store,
+          product: selectedProduct,
+          inverter: selectedInverter,
+          calculation,
+        }),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || 'Błąd wysyłki');
+      console.log('Offer sent:', result);
+    } catch (error) {
+      console.error('Failed to send offer:', error);
+      throw error;
+    }
   };
 
   const renderStep = () => {
@@ -113,11 +131,21 @@ export default function KonfiguratorPage() {
   const showCalculation = currentStep === 5 && selectedProductId && calculation;
 
   return (
-    <div className="min-h-screen flex flex-col bg-muted/20">
+    <div className="nexbe-dark dark min-h-screen flex flex-col bg-[#0f0520]">
       <Header />
 
       <main className="flex-1">
-        <div className="container mx-auto px-4 py-6 md:py-10">
+        {/* Subtle background grid */}
+        <div className="fixed inset-0 pointer-events-none opacity-[0.03] z-0" style={{
+          backgroundImage: `linear-gradient(rgba(181,0,93,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(181,0,93,0.3) 1px, transparent 1px)`,
+          backgroundSize: '80px 80px',
+        }} />
+        {/* Animated energy pulse orbs */}
+        <div className="energy-orb energy-orb-1" />
+        <div className="energy-orb energy-orb-2" />
+        <div className="energy-orb energy-orb-3" />
+
+        <div className="container mx-auto px-4 py-6 md:py-10 relative z-10">
           {/* Progress */}
           <div className="max-w-3xl mx-auto mb-8">
             <ProgressBar currentStep={currentStep} totalSteps={TOTAL_STEPS} />
@@ -131,7 +159,7 @@ export default function KonfiguratorPage() {
           {/* Navigation */}
           <div className="max-w-4xl mx-auto mt-8 flex items-center justify-between no-print">
             {currentStep > 1 ? (
-              <Button variant="outline" onClick={prevStep} size="lg">
+              <Button variant="outline" onClick={prevStep} size="lg" className="border-white/20 text-white hover:bg-white/5">
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Wstecz
               </Button>
@@ -140,7 +168,7 @@ export default function KonfiguratorPage() {
             )}
 
             {currentStep < TOTAL_STEPS && currentStep !== 1 && (
-              <Button onClick={nextStep} disabled={!canGoNext} size="lg">
+              <Button onClick={nextStep} disabled={!canGoNext} size="lg" className="bg-gradient-to-r from-[#B5005D] to-[#8B0048] hover:from-[#D4006E] hover:to-[#9A0050] text-white shadow-lg shadow-[#B5005D]/20">
                 Dalej
                 <ArrowRight className="h-4 w-4 ml-2" />
               </Button>
@@ -151,10 +179,10 @@ export default function KonfiguratorPage() {
           {showCalculation && calculation && (
             <div className="max-w-5xl mx-auto mt-12 space-y-8">
               <div className="text-center space-y-2">
-                <h2 className="font-heading text-2xl md:text-3xl">
+                <h2 className="font-heading text-2xl md:text-3xl text-white">
                   Twoja kalkulacja oszczędności
                 </h2>
-                <p className="text-muted-foreground">
+                <p className="text-gray-400">
                   Szczegółowa analiza opłacalności inwestycji w magazyn energii
                 </p>
               </div>
@@ -177,7 +205,7 @@ export default function KonfiguratorPage() {
               <div className="flex flex-col sm:flex-row gap-4 items-center justify-center pt-8 pb-4 no-print">
                 <Button
                   size="lg"
-                  className="text-lg px-8 h-14"
+                  className="text-lg px-8 h-14 bg-gradient-to-r from-[#B5005D] to-[#8B0048] hover:from-[#D4006E] hover:to-[#9A0050] text-white shadow-lg shadow-[#B5005D]/20"
                   onClick={() => setContactFormOpen(true)}
                 >
                   <FileText className="h-5 w-5 mr-2" />
@@ -186,7 +214,7 @@ export default function KonfiguratorPage() {
                 <Button
                   variant="outline"
                   size="lg"
-                  className="text-lg px-8 h-14"
+                  className="text-lg px-8 h-14 border-white/20 text-white hover:bg-white/5"
                   onClick={() => setContactFormOpen(true)}
                 >
                   <CalendarCheck className="h-5 w-5 mr-2" />

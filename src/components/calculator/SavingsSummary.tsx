@@ -17,7 +17,7 @@ export function SavingsSummary({ result }: SavingsSummaryProps) {
       <div className="rounded-xl border bg-card p-6 space-y-4">
         <div className="flex items-center gap-2">
           <Wallet className="h-5 w-5 text-primary" />
-          <h3 className="font-heading text-lg">Koszt inwestycji</h3>
+          <h3 className="font-heading text-lg text-white">Koszt inwestycji</h3>
         </div>
 
         <div className="space-y-2 text-sm">
@@ -44,7 +44,7 @@ export function SavingsSummary({ result }: SavingsSummaryProps) {
             </div>
           )}
 
-          <div className="border-t pt-2 flex justify-between font-heading text-base">
+          <div className="border-t border-white/10 pt-2 flex justify-between font-heading text-base text-white">
             <span>RAZEM BRUTTO</span>
             <span>{formatCurrency(investment.total_gross)}</span>
           </div>
@@ -85,7 +85,7 @@ export function SavingsSummary({ result }: SavingsSummaryProps) {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <ArrowDown className="h-5 w-5 text-primary" />
-              <span className="font-heading text-lg">Koszt po dotacjach</span>
+              <span className="font-heading text-lg text-primary">Koszt po dotacjach</span>
             </div>
             <span className="font-heading text-2xl text-primary">
               {formatCurrency(investment.net_cost)}
@@ -98,7 +98,7 @@ export function SavingsSummary({ result }: SavingsSummaryProps) {
       <div className="rounded-xl border bg-card p-6 space-y-4">
         <div className="flex items-center gap-2">
           <TrendingUp className="h-5 w-5 text-primary" />
-          <h3 className="font-heading text-lg">Twoje oszczędności</h3>
+          <h3 className="font-heading text-lg text-white">Twoje oszczędności</h3>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
@@ -120,7 +120,7 @@ export function SavingsSummary({ result }: SavingsSummaryProps) {
         <div className="bg-primary/10 rounded-lg p-4 space-y-3">
           <div className="flex items-center gap-2">
             <Target className="h-5 w-5 text-primary" />
-            <span className="font-heading text-lg">Zwrot inwestycji</span>
+            <span className="font-heading text-lg text-white">Zwrot inwestycji</span>
           </div>
 
           {roi_years ? (

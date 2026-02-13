@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { Product, Inverter } from '@/lib/types';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Battery, Zap, Shield, Calendar, Check } from 'lucide-react';
+import { Battery, Zap, Shield, Calendar, Check, CreditCard, Crown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatCurrency } from '@/lib/calculations';
 
@@ -14,8 +14,10 @@ interface ProductCardProps {
   badge: string;
   badgeVariant: 'default' | 'secondary' | 'outline';
   isRecommended: boolean;
+  isPremium?: boolean;
   isSelected: boolean;
   onSelect: () => void;
+  monthlyRate?: number;
 }
 
 export function ProductCard({
@@ -24,8 +26,10 @@ export function ProductCard({
   badge,
   badgeVariant,
   isRecommended,
+  isPremium,
   isSelected,
   onSelect,
+  monthlyRate,
 }: ProductCardProps) {
   const totalPrice = product.price_gross + (inverter?.price_gross || 0);
 
@@ -33,21 +37,29 @@ export function ProductCard({
     <div
       className={cn(
         'relative flex flex-col rounded-xl border-2 overflow-hidden transition-all',
-        isRecommended && 'ring-2 ring-primary shadow-lg',
-        isSelected ? 'border-primary bg-primary/5' : 'border-border bg-card'
+        isPremium && 'ring-2 ring-amber-400/40 shadow-[0_0_30px_-5px_rgba(251,191,36,0.15)]',
+        isRecommended && !isPremium && 'ring-2 ring-primary shadow-lg shadow-primary/10',
+        isSelected ? 'border-primary bg-primary/5' : isPremium ? 'border-amber-400/30 bg-card' : 'border-border bg-card'
       )}
     >
       {/* Badge */}
       <div className="absolute top-3 right-3 z-10">
         <Badge variant={badgeVariant} className={cn(
-          isRecommended && 'bg-primary text-primary-foreground'
+          isRecommended && !isPremium && 'bg-primary text-primary-foreground',
+          isPremium && 'bg-gradient-to-r from-amber-400 to-amber-500 text-black font-bold border-0'
         )}>
+          {isPremium && <Crown className="h-3 w-3 mr-1" />}
           {badge}
         </Badge>
       </div>
 
       {/* Product image */}
-      <div className="relative h-48 bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center overflow-hidden">
+      <div className={cn(
+        'relative h-48 flex items-center justify-center overflow-hidden',
+        isPremium
+          ? 'bg-gradient-to-br from-amber-400/5 via-muted to-amber-400/5'
+          : 'bg-gradient-to-br from-muted to-muted/50'
+      )}>
         {product.image ? (
           <Image
             src={product.image}
@@ -119,16 +131,26 @@ export function ProductCard({
           </div>
         )}
 
-        {/* Price */}
-        <div className="pt-2 border-t">
+        {/* Price + Monthly rate */}
+        <div className="pt-2 border-t space-y-2">
           <div className="flex items-baseline justify-between">
             <span className="text-sm text-muted-foreground">Cena brutto:</span>
-            <span className="text-2xl font-heading text-primary">
+            <span className={cn(
+              'text-2xl font-heading',
+              isPremium ? 'text-amber-400' : 'text-primary'
+            )}>
               {formatCurrency(totalPrice)}
             </span>
           </div>
+          {monthlyRate && monthlyRate > 0 && (
+            <div className="flex items-center gap-1.5 text-sm">
+              <CreditCard className="h-3.5 w-3.5 text-muted-foreground" />
+              <span className="text-muted-foreground">Rata już od</span>
+              <span className="font-heading text-primary">{monthlyRate} zł/mies.</span>
+            </div>
+          )}
           {inverter && (
-            <p className="text-xs text-muted-foreground mt-1">
+            <p className="text-xs text-muted-foreground">
               Magazyn: {formatCurrency(product.price_gross)} + Falownik:{' '}
               {formatCurrency(inverter.price_gross)}
             </p>
@@ -138,8 +160,11 @@ export function ProductCard({
         {/* Select button */}
         <Button
           onClick={onSelect}
-          variant={isSelected ? 'default' : isRecommended ? 'default' : 'outline'}
-          className="w-full mt-auto"
+          variant={isSelected ? 'default' : isRecommended || isPremium ? 'default' : 'outline'}
+          className={cn(
+            'w-full mt-auto',
+            isPremium && !isSelected && 'bg-gradient-to-r from-amber-400 to-amber-500 text-black hover:from-amber-500 hover:to-amber-600'
+          )}
           size="lg"
         >
           {isSelected ? (

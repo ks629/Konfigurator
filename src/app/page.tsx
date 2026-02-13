@@ -6,6 +6,7 @@ import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
+import { HouseCrossSectionSVG } from '@/components/home/HouseCrossSectionSVG';
 import {
   ArrowRight,
   Zap,
@@ -275,42 +276,38 @@ const kenoFeatures = [
 ];
 
 /* ---- Why Nexbe USPs ---- */
-const whyNexbe = [
+/* Educational content — replaces "Dlaczego Nexbe" */
+const educationalSections = [
   {
-    icon: Globe,
-    title: '100% polskie wsparcie',
-    desc: 'Ca\u0142y sprz\u0119t z polskiego magazynu, polski serwis i gwarancja bez po\u015brednik\u00f3w.',
-    highlight: '100%',
+    icon: BatteryCharging,
+    title: 'Dlaczego warto mieć magazyn energii?',
+    items: [
+      'Wykorzystujesz 80-90% produkowanej energii zamiast 25-30% bez magazynu',
+      'Oszczędzasz 2000-4000 zł rocznie na rachunkach za prąd',
+      'Uniezależniasz się od rosnących cen energii (wzrost ~5% rocznie)',
+      'Zyskujesz zasilanie awaryjne — Twój dom działa nawet podczas blackoutu',
+      'Zwiększasz wartość nieruchomości o 3-5%',
+    ],
   },
   {
-    icon: Truck,
-    title: 'Wysy\u0142ka w 48h',
-    desc: 'Dwa centra logistyczne zapewniaj\u0105 b\u0142yskawiczn\u0105 dostaw\u0119 na terenie ca\u0142ego kraju.',
-    highlight: '48h',
+    icon: Repeat2,
+    title: 'Systemy rozliczeń — co musisz wiedzieć?',
+    items: [
+      'Net-billing (od 04.2022) — sprzedajesz nadwyżki po cenie RCE (~0.28 zł/kWh), kupujesz po ~1.12 zł/kWh. Magazyn pozwala zużyć energię samemu zamiast sprzedawać ze stratą.',
+      'Net-metering (do 03.2022) — rozliczenie ilościowe 1:0.8. Tracisz 20% energii oddanej do sieci. Magazyn minimalizuje straty.',
+      'Z magazynem w net-billingu oszczędzasz nawet 3x więcej niż bez niego — bo unikasz sprzedaży po niskiej cenie RCE.',
+    ],
   },
   {
-    icon: PackageCheck,
-    title: 'Op\u0142acone BDO',
-    desc: 'Wszystkie produkty z op\u0142aconym BDO \u2014 \u017cadnych ukrytych koszt\u00f3w i pe\u0142na zgodno\u015b\u0107 z prawem.',
-    highlight: 'BDO',
-  },
-  {
-    icon: Users,
-    title: 'Certyfikowani instalatorzy',
-    desc: 'Sie\u0107 sprawdzonych, przeszkolonych instalator\u00f3w w ka\u017cdym regionie Polski.',
-    highlight: 'PL',
-  },
-  {
-    icon: Award,
-    title: '14+ lat w OZE',
-    desc: 'Ponad 14 lat do\u015bwiadczenia w bran\u017cy odnawialnych \u017ar\u00f3de\u0142 energii i magazynowania.',
-    highlight: '14+',
-  },
-  {
-    icon: Building2,
-    title: '2 centra logistyczne',
-    desc: 'W\u0142asna infrastruktura magazynowa gwarantuje dost\u0119pno\u015b\u0107 sprz\u0119tu i szybk\u0105 realizacj\u0119.',
-    highlight: '2x',
+    icon: ShieldAlert,
+    title: 'Co to jest zasilanie awaryjne (EPS)?',
+    items: [
+      'EPS (Emergency Power Supply) to automatyczne przełączenie na zasilanie bateryjne w momencie awarii sieci',
+      'Twój dom działa normalnie — lodówka, ogrzewanie, Internet, oświetlenie — nawet gdy cała okolica jest bez prądu',
+      'Magazyn 10 kWh zapewnia 12-18h zasilania typowego gospodarstwa domowego',
+      'Przełączenie trwa 10-20 ms — niewidoczne dla urządzeń elektronicznych',
+      'W Polsce w 2025 było ponad 1500 przerw w dostawie prądu — zabezpiecz swój dom',
+    ],
   },
 ];
 
@@ -400,14 +397,14 @@ function ProductCard({ product, index }: { product: ProductCardData; index: numb
             <div className="rounded-xl p-2.5 bg-white/5 border border-white/5">
               <div className="flex items-center gap-1.5 mb-1">
                 <Battery className={`h-3.5 w-3.5 ${isPremium ? 'text-amber-400' : 'text-[#B5005D]'}`} />
-                <span className="text-[10px] text-gray-400">Pojemno\u015b\u0107</span>
+                <span className="text-[10px] text-gray-400">Pojemność</span>
               </div>
               <p className="font-heading text-sm text-white">{product.capacityRange} <span className="text-[10px] font-normal text-gray-400">kWh</span></p>
             </div>
             <div className="rounded-xl p-2.5 bg-white/5 border border-white/5">
               <div className="flex items-center gap-1.5 mb-1">
                 <Gauge className={`h-3.5 w-3.5 ${isPremium ? 'text-amber-400' : 'text-[#B5005D]'}`} />
-                <span className="text-[10px] text-gray-400">Moc ci\u0105g\u0142a</span>
+                <span className="text-[10px] text-gray-400">Moc ciągła</span>
               </div>
               <p className="font-heading text-sm text-white">{product.powerRange} <span className="text-[10px] font-normal text-gray-400">kW</span></p>
             </div>
@@ -421,7 +418,7 @@ function ProductCard({ product, index }: { product: ProductCardData; index: numb
             <div className="rounded-xl p-2.5 bg-amber-500/5 border border-amber-500/10">
               <div className="flex items-center gap-1.5 mb-1">
                 <Repeat2 className="h-3.5 w-3.5 text-amber-400" />
-                <span className="text-[10px] text-gray-400">\u017bywotno\u015b\u0107</span>
+                <span className="text-[10px] text-gray-400">Żywotność</span>
               </div>
               <p className="font-heading text-sm text-white">{product.cycles} <span className="text-[10px] font-normal text-gray-400">cykli</span></p>
             </div>
@@ -476,11 +473,11 @@ function ProductCard({ product, index }: { product: ProductCardData; index: numb
    ============================================================ */
 export default function Home() {
   return (
-    <div className="min-h-screen flex flex-col bg-[#0f0520]">
+    <div className="nexbe-dark min-h-screen flex flex-col bg-[#0f0520]">
       <Header />
 
       {/* ==================== HERO — Hi-Tech Dark ==================== */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-[#0f0520] via-[#1a0a35] to-[#0f0520] min-h-[650px] md:min-h-[750px]">
+      <section className="relative overflow-hidden bg-gradient-to-br from-[#0f0520] via-[#1a0a35] to-[#0f0520] min-h-[750px] md:min-h-[900px]">
         {/* Animated background grid */}
         <div className="absolute inset-0 opacity-[0.07]" style={{
           backgroundImage: `linear-gradient(rgba(181,0,93,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(181,0,93,0.3) 1px, transparent 1px)`,
@@ -524,7 +521,7 @@ export default function Home() {
             { cx: 900, cy: 550, r: 3, dur: '6s', delay: '1.5s' },
           ].map((p, i) => (
             <circle key={i} cx={p.cx} cy={p.cy} r={p.r} fill="#FF004E" opacity="0">
-              <animate attributeName="opacity" values="0;0.6;0" dur={p.dur} begin={p.delay} repeatCount="indefinite" />
+              <animate attributeName="opacity" values="0;0.35;0" dur={p.dur} begin={p.delay} repeatCount="indefinite" />
               <animate attributeName="cy" values={`${p.cy};${p.cy - 80};${p.cy}`} dur={p.dur} begin={p.delay} repeatCount="indefinite" />
             </circle>
           ))}
@@ -545,14 +542,14 @@ export default function Home() {
               </span>
 
               <h1 className="font-heading text-3xl md:text-5xl lg:text-[3.5rem] leading-tight text-white">
-                Skonfiguruj sw&oacute;j{' '}
+                Skonfiguruj swój{' '}
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#B5005D] to-[#FF004E]">magazyn energii</span>
-                <br />z pomoc&aelig; AI w{' '}
+                <br />z pomocą AI w{' '}
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF004E] to-[#B5005D]">5 krokach</span>
               </h1>
 
               <p className="text-lg md:text-xl text-gray-400 mt-6 max-w-2xl mx-auto leading-relaxed">
-                Narz&#281;dzie, kt&oacute;re <strong className="text-white">dobiera</strong>, <strong className="text-white">edukuje</strong>, <strong className="text-white">doradza</strong> i <strong className="text-white">kalkuluje oszcz&#281;dno&#347;ci</strong>. Sprawd&#378; dofinansowanie do 16 000 z&#322; i ulg&#281; podatkow&#261;.
+                Narzędzie, które <strong className="text-white">dobiera</strong>, <strong className="text-white">edukuje</strong>, <strong className="text-white">doradza</strong> i <strong className="text-white">kalkuluje oszczędności</strong>. Sprawdź dofinansowanie do 16 000 zł i ulgę podatkową.
               </p>
             </motion.div>
 
@@ -591,6 +588,16 @@ export default function Home() {
                 <div className="w-2 h-2 rounded-full bg-purple-400 animate-pulse" style={{ animationDelay: '1.5s' }} />
                 Dofinansowanie do 16 000 z&#322;
               </span>
+            </motion.div>
+
+            {/* House cross-section with energy flow */}
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.6 }}
+              className="mt-12 max-w-3xl mx-auto"
+            >
+              <HouseCrossSectionSVG />
             </motion.div>
           </div>
         </div>
@@ -821,7 +828,7 @@ export default function Home() {
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="h-4 w-4 text-[#B5005D] shrink-0 mt-0.5" />
-                    Pokrywa do 50% koszt&oacute;w kwalifikowanych (maks. 800 z&#322;/kWh)
+                    {`Pokrywa do 30% koszt\u00f3w kwalifikowanych (maks. 800 z\u0142/kWh)`}
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="h-4 w-4 text-[#B5005D] shrink-0 mt-0.5" />
@@ -858,33 +865,33 @@ export default function Home() {
             {/* Combined calculation example */}
             <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="p-6 md:p-8 rounded-2xl bg-gradient-to-r from-[#B5005D]/5 via-white/[0.02] to-[#FF004E]/5 border border-white/10">
               <h3 className="font-heading text-lg text-white mb-6 text-center">
-                Przyk&#322;adowa kalkulacja — magazyn 15 kWh za{' '}
-                <span className="text-[#B5005D]">~25 000 z&#322; brutto</span>
+                {`Przyk\u0142adowa kalkulacja \u2014 magazyn 15 kWh za `}
+                <span className="text-[#B5005D]">{`~34 000 z\u0142 brutto`}</span>
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 text-center">
                 <div className="p-4 rounded-xl bg-white/5 border border-white/5">
-                  <p className="text-xs text-gray-500 mb-1">Cena wyj&#347;ciowa</p>
-                  <p className="text-xl font-heading text-white">25 000 z&#322;</p>
-                  <p className="text-[10px] text-gray-600">brutto z monta&#380;em</p>
+                  <p className="text-xs text-gray-500 mb-1">{`Cena wyj\u015bciowa`}</p>
+                  <p className="text-xl font-heading text-white">{`34 000 z\u0142`}</p>
+                  <p className="text-[10px] text-gray-600">{`brutto z monta\u017cem`}</p>
                 </div>
                 <div className="p-4 rounded-xl bg-[#B5005D]/5 border border-[#B5005D]/20">
-                  <p className="text-xs text-[#B5005D] mb-1">M&oacute;j Pr&#261;d 6.0</p>
-                  <p className="text-xl font-heading text-[#B5005D]">-12 000 z&#322;</p>
-                  <p className="text-[10px] text-gray-500">15 kWh × 800 z&#322;</p>
+                  <p className="text-xs text-[#B5005D] mb-1">{`M\u00f3j Pr\u0105d 6.0`}</p>
+                  <p className="text-xl font-heading text-[#B5005D]">{`-10 200 z\u0142`}</p>
+                  <p className="text-[10px] text-gray-500">{`30% \u00d7 34 000 z\u0142`}</p>
                 </div>
                 <div className="p-4 rounded-xl bg-[#FF004E]/5 border border-[#FF004E]/20">
-                  <p className="text-xs text-[#FF004E] mb-1">Ulga 32%</p>
-                  <p className="text-xl font-heading text-[#FF004E]">-4 160 z&#322;</p>
-                  <p className="text-[10px] text-gray-500">32% × 13 000 z&#322;</p>
+                  <p className="text-xs text-[#FF004E] mb-1">{`Ulga 32%`}</p>
+                  <p className="text-xl font-heading text-[#FF004E]">{`-7 616 z\u0142`}</p>
+                  <p className="text-[10px] text-gray-500">{`32% \u00d7 23 800 z\u0142`}</p>
                 </div>
                 <div className="p-4 rounded-xl bg-gradient-to-br from-amber-500/10 to-orange-500/10 border border-amber-400/30">
-                  <p className="text-xs text-amber-400 mb-1">P&#322;acisz realnie</p>
-                  <p className="text-2xl font-heading text-amber-400">~8 840 z&#322;</p>
-                  <p className="text-[10px] text-gray-500">oszcz&#281;dno&#347;&#263; 65%</p>
+                  <p className="text-xs text-amber-400 mb-1">{`P\u0142acisz realnie`}</p>
+                  <p className="text-2xl font-heading text-amber-400">{`~16 200 z\u0142`}</p>
+                  <p className="text-[10px] text-gray-500">{`oszcz\u0119dno\u015b\u0107 52%`}</p>
                 </div>
               </div>
               <p className="text-[10px] text-gray-600 text-center mt-4">
-                * Kalkulacja przyk&#322;adowa dla progu podatkowego 32%. Ulga liczona od kwoty po dotacji. Rzeczywista oszcz&#281;dno&#347;&#263; zale&#380;y od indywidualnej sytuacji.
+                {`* Kalkulacja: pr\u00f3g podatkowy 32%, dotacja = 30% ceny brutto (maks. 800 z\u0142/kWh, do 16 000 z\u0142). Ulga liczona od kwoty po dotacji. Rzeczywista oszcz\u0119dno\u015b\u0107 zale\u017cy od indywidualnej sytuacji.`}
               </p>
             </motion.div>
 
@@ -1034,43 +1041,48 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ==================== DLACZEGO NEXBE ==================== */}
+      {/* ==================== WIEDZA O MAGAZYNACH ENERGII ==================== */}
       <section className="py-20 md:py-28 bg-[#0f0520] relative overflow-hidden">
         <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-[#B5005D]/4 rounded-full blur-[200px]" />
+        <div className="absolute top-1/3 right-0 w-[300px] h-[300px] bg-[#350066]/20 rounded-full blur-[150px]" />
 
         <div className="container mx-auto px-4 relative z-10">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-14">
             <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 text-gray-300 text-sm font-medium mb-5 border border-white/10">
-              <ShieldCheck className="h-4 w-4 text-[#B5005D]" />
-              Dlaczego w&#322;a&#347;nie my
+              <Brain className="h-4 w-4 text-[#B5005D]" />
+              Baza wiedzy
             </span>
             <h2 className="font-heading text-2xl md:text-4xl text-white mb-4">
-              Dlaczego{' '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#B5005D] to-[#FF004E]">NEXBE</span>?
+              Wszystko, co musisz wiedzieć o{' '}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#B5005D] to-[#FF004E]">magazynach energii</span>
             </h2>
             <p className="text-gray-400 max-w-2xl mx-auto">
-              Ponad 14 lat do&#347;wiadczenia w bran&#380;y OZE. 100% polskie wsparcie, b&#322;yskawiczna logistyka i certyfikowani instalatorzy w ca&#322;ym kraju.
+              Poznaj kluczowe zagadnienia, które pomogą Ci podjąć najlepszą decyzję o inwestycji w magazyn energii.
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 max-w-5xl mx-auto">
-            {whyNexbe.map((item, i) => (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+            {educationalSections.map((section, i) => (
               <motion.div
-                key={item.title}
+                key={section.title}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: i * 0.08 }}
+                transition={{ delay: i * 0.1 }}
                 className="group relative p-6 rounded-2xl bg-white/[0.02] border border-white/5 hover:border-[#B5005D]/20 transition-all"
               >
-                {/* Highlight number */}
-                <div className="absolute top-4 right-4 text-2xl font-heading text-white/5 group-hover:text-[#B5005D]/10 transition-colors">{item.highlight}</div>
-
-                <div className="w-12 h-12 rounded-xl bg-[#B5005D]/10 border border-[#B5005D]/20 flex items-center justify-center mb-4">
-                  <item.icon className="h-6 w-6 text-[#B5005D]" />
+                <div className="w-12 h-12 rounded-xl bg-[#B5005D]/10 border border-[#B5005D]/20 flex items-center justify-center mb-5">
+                  <section.icon className="h-6 w-6 text-[#B5005D]" />
                 </div>
-                <h3 className="font-heading text-base text-white mb-2">{item.title}</h3>
-                <p className="text-sm text-gray-500 leading-relaxed">{item.desc}</p>
+                <h3 className="font-heading text-lg text-white mb-4">{section.title}</h3>
+                <ul className="space-y-3">
+                  {section.items.map((item, j) => (
+                    <li key={j} className="flex items-start gap-2.5 text-sm text-gray-400 leading-relaxed">
+                      <CheckCircle2 className="h-4 w-4 text-[#B5005D] mt-0.5 shrink-0" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
               </motion.div>
             ))}
           </div>

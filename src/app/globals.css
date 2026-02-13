@@ -109,6 +109,111 @@
   }
 }
 
+/* Dark NEXBE theme for configurator pages */
+.nexbe-dark {
+  --background: #0f0520;
+  --foreground: #f0eaf5;
+  --card: #150830;
+  --card-foreground: #f0eaf5;
+  --popover: #1a0a35;
+  --popover-foreground: #f0eaf5;
+  --primary: #e8478f;
+  --primary-foreground: #ffffff;
+  --secondary: #1f0e3a;
+  --secondary-foreground: #f0eaf5;
+  --muted: #1a0a35;
+  --muted-foreground: #b8a8d0;
+  --accent: #1f0e3a;
+  --accent-foreground: #f0eaf5;
+  --border: rgba(200, 170, 255, 0.15);
+  --input: rgba(200, 170, 255, 0.12);
+  --ring: #e8478f;
+
+  /* Apply actual color so all children inherit the dark theme foreground */
+  color: #f0eaf5;
+  background-color: #0f0520;
+}
+
+/* ===== Green overrides for dark theme ===== */
+.nexbe-dark .bg-green-50 {
+  background-color: rgba(0, 200, 83, 0.08) !important;
+}
+.nexbe-dark .text-green-700 {
+  color: #4ade80 !important;
+}
+.nexbe-dark .text-green-800 {
+  color: #86efac !important;
+}
+.nexbe-dark .border-green-200 {
+  border-color: rgba(0, 200, 83, 0.2) !important;
+}
+.nexbe-dark .bg-green-50.border-green-200,
+.nexbe-dark .bg-green-50.border {
+  border-color: rgba(0, 200, 83, 0.2) !important;
+}
+
+/* ===== Red overrides for dark theme ===== */
+.nexbe-dark .text-red-600 {
+  color: #f87171 !important;
+}
+.nexbe-dark .text-red-500 {
+  color: #f87171 !important;
+}
+
+/* ===== Gray overrides for readability ===== */
+.nexbe-dark .text-gray-600 {
+  color: #9b8cb8 !important;
+}
+.nexbe-dark .text-gray-500 {
+  color: #a899c0 !important;
+}
+
+/* ===== Energy pulse background animation ===== */
+@keyframes energyPulse {
+  0%, 100% { opacity: 0.03; transform: scale(1); }
+  50% { opacity: 0.07; transform: scale(1.05); }
+}
+@keyframes energyDrift {
+  0% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(30px, -20px) scale(1.1); }
+  66% { transform: translate(-20px, 15px) scale(0.95); }
+  100% { transform: translate(0, 0) scale(1); }
+}
+.nexbe-dark .energy-orb {
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(100px);
+  animation: energyDrift 12s ease-in-out infinite;
+}
+.nexbe-dark .energy-orb-1 {
+  top: 15%;
+  left: 10%;
+  width: 400px;
+  height: 400px;
+  background: rgba(181, 0, 93, 0.06);
+  animation-duration: 15s;
+}
+.nexbe-dark .energy-orb-2 {
+  bottom: 20%;
+  right: 5%;
+  width: 350px;
+  height: 350px;
+  background: rgba(53, 0, 102, 0.12);
+  animation-duration: 18s;
+  animation-delay: -5s;
+}
+.nexbe-dark .energy-orb-3 {
+  top: 50%;
+  left: 50%;
+  width: 500px;
+  height: 500px;
+  background: rgba(255, 0, 78, 0.04);
+  animation-duration: 20s;
+  animation-delay: -10s;
+}
+
 @media print {
   .no-print {
     display: none !important;
