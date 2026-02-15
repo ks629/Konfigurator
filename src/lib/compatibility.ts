@@ -24,7 +24,7 @@ export function calculateRecommendedCapacity(
   let base = pvPowerKwp * 2;
   if (hasHeatPump) base += 5;
   if (hasEV) base += 5;
-  if (backupImportant) base += 2;
+  // backup nie zwiększa pojemności — zmienia tylko cenę (wariant B)
   base = Math.max(base, 10); // minimalna pojemność 10 kWh
   return roundToNearestCapacity(base);
 }
@@ -121,6 +121,36 @@ export function getRecommendations(
     economic: econResult,
     premium: premResult,
   };
+}
+
+export interface ProductOption {
+  product: Product;
+  inverter?: Inverter;
+}
+
+/**
+ * Get all eligible products sorted by capacity then price.
+ * Min capacity = pvPowerKwp × 2 (subsidy requirement), at least 10 kWh.
+ */
+export function getAllEligibleProducts(
+  pvPowerKwp: number,
+  hasHeatPump: boolean,
+  hasEV: boolean,
+  backupImportant: boolean
+): ProductOption[] {
+  const minCapacity = Math.max(pvPowerKwp * 2, 10);
+
+  const eligible = allProducts
+    .filter(p => p.capacity_kwh >= minCapacity)
+    .sort((a, b) => {
+      if (a.capacity_kwh !== b.capacity_kwh) return a.capacity_kwh - b.capacity_kwh;
+      return a.price_gross - b.price_gross;
+    });
+
+  return eligible.map(p => ({
+    product: p,
+    inverter: findInverterForProduct(p.id),
+  }));
 }
 
 export function isACCompatible(): boolean {

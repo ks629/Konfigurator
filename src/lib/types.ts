@@ -74,7 +74,8 @@ export interface Product {
   inverter_power_kw: number;
   inverter_cost_net: number; // koszt falownika netto (XLS kol. I) — do odliczenia przy retrofit
   warranty_years: number;
-  price_gross: number;
+  price_gross: number; // Wariant A: EPS / bez backup
+  price_gross_b: number; // Wariant B: pełny backup 3F (SZR)
   eps_capable: boolean;
   image: string;
   segment?: string;

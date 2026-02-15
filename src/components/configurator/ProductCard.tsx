@@ -9,6 +9,19 @@ import { Battery, Zap, Shield, Calendar, Check, CreditCard, Crown, ArrowUpCircle
 import { cn } from '@/lib/utils';
 import { formatCurrency } from '@/lib/calculations';
 
+/** Simple monthly installment calculator (Inbank: 8.99% nominal, 10 zl/month fee, 120 months) */
+function calcLowestRate(priceGross: number): number {
+  const nominalRate = 0.0899;
+  const monthlyFee = 10;
+  const months = 120;
+  const monthlyRate = nominalRate / 12;
+  if (priceGross <= 0) return 0;
+  const annuity =
+    (priceGross * monthlyRate * Math.pow(1 + monthlyRate, months)) /
+    (Math.pow(1 + monthlyRate, months) - 1);
+  return Math.round(annuity + monthlyFee);
+}
+
 interface ProductCardProps {
   product: Product;
   inverter?: Inverter;
@@ -19,7 +32,7 @@ interface ProductCardProps {
   isSelected: boolean;
   onSelect: () => void;
   onUpgradeInverter?: (productId: string) => void;
-  monthlyRate?: number;
+  useBackupPrice?: boolean;
   isRetrofit?: boolean;
 }
 
@@ -33,13 +46,12 @@ export function ProductCard({
   isSelected,
   onSelect,
   onUpgradeInverter,
-  monthlyRate,
+  useBackupPrice,
   isRetrofit,
 }: ProductCardProps) {
-  const totalPrice = product.price_gross + (inverter?.price_gross || 0);
-  // Cena retrofit: zestaw minus falownik (netto→brutto 8% VAT)
-  const inverterCostGross = Math.round(product.inverter_cost_net * 1.08);
-  const retrofitPrice = totalPrice - inverterCostGross;
+  // Wariant B (pełny backup SZR) lub A (EPS / bez backup) — cena brutto za cały zestaw
+  const totalPrice = useBackupPrice ? product.price_gross_b : product.price_gross;
+  const monthlyRate = calcLowestRate(totalPrice);
 
   // Znajdź wariant z większym falownikiem (ta sama marka, zbliżona pojemność)
   const upgradeOption = allProducts.find(p =>
@@ -48,7 +60,9 @@ export function ProductCard({
     Math.abs(p.capacity_kwh - product.capacity_kwh) < 1.5 &&
     p.inverter_power_kw > product.inverter_power_kw
   );
-  const upgradeDiff = upgradeOption ? upgradeOption.price_gross - product.price_gross : 0;
+  const upgradeDiff = upgradeOption
+    ? (useBackupPrice ? upgradeOption.price_gross_b : upgradeOption.price_gross) - totalPrice
+    : 0;
 
   return (
     <div
@@ -159,26 +173,12 @@ export function ProductCard({
               {formatCurrency(totalPrice)}
             </span>
           </div>
-          {isRetrofit && retrofitPrice > 0 && (
-            <div className="flex items-baseline justify-between">
-              <span className="text-sm text-muted-foreground">Magazyn + montaż:</span>
-              <span className="text-lg font-heading text-green-500">
-                {formatCurrency(retrofitPrice)}
-              </span>
-            </div>
-          )}
           {monthlyRate && monthlyRate > 0 && (
             <div className="flex items-center gap-1.5 text-sm">
               <CreditCard className="h-3.5 w-3.5 text-muted-foreground" />
               <span className="text-muted-foreground">Rata już od</span>
               <span className="font-heading text-primary">{monthlyRate} zł/mies.</span>
             </div>
-          )}
-          {inverter && (
-            <p className="text-xs text-muted-foreground">
-              Magazyn: {formatCurrency(product.price_gross)} + Falownik:{' '}
-              {formatCurrency(inverter.price_gross)}
-            </p>
           )}
         </div>
 

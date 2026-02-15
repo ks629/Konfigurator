@@ -23,6 +23,7 @@ export const allProducts: Product[] = [
     segment: 'PREMIUM',
     warranty_years: 10,
     price_gross: 29193, // XLS Lp1 war.A
+    price_gross_b: 32772, // XLS Lp1 war.B
     eps_capable: true,
     image: '/products/sigenergy.png',
   },
@@ -40,6 +41,7 @@ export const allProducts: Product[] = [
     segment: 'PREMIUM',
     warranty_years: 10,
     price_gross: 30086, // XLS Lp2 war.A
+    price_gross_b: 33665, // XLS Lp2 war.B
     eps_capable: true,
     image: '/products/sigenergy.png',
   },
@@ -57,6 +59,7 @@ export const allProducts: Product[] = [
     segment: 'PREMIUM',
     warranty_years: 10,
     price_gross: 41627, // XLS Lp3 war.A
+    price_gross_b: 45206, // XLS Lp3 war.B
     eps_capable: true,
     image: '/products/sigenergy.png',
   },
@@ -74,6 +77,7 @@ export const allProducts: Product[] = [
     segment: 'PREMIUM',
     warranty_years: 10,
     price_gross: 42519, // XLS Lp4 war.A
+    price_gross_b: 46098, // XLS Lp4 war.B
     eps_capable: true,
     image: '/products/sigenergy.png',
   },
@@ -91,6 +95,7 @@ export const allProducts: Product[] = [
     segment: 'PREMIUM',
     warranty_years: 10,
     price_gross: 45353, // XLS Lp5 war.A
+    price_gross_b: 48932, // XLS Lp5 war.B
     eps_capable: true,
     image: '/products/sigenergy.png',
   },
@@ -108,6 +113,7 @@ export const allProducts: Product[] = [
     segment: 'PREMIUM',
     warranty_years: 10,
     price_gross: 49994, // XLS Lp6 war.A
+    price_gross_b: 53573, // XLS Lp6 war.B
     eps_capable: true,
     image: '/products/sigenergy.png',
   },
@@ -125,6 +131,7 @@ export const allProducts: Product[] = [
     segment: 'PREMIUM',
     warranty_years: 10,
     price_gross: 56398, // XLS Lp7 war.A
+    price_gross_b: 59977, // XLS Lp7 war.B
     eps_capable: true,
     image: '/products/sigenergy.png',
   },
@@ -144,6 +151,7 @@ export const allProducts: Product[] = [
     segment: 'PREMIUM RETROFIT',
     warranty_years: 10,
     price_gross: 25885, // XLS Lp8 war.A
+    price_gross_b: 29464, // XLS Lp8 war.B
     eps_capable: true,
     image: '/products/sigenergy.png',
   },
@@ -161,6 +169,7 @@ export const allProducts: Product[] = [
     segment: 'PREMIUM RETROFIT',
     warranty_years: 10,
     price_gross: 38502, // XLS Lp9 war.A
+    price_gross_b: 42081, // XLS Lp9 war.B
     eps_capable: true,
     image: '/products/sigenergy.png',
   },
@@ -180,6 +189,7 @@ export const allProducts: Product[] = [
     segment: 'STANDARD',
     warranty_years: 10,
     price_gross: 22823, // XLS Lp10 war.A
+    price_gross_b: 25754, // XLS Lp10 war.B
     eps_capable: true,
     image: '/products/foxess-ecs.png',
   },
@@ -197,6 +207,7 @@ export const allProducts: Product[] = [
     segment: 'STANDARD',
     warranty_years: 10,
     price_gross: 22849, // XLS Lp11 war.A
+    price_gross_b: 25781, // XLS Lp11 war.B
     eps_capable: true,
     image: '/products/foxess-ecs.png',
   },
@@ -214,6 +225,7 @@ export const allProducts: Product[] = [
     segment: 'STANDARD',
     warranty_years: 10,
     price_gross: 23382, // XLS Lp12 war.A
+    price_gross_b: 26314, // XLS Lp12 war.B
     eps_capable: true,
     image: '/products/foxess-ecs.png',
   },
@@ -231,6 +243,7 @@ export const allProducts: Product[] = [
     segment: 'STANDARD',
     warranty_years: 10,
     price_gross: 26678, // XLS Lp13 war.A
+    price_gross_b: 29609, // XLS Lp13 war.B
     eps_capable: true,
     image: '/products/foxess-ecs.png',
   },
@@ -248,6 +261,7 @@ export const allProducts: Product[] = [
     segment: 'STANDARD',
     warranty_years: 10,
     price_gross: 30191, // XLS Lp14 war.A
+    price_gross_b: 33122, // XLS Lp14 war.B
     eps_capable: true,
     image: '/products/foxess-ecs.png',
   },
@@ -265,6 +279,7 @@ export const allProducts: Product[] = [
     segment: 'STANDARD',
     warranty_years: 10,
     price_gross: 28802, // XLS Lp15 war.A
+    price_gross_b: 29637, // XLS Lp15 war.B
     eps_capable: true,
     image: '/products/foxess-ecs.png',
   },
@@ -282,6 +297,7 @@ export const allProducts: Product[] = [
     segment: 'STANDARD',
     warranty_years: 10,
     price_gross: 41623, // XLS Lp16 war.A
+    price_gross_b: 42459, // XLS Lp16 war.B
     eps_capable: true,
     image: '/products/foxess-ecs.png',
   },
@@ -301,6 +317,7 @@ export const allProducts: Product[] = [
     segment: 'STANDARD',
     warranty_years: 10,
     price_gross: 24168, // XLS Lp17 war.A
+    price_gross_b: 29080, // XLS Lp17 war.B
     eps_capable: true,
     image: '/products/goodwe-lynx.png',
   },
@@ -318,6 +335,7 @@ export const allProducts: Product[] = [
     segment: 'STANDARD',
     warranty_years: 10,
     price_gross: 31918, // XLS Lp18 war.A
+    price_gross_b: 36829, // XLS Lp18 war.B
     eps_capable: true,
     image: '/products/goodwe-lynx.png',
   },
@@ -335,6 +353,7 @@ export const allProducts: Product[] = [
     segment: 'STANDARD',
     warranty_years: 10,
     price_gross: 32154, // XLS Lp19 war.A
+    price_gross_b: 37066, // XLS Lp19 war.B
     eps_capable: true,
     image: '/products/goodwe-lynx.png',
   },
@@ -352,6 +371,7 @@ export const allProducts: Product[] = [
     segment: 'STANDARD',
     warranty_years: 10,
     price_gross: 45568, // XLS Lp20 war.A
+    price_gross_b: 50607, // XLS Lp20 war.B
     eps_capable: true,
     image: '/products/goodwe-lynx.png',
   },
@@ -371,6 +391,7 @@ export const allProducts: Product[] = [
     segment: 'STANDARD CROSS',
     warranty_years: 10,
     price_gross: 20885, // XLS Lp21 war.A
+    price_gross_b: 25796, // XLS Lp21 war.B
     eps_capable: true,
     image: '/products/dyness-tower.png',
   },
@@ -388,6 +409,7 @@ export const allProducts: Product[] = [
     segment: 'STANDARD CROSS',
     warranty_years: 10,
     price_gross: 24707, // XLS Lp22 war.A
+    price_gross_b: 29618, // XLS Lp22 war.B
     eps_capable: true,
     image: '/products/dyness-tower.png',
   },
@@ -407,6 +429,7 @@ export const allProducts: Product[] = [
     segment: 'STANDARD CROSS',
     warranty_years: 10,
     price_gross: 30476, // XLS Lp23 war.A
+    price_gross_b: 35388, // XLS Lp23 war.B
     eps_capable: true,
     image: '/products/goodwe-lynx.png',
   },
@@ -424,6 +447,7 @@ export const allProducts: Product[] = [
     segment: 'STANDARD CROSS',
     warranty_years: 10,
     price_gross: 40410, // XLS Lp24 war.A
+    price_gross_b: 45322, // XLS Lp24 war.B
     eps_capable: true,
     image: '/products/goodwe-lynx.png',
   },
@@ -443,6 +467,7 @@ export const allProducts: Product[] = [
     segment: 'STANDARD',
     warranty_years: 10,
     price_gross: 36163, // XLS Lp25 war.A
+    price_gross_b: 41392, // XLS Lp25 war.B
     eps_capable: true,
     image: '/products/huawei-luna.png',
   },
@@ -460,6 +485,7 @@ export const allProducts: Product[] = [
     segment: 'STANDARD',
     warranty_years: 10,
     price_gross: 46998, // XLS Lp26 war.A
+    price_gross_b: 52227, // XLS Lp26 war.B
     eps_capable: true,
     image: '/products/huawei-luna.png',
   },
@@ -477,6 +503,7 @@ export const allProducts: Product[] = [
     segment: 'STANDARD',
     warranty_years: 10,
     price_gross: 50767, // XLS Lp27 war.A
+    price_gross_b: 55996, // XLS Lp27 war.B
     eps_capable: true,
     image: '/products/huawei-luna.png',
   },
@@ -494,6 +521,7 @@ export const allProducts: Product[] = [
     segment: 'STANDARD',
     warranty_years: 10,
     price_gross: 51721, // XLS Lp28 war.A
+    price_gross_b: 56950, // XLS Lp28 war.B
     eps_capable: true,
     image: '/products/huawei-luna.png',
   },

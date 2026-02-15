@@ -1,24 +1,16 @@
 'use client';
 
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useConfigurator } from '@/hooks/useConfigurator';
-import { getRecommendations } from '@/lib/compatibility';
+import { getAllEligibleProducts } from '@/lib/compatibility';
 import { inverters } from '@/data/products';
 import { ProductCard } from './ProductCard';
-import { Sparkles, Info } from 'lucide-react';
+import { Sparkles, Info, ChevronLeft, ChevronRight } from 'lucide-react';
 
-/** Simple monthly installment calculator (Inbank: 8.99% nominal, 10 zl/month fee, 120 months) */
-function calcLowestRate(priceGross: number): number {
-  const nominalRate = 0.0899;
-  const monthlyFee = 10;
-  const months = 120;
-  const monthlyRate = nominalRate / 12;
-  if (priceGross <= 0) return 0;
-  const annuity =
-    (priceGross * monthlyRate * Math.pow(1 + monthlyRate, months)) /
-    (Math.pow(1 + monthlyRate, months) - 1);
-  return Math.round(annuity + monthlyFee);
-}
+const CARDS_PER_PAGE = 3;
+
+const premiumBrands = ['Sigenergy', 'Huawei'];
 
 export function StepRecommendation() {
   const {
@@ -32,17 +24,18 @@ export function StepRecommendation() {
     setSelectedInverterId,
   } = useConfigurator();
 
+  const [page, setPage] = useState(0);
+
   if (!installationType) return null;
 
-  const recommendations = getRecommendations(
-    installationType,
+  const allOptions = getAllEligibleProducts(
     pvPowerKwp,
     hasHeatPump,
     hasEV,
     backupPreference === 'yes'
   );
 
-  if (!recommendations) {
+  if (allOptions.length === 0) {
     return (
       <div className="text-center p-8">
         <p className="text-muted-foreground">
@@ -63,17 +56,16 @@ export function StepRecommendation() {
     setSelectedInverterId(inv?.id || null);
   };
 
-  const { recommended, economic, premium } = recommendations;
   const isRetrofit = installationType === 'retrofit';
+  const useBackupPrice = backupPreference === 'yes';
+  const totalPages = Math.ceil(allOptions.length / CARDS_PER_PAGE);
+  const startIdx = page * CARDS_PER_PAGE;
+  const visibleOptions = allOptions.slice(startIdx, startIdx + CARDS_PER_PAGE);
 
-  // Calculate lowest monthly rates for each option
-  const recRate = calcLowestRate(recommended.product.price_gross + (recommended.inverter?.price_gross || 0));
-  const econRate = economic ? calcLowestRate(economic.product.price_gross + (economic.inverter?.price_gross || 0)) : 0;
-  const premRate = premium ? calcLowestRate(premium.product.price_gross + (premium.inverter?.price_gross || 0)) : 0;
+  // First product (cheapest at min capacity) = recommended
+  const recommendedId = allOptions[0]?.product.id;
 
-  // Count how many options we have
-  const optionCount = 1 + (economic ? 1 : 0) + (premium ? 1 : 0);
-  const gridCols = optionCount >= 3 ? 'lg:grid-cols-3' : optionCount === 2 ? 'md:grid-cols-2' : '';
+  const gridCols = visibleOptions.length >= 3 ? 'lg:grid-cols-3' : visibleOptions.length === 2 ? 'md:grid-cols-2' : '';
 
   return (
     <motion.div
@@ -90,7 +82,7 @@ export function StepRecommendation() {
           </h2>
         </div>
         <p className="text-muted-foreground">
-          Na podstawie Twoich danych dobraliśmy {optionCount >= 3 ? '3 warianty' : 'optymalną konfigurację'} — wybierz najlepszy dla siebie
+          Dobraliśmy {allOptions.length} konfiguracji spełniających warunki dofinansowania — wybierz najlepszą dla siebie
         </p>
       </div>
 
@@ -104,52 +96,70 @@ export function StepRecommendation() {
         </div>
       )}
 
-      <div className={`grid gap-6 ${gridCols} max-w-5xl mx-auto`}>
-        {/* Economic option */}
-        {economic && (
-          <ProductCard
-            product={economic.product}
-            inverter={economic.inverter}
-            badge="Oszczędny"
-            badgeVariant="secondary"
-            isRecommended={false}
-            isSelected={selectedProductId === economic.product.id}
-            onSelect={() => handleSelect(economic.product.id, economic.inverter?.id)}
-            onUpgradeInverter={handleUpgradeInverter}
-            monthlyRate={econRate}
-            isRetrofit={isRetrofit}
-          />
+      {/* Carousel navigation */}
+      <div className="relative max-w-5xl mx-auto">
+        {totalPages > 1 && (
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <button
+              onClick={() => setPage(p => Math.max(0, p - 1))}
+              disabled={page === 0}
+              className="p-2 rounded-full border border-border bg-card hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+              aria-label="Poprzednie"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </button>
+            <span className="text-sm text-muted-foreground">
+              {startIdx + 1}–{Math.min(startIdx + CARDS_PER_PAGE, allOptions.length)} z {allOptions.length}
+            </span>
+            <button
+              onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
+              disabled={page >= totalPages - 1}
+              className="p-2 rounded-full border border-border bg-card hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+              aria-label="Następne"
+            >
+              <ChevronRight className="h-5 w-5" />
+            </button>
+          </div>
         )}
 
-        {/* Recommended — always present, center position */}
-        <ProductCard
-          product={recommended.product}
-          inverter={recommended.inverter}
-          badge="Najlepszy wybór"
-          badgeVariant="default"
-          isRecommended={true}
-          isSelected={selectedProductId === recommended.product.id}
-          onSelect={() => handleSelect(recommended.product.id, recommended.inverter?.id)}
-          onUpgradeInverter={handleUpgradeInverter}
-          monthlyRate={recRate}
-          isRetrofit={isRetrofit}
-        />
+        <div className={`grid gap-6 ${gridCols}`}>
+          {visibleOptions.map(({ product, inverter }) => {
+            const isRec = product.id === recommendedId;
+            const isPrem = premiumBrands.includes(product.brand);
 
-        {/* Premium option */}
-        {premium && (
-          <ProductCard
-            product={premium.product}
-            inverter={premium.inverter}
-            badge="Premium"
-            badgeVariant="outline"
-            isRecommended={false}
-            isPremium={true}
-            isSelected={selectedProductId === premium.product.id}
-            onSelect={() => handleSelect(premium.product.id, premium.inverter?.id)}
-            onUpgradeInverter={handleUpgradeInverter}
-            monthlyRate={premRate}
-            isRetrofit={isRetrofit}
-          />
+            return (
+              <ProductCard
+                key={product.id}
+                product={product}
+                inverter={inverter}
+                badge={isRec ? 'Najlepszy wybór' : isPrem ? 'Premium' : product.brand}
+                badgeVariant={isRec ? 'default' : isPrem ? 'outline' : 'secondary'}
+                isRecommended={isRec}
+                isPremium={isPrem && !isRec}
+                isSelected={selectedProductId === product.id}
+                onSelect={() => handleSelect(product.id, inverter?.id)}
+                onUpgradeInverter={handleUpgradeInverter}
+                useBackupPrice={useBackupPrice}
+                isRetrofit={isRetrofit}
+              />
+            );
+          })}
+        </div>
+
+        {/* Dot indicators */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-center gap-1.5 mt-4">
+            {Array.from({ length: totalPages }, (_, i) => (
+              <button
+                key={i}
+                onClick={() => setPage(i)}
+                className={`h-2 rounded-full transition-all ${
+                  i === page ? 'w-6 bg-primary' : 'w-2 bg-muted-foreground/30'
+                }`}
+                aria-label={`Strona ${i + 1}`}
+              />
+            ))}
+          </div>
         )}
       </div>
     </motion.div>
