@@ -2,9 +2,10 @@
 
 import Image from 'next/image';
 import { Product, Inverter } from '@/lib/types';
+import { allProducts } from '@/data/products';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Battery, Zap, Shield, Calendar, Check, CreditCard, Crown } from 'lucide-react';
+import { Battery, Zap, Shield, Calendar, Check, CreditCard, Crown, ArrowUpCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatCurrency } from '@/lib/calculations';
 
@@ -17,7 +18,9 @@ interface ProductCardProps {
   isPremium?: boolean;
   isSelected: boolean;
   onSelect: () => void;
+  onUpgradeInverter?: (productId: string) => void;
   monthlyRate?: number;
+  isRetrofit?: boolean;
 }
 
 export function ProductCard({
@@ -29,9 +32,23 @@ export function ProductCard({
   isPremium,
   isSelected,
   onSelect,
+  onUpgradeInverter,
   monthlyRate,
+  isRetrofit,
 }: ProductCardProps) {
   const totalPrice = product.price_gross + (inverter?.price_gross || 0);
+  // Cena retrofit: zestaw minus falownik (netto→brutto 8% VAT)
+  const inverterCostGross = Math.round(product.inverter_cost_net * 1.08);
+  const retrofitPrice = totalPrice - inverterCostGross;
+
+  // Znajdź wariant z większym falownikiem (ta sama marka, zbliżona pojemność)
+  const upgradeOption = allProducts.find(p =>
+    p.id !== product.id &&
+    p.brand === product.brand &&
+    Math.abs(p.capacity_kwh - product.capacity_kwh) < 1.5 &&
+    p.inverter_power_kw > product.inverter_power_kw
+  );
+  const upgradeDiff = upgradeOption ? upgradeOption.price_gross - product.price_gross : 0;
 
   return (
     <div
@@ -110,8 +127,8 @@ export function ProductCard({
           <div className="flex items-center gap-2">
             <Shield className="h-4 w-4 text-primary" />
             <div>
-              <p className="font-medium">{product.type}</p>
-              <p className="text-xs text-muted-foreground">Typ</p>
+              <p className="font-medium">{product.inverter_power_kw} kW</p>
+              <p className="text-xs text-muted-foreground">Falownik</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -142,6 +159,14 @@ export function ProductCard({
               {formatCurrency(totalPrice)}
             </span>
           </div>
+          {isRetrofit && retrofitPrice > 0 && (
+            <div className="flex items-baseline justify-between">
+              <span className="text-sm text-muted-foreground">Magazyn + montaż:</span>
+              <span className="text-lg font-heading text-green-500">
+                {formatCurrency(retrofitPrice)}
+              </span>
+            </div>
+          )}
           {monthlyRate && monthlyRate > 0 && (
             <div className="flex items-center gap-1.5 text-sm">
               <CreditCard className="h-3.5 w-3.5 text-muted-foreground" />
@@ -156,6 +181,18 @@ export function ProductCard({
             </p>
           )}
         </div>
+
+        {/* Upgrade inverter option */}
+        {upgradeOption && onUpgradeInverter && (
+          <button
+            onClick={() => onUpgradeInverter(upgradeOption.id)}
+            className="flex items-center gap-1.5 text-xs text-primary hover:text-primary/80 transition-colors py-1"
+          >
+            <ArrowUpCircle className="h-3.5 w-3.5" />
+            <span>Zwiększ falownik do {upgradeOption.inverter_power_kw} kW</span>
+            <span className="text-muted-foreground">(+{formatCurrency(upgradeDiff)})</span>
+          </button>
+        )}
 
         {/* Select button */}
         <Button

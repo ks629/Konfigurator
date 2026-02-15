@@ -109,9 +109,13 @@ function calculateSubsidy(
     );
   }
 
-  // Net-metering
+  // Net-metering: 800 zł × pojemność, nie więcej niż 30% inwestycji, max 8000 zł
+  if (input.battery_capacity_kwh < 10) return 0;
+
+  const qualifiedCapacityNM = Math.min(input.battery_capacity_kwh, 20);
   return Math.min(
-    totalInvestment * 0.3,
+    qualifiedCapacityNM * params.subsidy_pme_netbilling_per_kwh,
+    totalInvestment * params.subsidy_pme_netbilling_percent,
     params.subsidy_pme_netmetering_max
   );
 }

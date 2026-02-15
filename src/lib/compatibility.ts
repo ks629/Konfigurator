@@ -1,7 +1,5 @@
 import { InstallationType, Product, Inverter } from './types';
-import { productsAC, productsDC, inverters } from '@/data/products';
-
-const availableCapacities = [9, 10, 11, 12, 14, 15, 17, 18, 20, 21, 23];
+import { allProducts, inverters, availableCapacities } from '@/data/products';
 
 export function roundToNearestCapacity(capacity: number): number {
   let nearest = availableCapacities[0];
@@ -23,72 +21,16 @@ export function calculateRecommendedCapacity(
   hasEV: boolean,
   backupImportant: boolean
 ): number {
-  let base = pvPowerKwp * 1.2;
+  let base = pvPowerKwp * 2;
   if (hasHeatPump) base += 5;
   if (hasEV) base += 5;
   if (backupImportant) base += 2;
+  base = Math.max(base, 10); // minimalna pojemność 10 kWh
   return roundToNearestCapacity(base);
 }
 
-function getAdjacentCapacities(capacity: number): {
-  smaller: number | null;
-  larger: number | null;
-} {
-  const idx = availableCapacities.indexOf(capacity);
-
-  if (idx === -1) {
-    const sorted = [...availableCapacities, capacity].sort((a, b) => a - b);
-    const newIdx = sorted.indexOf(capacity);
-    return {
-      smaller: newIdx > 0 ? sorted[newIdx - 1] : null,
-      larger: newIdx < sorted.length - 1 ? sorted[newIdx + 1] : null,
-    };
-  }
-
-  return {
-    smaller: idx > 0 ? availableCapacities[idx - 1] : null,
-    larger:
-      idx < availableCapacities.length - 1
-        ? availableCapacities[idx + 1]
-        : null,
-  };
-}
-
-function findBestProduct(
-  products: Product[],
-  targetCapacity: number
-): Product | null {
-  if (products.length === 0) return null;
-
-  const sorted = [...products].sort(
-    (a, b) =>
-      Math.abs(a.capacity_kwh - targetCapacity) -
-      Math.abs(b.capacity_kwh - targetCapacity)
-  );
-  return sorted[0];
-}
-
-function findBestInverter(pvPowerKwp: number, batteryId?: string): Inverter {
-  // Find inverter compatible with chosen battery
-  if (batteryId) {
-    const compatible = inverters.filter((inv) =>
-      inv.compatible_batteries.includes(batteryId)
-    );
-    if (compatible.length > 0) {
-      return compatible.sort(
-        (a, b) =>
-          Math.abs(a.power_kw - pvPowerKwp) -
-          Math.abs(b.power_kw - pvPowerKwp)
-      )[0];
-    }
-  }
-  // Fallback: closest by power
-  const sorted = [...inverters].sort(
-    (a, b) =>
-      Math.abs(a.power_kw - pvPowerKwp) -
-      Math.abs(b.power_kw - pvPowerKwp)
-  );
-  return sorted[0];
+function findInverterForProduct(productId: string): Inverter | undefined {
+  return inverters.find((inv) => inv.compatible_batteries.includes(productId));
 }
 
 export interface RecommendationSet {
@@ -119,68 +61,63 @@ export function getRecommendations(
     hasEV,
     backupImportant
   );
-  const { smaller, larger } = getAdjacentCapacities(recCapacity);
 
-  const products =
-    installationType === 'retrofit' ? productsAC : productsDC;
-  const needsInverter =
-    installationType === 'hybrid' || installationType === 'upgrade';
+  // Sortuj wszystkie produkty: najpierw po bliskości pojemności, potem po cenie (najtańsza)
+  const sorted = [...allProducts].sort((a, b) => {
+    const diffA = Math.abs(a.capacity_kwh - recCapacity);
+    const diffB = Math.abs(b.capacity_kwh - recCapacity);
+    if (diffA !== diffB) return diffA - diffB;
+    return a.price_gross - b.price_gross;
+  });
 
-  const recProduct = findBestProduct(products, recCapacity);
-  if (!recProduct) return null;
+  if (sorted.length === 0) return null;
 
-  const recInverter = needsInverter ? findBestInverter(pvPowerKwp, recProduct.id) : undefined;
+  // Najtańsza opcja o najbliższej pojemności = rekomendacja
+  const recProduct = sorted[0];
 
-  const econProduct = smaller
-    ? findBestProduct(products, smaller)
-    : null;
-  const econInverter = econProduct && needsInverter ? findBestInverter(pvPowerKwp, econProduct.id) : undefined;
+  // Zbierz kolejne opcje (inne marki/zestawy) o zbliżonej pojemności
+  const candidates = sorted.filter(p => p.id !== recProduct.id);
 
-  const premProduct = larger
-    ? findBestProduct(products, larger)
-    : null;
-  const premInverter = premProduct && needsInverter ? findBestInverter(pvPowerKwp, premProduct.id) : undefined;
+  // Zapewnij min 1× Sigenergy lub Huawei w wynikach
+  const premiumBrands = ['Sigenergy', 'Huawei'];
+  const isPremiumRec = premiumBrands.includes(recProduct.brand);
 
-  const hasValidEconomic = econProduct && econProduct.id !== recProduct.id;
-  const hasValidPremium = premProduct && premProduct.id !== recProduct.id;
-
-  // Always try to return 3 options: economic + recommended + premium
-  // If economic not available, try finding a second premium option
-  // If premium not available, try finding a second economic option
   let econResult: { product: Product; inverter?: Inverter } | null = null;
   let premResult: { product: Product; inverter?: Inverter } | null = null;
 
-  if (hasValidEconomic) {
-    econResult = { product: econProduct!, inverter: econInverter };
-  }
-  if (hasValidPremium) {
-    premResult = { product: premProduct!, inverter: premInverter };
-  }
-
-  // If we don't have an economic option, try finding one from a different brand
-  if (!econResult && products.length > 1) {
-    const altProduct = products
-      .filter(p => p.id !== recProduct.id && p.id !== premProduct?.id)
-      .sort((a, b) => a.price_gross - b.price_gross)[0];
-    if (altProduct) {
-      const altInverter = needsInverter ? findBestInverter(pvPowerKwp, altProduct.id) : undefined;
-      econResult = { product: altProduct, inverter: altInverter };
+  if (isPremiumRec) {
+    // Rekomendacja to premium marka — szukaj 2 innych (najtańszych)
+    const others = candidates.filter(p => p.id !== recProduct.id);
+    if (others.length >= 1) {
+      econResult = { product: others[0], inverter: findInverterForProduct(others[0].id) };
     }
-  }
+    if (others.length >= 2) {
+      premResult = { product: others[1], inverter: findInverterForProduct(others[1].id) };
+    }
+  } else {
+    // Rekomendacja to standard — szukaj 1 innej standard + 1 premium
+    const otherStandard = candidates.find(p => !premiumBrands.includes(p.brand));
+    const premiumOption = candidates.find(p => premiumBrands.includes(p.brand));
 
-  // If we don't have a premium option, try finding one from a different brand
-  if (!premResult && products.length > 1) {
-    const altProduct = products
-      .filter(p => p.id !== recProduct.id && p.id !== econResult?.product.id)
-      .sort((a, b) => b.price_gross - a.price_gross)[0];
-    if (altProduct && altProduct.id !== recProduct.id) {
-      const altInverter = needsInverter ? findBestInverter(pvPowerKwp, altProduct.id) : undefined;
-      premResult = { product: altProduct, inverter: altInverter };
+    if (otherStandard) {
+      econResult = { product: otherStandard, inverter: findInverterForProduct(otherStandard.id) };
+    }
+    if (premiumOption) {
+      premResult = { product: premiumOption, inverter: findInverterForProduct(premiumOption.id) };
+    }
+
+    // Jeśli brak drugiej opcji, bierz cokolwiek
+    if (!econResult && candidates.length >= 1) {
+      econResult = { product: candidates[0], inverter: findInverterForProduct(candidates[0].id) };
+    }
+    if (!premResult && candidates.length >= 2) {
+      const alt = candidates.find(p => p.id !== econResult?.product.id);
+      if (alt) premResult = { product: alt, inverter: findInverterForProduct(alt.id) };
     }
   }
 
   return {
-    recommended: { product: recProduct, inverter: recInverter },
+    recommended: { product: recProduct, inverter: findInverterForProduct(recProduct.id) },
     economic: econResult,
     premium: premResult,
   };

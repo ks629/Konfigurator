@@ -71,10 +71,13 @@ export interface Product {
   power_continuous_kw: number;
   power_peak_kw: number;
   type: 'AC' | 'DC';
+  inverter_power_kw: number;
+  inverter_cost_net: number; // koszt falownika netto (XLS kol. I) — do odliczenia przy retrofit
   warranty_years: number;
   price_gross: number;
   eps_capable: boolean;
   image: string;
+  segment?: string;
   compatible_inverters?: string[];
 }
 

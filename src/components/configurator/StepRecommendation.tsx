@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { useConfigurator } from '@/hooks/useConfigurator';
 import { getRecommendations } from '@/lib/compatibility';
+import { inverters } from '@/data/products';
 import { ProductCard } from './ProductCard';
 import { Sparkles, Info } from 'lucide-react';
 
@@ -56,7 +57,14 @@ export function StepRecommendation() {
     setSelectedInverterId(inverterId || null);
   };
 
+  const handleUpgradeInverter = (newProductId: string) => {
+    const inv = inverters.find(i => i.compatible_batteries.includes(newProductId));
+    setSelectedProductId(newProductId);
+    setSelectedInverterId(inv?.id || null);
+  };
+
   const { recommended, economic, premium } = recommendations;
+  const isRetrofit = installationType === 'retrofit';
 
   // Calculate lowest monthly rates for each option
   const recRate = calcLowestRate(recommended.product.price_gross + (recommended.inverter?.price_gross || 0));
@@ -107,7 +115,9 @@ export function StepRecommendation() {
             isRecommended={false}
             isSelected={selectedProductId === economic.product.id}
             onSelect={() => handleSelect(economic.product.id, economic.inverter?.id)}
+            onUpgradeInverter={handleUpgradeInverter}
             monthlyRate={econRate}
+            isRetrofit={isRetrofit}
           />
         )}
 
@@ -120,7 +130,9 @@ export function StepRecommendation() {
           isRecommended={true}
           isSelected={selectedProductId === recommended.product.id}
           onSelect={() => handleSelect(recommended.product.id, recommended.inverter?.id)}
+          onUpgradeInverter={handleUpgradeInverter}
           monthlyRate={recRate}
+          isRetrofit={isRetrofit}
         />
 
         {/* Premium option */}
@@ -134,7 +146,9 @@ export function StepRecommendation() {
             isPremium={true}
             isSelected={selectedProductId === premium.product.id}
             onSelect={() => handleSelect(premium.product.id, premium.inverter?.id)}
+            onUpgradeInverter={handleUpgradeInverter}
             monthlyRate={premRate}
+            isRetrofit={isRetrofit}
           />
         )}
       </div>
