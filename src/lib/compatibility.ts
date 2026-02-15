@@ -22,9 +22,8 @@ export function calculateRecommendedCapacity(
   backupImportant: boolean
 ): number {
   let base = pvPowerKwp * 2;
-  if (hasHeatPump) base += 5;
-  if (hasEV) base += 5;
-  // backup nie zwiększa pojemności — zmienia tylko cenę (wariant B)
+  // Pompa ciepła i EV zwiększają zapotrzebowanie na energię (w kalkulacji ROI),
+  // ale NIE zwiększają wymaganej pojemności magazynu (wymóg dotacji: PV×2)
   base = Math.max(base, 10); // minimalna pojemność 10 kWh
   return roundToNearestCapacity(base);
 }
@@ -143,9 +142,9 @@ export function getAllEligibleProducts(
   hasEV: boolean,
   backupImportant: boolean
 ): ProductOption[] {
+  // Min capacity = PV×2 (wymóg dotacji), min 10 kWh
+  // Pompa/EV wpływają na zapotrzebowanie, nie na pojemność
   let minCapacity = pvPowerKwp * 2;
-  if (hasHeatPump) minCapacity += 5;
-  if (hasEV) minCapacity += 5;
   minCapacity = Math.max(minCapacity, 10);
 
   const eligible = allProducts
@@ -176,9 +175,8 @@ export function getTopPicks(
   hasHeatPump: boolean,
   hasEV: boolean,
 ): TopPicks | null {
+  // Min capacity = PV×2 (wymóg dotacji), min 10 kWh
   let minCapacity = pvPowerKwp * 2;
-  if (hasHeatPump) minCapacity += 5;
-  if (hasEV) minCapacity += 5;
   minCapacity = Math.max(minCapacity, 10);
 
   const eligible = allProducts
@@ -216,9 +214,8 @@ export function getBrandProducts(
   hasHeatPump: boolean,
   hasEV: boolean,
 ): ProductOption[] {
+  // Min capacity = PV×2 (wymóg dotacji), min 10 kWh
   let minCapacity = pvPowerKwp * 2;
-  if (hasHeatPump) minCapacity += 5;
-  if (hasEV) minCapacity += 5;
   minCapacity = Math.max(minCapacity, 10);
 
   // Dla GoodWe — pokaż też GoodWe/Dyness i GoodWe/BYD

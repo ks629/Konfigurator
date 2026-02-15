@@ -31,6 +31,7 @@ const tariffOptions: { value: Tariff; label: string; desc: string }[] = [
   { value: 'G12', label: 'G12', desc: 'Dwustrefowa dzien/noc' },
   { value: 'G12w', label: 'G12w', desc: 'Dwustrefowa weekendowa' },
   { value: 'G13', label: 'G13', desc: 'Trzystrefowa' },
+  { value: 'dynamic', label: 'Taryfa dynamiczna', desc: 'Cena zmienia sie co godzine wg rynku' },
   { value: 'unknown', label: 'Nie wiem', desc: '' },
 ];
 

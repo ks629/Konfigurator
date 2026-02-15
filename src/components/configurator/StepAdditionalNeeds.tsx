@@ -224,10 +224,11 @@ export function StepAdditionalNeeds() {
           <RadioGroup
             value={taxBracket.toString()}
             onValueChange={(val) => setTaxBracket(parseInt(val) as TaxBracket)}
-            className="grid grid-cols-2 gap-2"
+            className="grid grid-cols-3 gap-2"
           >
             {[
               { value: '12', label: '12% (I próg)' },
+              { value: '19', label: '19% (liniowy)' },
               { value: '32', label: '32% (II próg)' },
             ].map((opt) => (
               <label

@@ -17,7 +17,7 @@ import { ProjectionTable } from '@/components/calculator/ProjectionTable';
 import { FinancingSimulator } from '@/components/calculator/FinancingSimulator';
 import { ContactForm } from '@/components/forms/ContactForm';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, ArrowRight, FileText, CalendarCheck } from 'lucide-react';
+import { ArrowLeft, ArrowRight, FileText, CalendarCheck, Zap } from 'lucide-react';
 import { calculateROI, calculateMonthlyFromBill } from '@/lib/calculations';
 import { allProducts } from '@/data/products';
 import { inverters } from '@/data/products';
@@ -43,10 +43,13 @@ export default function KonfiguratorPage() {
   const calculation = useMemo(() => {
     if (!selectedProduct || !store.installationType) return null;
 
-    const annualConsumption =
+    let annualConsumption =
       store.consumptionMode === 'bill'
         ? calculateMonthlyFromBill(store.monthlyBill)
         : store.annualConsumptionKwh;
+    // Pompa ciepła i EV zwiększają zapotrzebowanie na energię
+    if (store.hasHeatPump) annualConsumption += 3000;
+    if (store.hasEV) annualConsumption += 3000;
 
     return calculateROI({
       pv_power_kwp: store.pvPowerKwp,
@@ -62,6 +65,38 @@ export default function KonfiguratorPage() {
       user_profile: store.userProfile,
       energy_operator: store.energyOperator,
       tariff: store.tariff,
+      pv_orientation: store.pvOrientation,
+      wants_subsidy: store.wantsSubsidy,
+      thermomodernization_used_percent: store.thermomodernizationUsedPercent,
+      tax_bracket: store.taxBracket,
+    });
+  }, [selectedProduct, selectedInverter, store]);
+
+  // Kalkulacja z taryfą dynamiczną (do porównania)
+  const dynamicCalculation = useMemo(() => {
+    if (!selectedProduct || !store.installationType) return null;
+    if (store.tariff === 'dynamic') return null; // już jest dynamiczna
+
+    let annualConsumption =
+      store.consumptionMode === 'bill'
+        ? calculateMonthlyFromBill(store.monthlyBill)
+        : store.annualConsumptionKwh;
+    if (store.hasHeatPump) annualConsumption += 3000;
+    if (store.hasEV) annualConsumption += 3000;
+
+    return calculateROI({
+      pv_power_kwp: store.pvPowerKwp,
+      annual_consumption_kwh: annualConsumption,
+      billing_system: store.billingSystem,
+      battery_capacity_kwh: selectedProduct.capacity_kwh,
+      battery_price_gross: selectedProduct.price_gross,
+      installation_type: store.installationType,
+      needs_inverter_upgrade: false,
+      inverter_price_gross: 0,
+      needs_backup: true,
+      user_profile: store.userProfile,
+      energy_operator: store.energyOperator,
+      tariff: 'dynamic',
       pv_orientation: store.pvOrientation,
       wants_subsidy: store.wantsSubsidy,
       thermomodernization_used_percent: store.thermomodernizationUsedPercent,
@@ -193,6 +228,63 @@ export default function KonfiguratorPage() {
                   <FinancingSimulator result={calculation} />
                 </div>
               </div>
+
+              {/* Dynamic Tariff Comparison Banner */}
+              {dynamicCalculation && store.tariff !== 'dynamic' && (
+                <div className="rounded-xl border-2 border-amber-400/30 bg-gradient-to-r from-amber-400/5 via-card to-amber-400/5 p-6 space-y-4">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-lg bg-amber-400/10">
+                      <Zap className="h-6 w-6 text-amber-400" />
+                    </div>
+                    <div>
+                      <h3 className="font-heading text-lg text-white">
+                        Zmień taryfę na dynamiczną — oszczędzaj więcej!
+                      </h3>
+                      <p className="text-sm text-muted-foreground">
+                        Magazyn energii pozwala ładować tanim prądem w nocy i zużywać w szczycie
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-4 text-center">
+                    <div className="bg-card rounded-lg p-3 border border-white/10">
+                      <p className="text-xs text-muted-foreground mb-1">Obecna taryfa ({store.tariff.toUpperCase()})</p>
+                      <p className="text-lg font-heading text-white">
+                        {calculation.annual_savings > 0 ? '+' : ''}{calculation.annual_savings.toLocaleString('pl-PL')} zł
+                      </p>
+                      <p className="text-xs text-muted-foreground">rocznie</p>
+                    </div>
+                    <div className="bg-amber-400/10 rounded-lg p-3 border border-amber-400/30">
+                      <p className="text-xs text-amber-300 mb-1">Taryfa dynamiczna</p>
+                      <p className="text-lg font-heading text-amber-400">
+                        {dynamicCalculation.annual_savings > 0 ? '+' : ''}{dynamicCalculation.annual_savings.toLocaleString('pl-PL')} zł
+                      </p>
+                      <p className="text-xs text-amber-300">rocznie</p>
+                    </div>
+                    <div className="bg-green-500/10 rounded-lg p-3 border border-green-500/30">
+                      <p className="text-xs text-green-300 mb-1">Dodatkowa korzyść</p>
+                      <p className="text-lg font-heading text-green-400">
+                        +{(dynamicCalculation.annual_savings - calculation.annual_savings).toLocaleString('pl-PL')} zł
+                      </p>
+                      <p className="text-xs text-green-300">rocznie więcej</p>
+                    </div>
+                  </div>
+
+                  {dynamicCalculation.roi_years && calculation.roi_years && dynamicCalculation.roi_years < calculation.roi_years && (
+                    <p className="text-sm text-amber-300">
+                      ⚡ Zwrot inwestycji szybszy o <span className="font-heading">{calculation.roi_years - dynamicCalculation.roi_years} {calculation.roi_years - dynamicCalculation.roi_years === 1 ? 'rok' : (calculation.roi_years - dynamicCalculation.roi_years < 5 ? 'lata' : 'lat')}</span> ({dynamicCalculation.roi_years} zamiast {calculation.roi_years} lat)
+                    </p>
+                  )}
+
+                  <Button
+                    onClick={() => store.setTariff('dynamic')}
+                    className="bg-gradient-to-r from-amber-400 to-amber-500 text-black hover:from-amber-500 hover:to-amber-600 font-bold"
+                  >
+                    <Zap className="h-4 w-4 mr-2" />
+                    Przelicz z taryfą dynamiczną
+                  </Button>
+                </div>
+              )}
 
               <ROIChart
                 projection={calculation.projection}

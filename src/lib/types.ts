@@ -6,7 +6,7 @@ export type BillingSystem = 'net-billing' | 'net-metering' | 'unknown';
 
 export type BackupPreference = 'yes' | 'no' | 'unknown';
 
-export type Tariff = 'G11' | 'G12' | 'G12w' | 'G13' | 'unknown';
+export type Tariff = 'G11' | 'G12' | 'G12w' | 'G13' | 'dynamic' | 'unknown';
 
 export type Priority =
   | 'savings'
@@ -23,7 +23,7 @@ export type EnergyOperator = 'tauron' | 'pge' | 'enea' | 'energa' | 'innogy';
 
 export type PVOrientation = 'south' | 'east_west' | 'east' | 'west';
 
-export type TaxBracket = 12 | 32;
+export type TaxBracket = 12 | 19 | 32;
 
 export interface OperatorPricing {
   operator: EnergyOperator;

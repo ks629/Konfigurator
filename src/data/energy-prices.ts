@@ -89,6 +89,24 @@ export const g12NightHours = [0, 1, 2, 3, 4, 5, 13, 14, 22, 23];
  * Oblicz ważoną cenę energii dla taryfy G12 na podstawie profilu PV.
  * Zwraca średnią cenę ważoną udziałem produkcji PV w godzinach dziennych/nocnych.
  */
+/**
+ * Parametry taryfy dynamicznej (RCE).
+ * Ceny netto z TGE, przeliczone na zł/kWh brutto (×1.23 VAT).
+ * Bazowane na średnich danych RCE 2024-2025.
+ */
+export const dynamicTariffParams = {
+  /** Średnia cena kupna w godzinach off-peak (noc 22-6, środek dnia 11-15): ~150-250 zł/MWh netto */
+  offPeakPrice: 0.20, // zł/kWh czynna brutto (noc/środek dnia)
+  /** Średnia cena kupna w godzinach szczytu (poranek 7-10, wieczór 17-21): ~500-800 zł/MWh netto */
+  peakPrice: 0.75, // zł/kWh czynna brutto (szczyt)
+  /** Średnia ważona cena całodobowa: ~350-500 zł/MWh netto */
+  avgPrice: 0.50, // zł/kWh czynna brutto
+  /** Sprawność cyklu ładowanie→rozładowanie magazynu */
+  roundTripEfficiency: 0.90,
+  /** Ile cykli arbitrażowych rocznie (ładowanie z sieci + oddanie) */
+  arbitrageCyclesPerYear: 250,
+};
+
 export function calcWeightedG12Price(
   dayPrice: number,
   nightPrice: number,

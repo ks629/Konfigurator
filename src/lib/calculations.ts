@@ -13,6 +13,7 @@ import {
   selfConsumptionProfiles,
   pvOrientationProfiles,
   calcWeightedG12Price,
+  dynamicTariffParams,
 } from '@/data/energy-prices';
 
 // ─────────────── Helpery wewnętrzne ───────────────
@@ -24,7 +25,7 @@ import {
 function resolveEnergyPrice(
   input: CalcInput,
   params: CalcParams
-): { buyPrice: number; dayPrice?: number; nightPrice?: number } {
+): { buyPrice: number; dayPrice?: number; nightPrice?: number; isDynamic?: boolean; offPeakPrice?: number; peakPrice?: number } {
   const dist = params.distribution_fees || defaultDistributionFees;
 
   if (input.energy_operator && input.tariff) {
@@ -39,6 +40,20 @@ function resolveEnergyPrice(
         const pvProfile = pvOrientationProfiles[orientation] || pvOrientationProfiles.south;
         const weighted = calcWeightedG12Price(dayFull, nightFull, pvProfile);
         return { buyPrice: weighted, dayPrice: dayFull, nightPrice: nightFull };
+      }
+      if (tariff === 'dynamic') {
+        // Taryfa dynamiczna: cena zmienia się co godzinę wg RCE.
+        // Magazyn pozwala kupować tanio (noc/południe) i unikać szczytu wieczornego.
+        const dyn = dynamicTariffParams;
+        const avgFull = dyn.avgPrice + dist.total;
+        const offPeakFull = dyn.offPeakPrice + dist.total;
+        const peakFull = dyn.peakPrice + dist.total;
+        return {
+          buyPrice: avgFull,
+          isDynamic: true,
+          offPeakPrice: offPeakFull,
+          peakPrice: peakFull,
+        };
       }
       // G11, G13, unknown — jednostrefowa
       return { buyPrice: op.g11 + dist.total };
@@ -205,7 +220,8 @@ export function calculateROI(
 
   // 4. PRODUKCJA I ZUŻYCIE
   const annualProduction = input.pv_power_kwp * params.pv_production_per_kwp;
-  const { buyPrice } = resolveEnergyPrice(input, params);
+  const priceInfo = resolveEnergyPrice(input, params);
+  const { buyPrice } = priceInfo;
   const { withBattery: selfConsumptionRate, withoutBattery: selfConsumptionRateWithout } =
     resolveSelfConsumption(input, params);
 
@@ -213,6 +229,18 @@ export function calculateROI(
     input.billing_system === 'net-metering'
       ? buyPrice * params.energy_sell_price_netmetering
       : params.energy_sell_price_rce;
+
+  // 4a. ARBITRAŻ CENOWY — taryfa dynamiczna
+  // Magazyn ładowany tanim prądem z sieci (noc/południe) i zużywany w szczycie wieczornym.
+  // Zysk = (cena_peak - cena_offpeak) × pojemność × DoD × sprawność × cykle/rok
+  let baseArbitrageSavings = 0;
+  if (priceInfo.isDynamic && priceInfo.peakPrice && priceInfo.offPeakPrice) {
+    const dyn = dynamicTariffParams;
+    const usableCapacity = input.battery_capacity_kwh * 0.90; // 90% DoD
+    const spreadPerKwh = priceInfo.peakPrice - priceInfo.offPeakPrice;
+    const netSpread = spreadPerKwh * dyn.roundTripEfficiency;
+    baseArbitrageSavings = usableCapacity * netSpread * dyn.arbitrageCyclesPerYear;
+  }
 
   // 5. OSZCZĘDNOŚCI ROCZNE (rok 1)
   const energyConsumedWithBattery = annualProduction * selfConsumptionRate;
@@ -226,7 +254,7 @@ export function calculateROI(
   const savingsWithout =
     energyConsumedWithout * buyPrice + energySoldWithout * sellPrice;
 
-  const annualSavingsFromBattery = savingsWithBattery - savingsWithout;
+  const annualSavingsFromBattery = (savingsWithBattery - savingsWithout) + baseArbitrageSavings;
 
   // 6. PROJEKCJA (do max(horizon, 20) lat dla backward compat)
   const maxYears = Math.max(horizon, 20);
@@ -267,7 +295,10 @@ export function calculateROI(
         sellPrice *
         priceGrowth;
 
-    const netYearlySavings = yearlySavings - yearlySavingsWithout;
+    // Arbitraż cenowy (taryfa dynamiczna) — skalowany degradacją baterii i wzrostem cen
+    const yearlyArbitrage = baseArbitrageSavings * batteryDegradation * priceGrowth;
+
+    const netYearlySavings = (yearlySavings - yearlySavingsWithout) + yearlyArbitrage;
     cumulativeSavings += netYearlySavings;
 
     if (cumulativeSavings >= 0 && roiYear === null) {
