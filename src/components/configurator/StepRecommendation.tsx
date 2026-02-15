@@ -1,9 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useConfigurator } from '@/hooks/useConfigurator';
-import { getTopPicks, getBrandProducts } from '@/lib/compatibility';
+import { getRecommendedProducts, getBrandProducts } from '@/lib/compatibility';
 import { inverters } from '@/data/products';
 import { ProductCard } from './ProductCard';
 import { Sparkles, Info, ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react';
@@ -22,15 +22,17 @@ export function StepRecommendation() {
     setSelectedInverterId,
   } = useConfigurator();
 
-  // null = main view (3 top picks), string = brand drill-down
+  // null = main view, string = brand drill-down
   const [selectedBrand, setSelectedBrand] = useState<string | null>(null);
   const [page, setPage] = useState(0);
+  // Carousel index for "others" in main view
+  const [othersStart, setOthersStart] = useState(0);
 
   if (!installationType) return null;
 
-  const topPicks = getTopPicks(pvPowerKwp, hasHeatPump, hasEV);
+  const picks = getRecommendedProducts(pvPowerKwp, hasHeatPump, hasEV);
 
-  if (!topPicks) {
+  if (!picks) {
     return (
       <div className="text-center p-8">
         <p className="text-muted-foreground">
@@ -39,6 +41,8 @@ export function StepRecommendation() {
       </div>
     );
   }
+
+  const { recommended, others } = picks;
 
   const handleSelect = (productId: string, inverterId?: string) => {
     setSelectedProductId(productId);
@@ -157,8 +161,13 @@ export function StepRecommendation() {
     );
   }
 
-  // === MAIN VIEW — 3 TOP PICKS ===
-  const { cheapest, bestSeller, premium } = topPicks;
+  // === MAIN VIEW — 1 recommended + carousel of others ===
+
+  // How many "others" cards visible at once (max 2 on desktop to keep layout balanced)
+  const OTHERS_VISIBLE = Math.min(others.length, 2);
+  const canScrollLeft = othersStart > 0;
+  const canScrollRight = othersStart + OTHERS_VISIBLE < others.length;
+  const visibleOthers = others.slice(othersStart, othersStart + OTHERS_VISIBLE);
 
   return (
     <motion.div
@@ -175,7 +184,7 @@ export function StepRecommendation() {
           </h2>
         </div>
         <p className="text-muted-foreground">
-          Na podstawie Twoich danych dobraliśmy 3 warianty — wybierz najlepszy dla siebie
+          Wybraliśmy najlepszy zestaw dla Twojej instalacji — zobacz też inne pasujące opcje
         </p>
       </div>
 
@@ -189,52 +198,114 @@ export function StepRecommendation() {
         </div>
       )}
 
-      <div className="grid gap-6 lg:grid-cols-3 max-w-5xl mx-auto">
-        {/* Najtańszy */}
-        <ProductCard
-          product={cheapest.product}
-          inverter={cheapest.inverter}
-          badge="Najtańszy"
-          badgeVariant="secondary"
-          isRecommended={false}
-          isSelected={selectedProductId === cheapest.product.id}
-          onSelect={() => handleSelect(cheapest.product.id, cheapest.inverter?.id)}
-          onUpgradeInverter={handleUpgradeInverter}
-          useBackupPrice={useBackupPrice}
-          isRetrofit={isRetrofit}
-          onBrandClick={() => handleBrandClick(cheapest.product.brand.split('/')[0])}
-        />
+      <div className="max-w-5xl mx-auto">
+        {/* Grid: recommended (wider) + others carousel */}
+        <div className="grid gap-6 lg:grid-cols-5">
+          {/* Recommended — takes 2 cols */}
+          <div className="lg:col-span-2">
+            <ProductCard
+              product={recommended.product}
+              inverter={recommended.inverter}
+              badge="Rekomendacja"
+              badgeVariant="default"
+              isRecommended={true}
+              isSelected={selectedProductId === recommended.product.id}
+              onSelect={() => handleSelect(recommended.product.id, recommended.inverter?.id)}
+              onUpgradeInverter={handleUpgradeInverter}
+              useBackupPrice={useBackupPrice}
+              isRetrofit={isRetrofit}
+              onBrandClick={() => handleBrandClick(recommended.product.brand.split('/')[0])}
+            />
+          </div>
 
-        {/* Best Seller */}
-        <ProductCard
-          product={bestSeller.product}
-          inverter={bestSeller.inverter}
-          badge="Best Seller"
-          badgeVariant="default"
-          isRecommended={true}
-          isSelected={selectedProductId === bestSeller.product.id}
-          onSelect={() => handleSelect(bestSeller.product.id, bestSeller.inverter?.id)}
-          onUpgradeInverter={handleUpgradeInverter}
-          useBackupPrice={useBackupPrice}
-          isRetrofit={isRetrofit}
-          onBrandClick={() => handleBrandClick(bestSeller.product.brand.split('/')[0])}
-        />
+          {/* Others carousel — takes 3 cols */}
+          {others.length > 0 && (
+            <div className="lg:col-span-3 flex flex-col">
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-sm text-muted-foreground">
+                  Inne pasujące zestawy ({others.length})
+                </p>
+                {others.length > OTHERS_VISIBLE && (
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setOthersStart(s => Math.max(0, s - 1))}
+                      disabled={!canScrollLeft}
+                      className="p-1.5 rounded-full border border-border bg-card hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                    </button>
+                    <span className="text-xs text-muted-foreground tabular-nums">
+                      {othersStart + 1}–{Math.min(othersStart + OTHERS_VISIBLE, others.length)} / {others.length}
+                    </span>
+                    <button
+                      onClick={() => setOthersStart(s => Math.min(others.length - OTHERS_VISIBLE, s + 1))}
+                      disabled={!canScrollRight}
+                      className="p-1.5 rounded-full border border-border bg-card hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                    >
+                      <ChevronRight className="h-4 w-4" />
+                    </button>
+                  </div>
+                )}
+              </div>
 
-        {/* Premium */}
-        <ProductCard
-          product={premium.product}
-          inverter={premium.inverter}
-          badge="Premium"
-          badgeVariant="outline"
-          isRecommended={false}
-          isPremium={true}
-          isSelected={selectedProductId === premium.product.id}
-          onSelect={() => handleSelect(premium.product.id, premium.inverter?.id)}
-          onUpgradeInverter={handleUpgradeInverter}
-          useBackupPrice={useBackupPrice}
-          isRetrofit={isRetrofit}
-          onBrandClick={() => handleBrandClick(premium.product.brand.split('/')[0])}
-        />
+              <div className={`grid gap-4 flex-1 ${visibleOthers.length >= 2 ? 'md:grid-cols-2' : ''}`}>
+                <AnimatePresence mode="popLayout">
+                  {visibleOthers.map(({ product, inverter }) => (
+                    <motion.div
+                      key={product.id}
+                      initial={{ opacity: 0, x: 30 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -30 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <ProductCard
+                        product={product}
+                        inverter={inverter}
+                        badge={
+                          PREMIUM_BRANDS.includes(product.brand)
+                            ? 'Premium'
+                            : BESTSELLER_BRANDS.includes(product.brand)
+                            ? 'Best Seller'
+                            : product.capacity_kwh + ' kWh'
+                        }
+                        badgeVariant={
+                          PREMIUM_BRANDS.includes(product.brand)
+                            ? 'outline'
+                            : BESTSELLER_BRANDS.includes(product.brand)
+                            ? 'default'
+                            : 'secondary'
+                        }
+                        isRecommended={false}
+                        isPremium={PREMIUM_BRANDS.includes(product.brand)}
+                        isSelected={selectedProductId === product.id}
+                        onSelect={() => handleSelect(product.id, inverter?.id)}
+                        onUpgradeInverter={handleUpgradeInverter}
+                        useBackupPrice={useBackupPrice}
+                        isRetrofit={isRetrofit}
+                        onBrandClick={() => handleBrandClick(product.brand.split('/')[0])}
+                      />
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              </div>
+
+              {/* Dot indicators */}
+              {others.length > OTHERS_VISIBLE && (
+                <div className="flex items-center justify-center gap-1.5 mt-3">
+                  {Array.from({ length: others.length - OTHERS_VISIBLE + 1 }, (_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setOthersStart(i)}
+                      className={`h-2 rounded-full transition-all ${
+                        i === othersStart ? 'w-5 bg-primary' : 'w-2 bg-muted-foreground/30'
+                      }`}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       </div>
 
       <p className="text-center text-xs text-muted-foreground">
@@ -243,3 +314,7 @@ export function StepRecommendation() {
     </motion.div>
   );
 }
+
+// Re-export brand constants for badge logic
+const BESTSELLER_BRANDS = ['FoxESS'];
+const PREMIUM_BRANDS = ['Sigenergy'];

@@ -167,15 +167,37 @@ export interface TopPicks {
 }
 
 /**
- * Get 3 top picks: najtańszy, best seller (FoxESS), premium (Sigenergy).
- * Each is the cheapest product of its category that meets subsidy min capacity.
+ * @deprecated Use getRecommendedProducts instead
  */
 export function getTopPicks(
   pvPowerKwp: number,
   hasHeatPump: boolean,
   hasEV: boolean,
 ): TopPicks | null {
-  // Min capacity = PV×2 (wymóg dotacji), min 10 kWh
+  const result = getRecommendedProducts(pvPowerKwp, hasHeatPump, hasEV);
+  if (!result) return null;
+  return {
+    cheapest: result.recommended,
+    bestSeller: result.others[0] || result.recommended,
+    premium: result.others[1] || result.recommended,
+  };
+}
+
+export interface RecommendedProducts {
+  recommended: ProductOption;     // Wyróżniony zestaw (najtańszy pasujący)
+  others: ProductOption[];        // Kolejne unikalne zestawy (max 5)
+}
+
+/**
+ * 1 wyróżniony zestaw + max 5 kolejnych pasujących (bez duplikatów).
+ * Najtańszy z każdej marki, potem kolejne warianty.
+ * Sortowanie: najtańszy z każdej marki najpierw, potem reszta po cenie.
+ */
+export function getRecommendedProducts(
+  pvPowerKwp: number,
+  hasHeatPump: boolean,
+  hasEV: boolean,
+): RecommendedProducts | null {
   let minCapacity = pvPowerKwp * 2;
   minCapacity = Math.max(minCapacity, 10);
 
@@ -185,22 +207,31 @@ export function getTopPicks(
 
   if (eligible.length === 0) return null;
 
-  // Najtańszy ogółem (zwykle GoodWe/Dyness)
-  const cheapest = eligible[0];
+  // Wyróżniony = najtańszy ogółem
+  const recommended = eligible[0];
 
-  // Best Seller: najtańszy FoxESS
-  const bestSeller = eligible.find(p => BESTSELLER_BRANDS.includes(p.brand))
-    || eligible.find(p => !PREMIUM_BRANDS.includes(p.brand) && p.id !== cheapest.id)
-    || eligible[1] || cheapest;
+  // Zbierz najtańszego z każdej marki (poza rekomendowanym)
+  const brandCheapest = new Map<string, Product>();
+  for (const p of eligible) {
+    if (p.id === recommended.id) continue;
+    const baseBrand = p.brand.split('/')[0]; // GoodWe/Dyness -> GoodWe
+    if (!brandCheapest.has(baseBrand)) {
+      brandCheapest.set(baseBrand, p);
+    }
+  }
 
-  // Premium: najtańszy Sigenergy
-  const premium = eligible.find(p => PREMIUM_BRANDS.includes(p.brand))
-    || eligible[eligible.length - 1] || cheapest;
+  // Najpierw najtańsi z każdej marki (sortowani po cenie), potem reszta
+  const brandPicks = [...brandCheapest.values()].sort((a, b) => a.price_gross - b.price_gross);
+  const usedIds = new Set([recommended.id, ...brandPicks.map(p => p.id)]);
+  const remaining = eligible.filter(p => !usedIds.has(p.id));
+
+  const others = [...brandPicks, ...remaining]
+    .slice(0, 5)
+    .map(p => ({ product: p, inverter: findInverterForProduct(p.id) }));
 
   return {
-    cheapest: { product: cheapest, inverter: findInverterForProduct(cheapest.id) },
-    bestSeller: { product: bestSeller, inverter: findInverterForProduct(bestSeller.id) },
-    premium: { product: premium, inverter: findInverterForProduct(premium.id) },
+    recommended: { product: recommended, inverter: findInverterForProduct(recommended.id) },
+    others,
   };
 }
 
