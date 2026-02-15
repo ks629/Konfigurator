@@ -143,7 +143,10 @@ export function getAllEligibleProducts(
   hasEV: boolean,
   backupImportant: boolean
 ): ProductOption[] {
-  const minCapacity = Math.max(pvPowerKwp * 2, 10);
+  let minCapacity = pvPowerKwp * 2;
+  if (hasHeatPump) minCapacity += 5;
+  if (hasEV) minCapacity += 5;
+  minCapacity = Math.max(minCapacity, 10);
 
   const eligible = allProducts
     .filter(p => p.capacity_kwh >= minCapacity)
@@ -173,7 +176,10 @@ export function getTopPicks(
   hasHeatPump: boolean,
   hasEV: boolean,
 ): TopPicks | null {
-  const minCapacity = Math.max(pvPowerKwp * 2, 10);
+  let minCapacity = pvPowerKwp * 2;
+  if (hasHeatPump) minCapacity += 5;
+  if (hasEV) minCapacity += 5;
+  minCapacity = Math.max(minCapacity, 10);
 
   const eligible = allProducts
     .filter(p => p.capacity_kwh >= minCapacity)
@@ -210,7 +216,10 @@ export function getBrandProducts(
   hasHeatPump: boolean,
   hasEV: boolean,
 ): ProductOption[] {
-  const minCapacity = Math.max(pvPowerKwp * 2, 10);
+  let minCapacity = pvPowerKwp * 2;
+  if (hasHeatPump) minCapacity += 5;
+  if (hasEV) minCapacity += 5;
+  minCapacity = Math.max(minCapacity, 10);
 
   // Dla GoodWe — pokaż też GoodWe/Dyness i GoodWe/BYD
   const eligible = allProducts

@@ -27,7 +27,7 @@ const TOTAL_STEPS = 5;
 
 export default function KonfiguratorPage() {
   const store = useConfigurator();
-  const { currentStep, nextStep, prevStep, selectedProductId, selectedInverterId } = store;
+  const { currentStep, nextStep, prevStep, setStep, selectedProductId, selectedInverterId } = store;
   const [contactFormOpen, setContactFormOpen] = useState(false);
 
   const selectedProduct = useMemo(
@@ -148,7 +148,7 @@ export default function KonfiguratorPage() {
         <div className="container mx-auto px-4 py-6 md:py-10 relative z-10">
           {/* Progress */}
           <div className="max-w-3xl mx-auto mb-8">
-            <ProgressBar currentStep={currentStep} totalSteps={TOTAL_STEPS} />
+            <ProgressBar currentStep={currentStep} totalSteps={TOTAL_STEPS} onStepClick={setStep} />
           </div>
 
           {/* Step Content */}

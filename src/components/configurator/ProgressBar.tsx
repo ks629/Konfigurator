@@ -6,6 +6,7 @@ import { Check } from 'lucide-react';
 interface ProgressBarProps {
   currentStep: number;
   totalSteps: number;
+  onStepClick?: (step: number) => void;
 }
 
 const stepLabels = [
@@ -16,7 +17,7 @@ const stepLabels = [
   'Rekomendacja',
 ];
 
-export function ProgressBar({ currentStep, totalSteps }: ProgressBarProps) {
+export function ProgressBar({ currentStep, totalSteps, onStepClick }: ProgressBarProps) {
   const percentage = Math.round(((currentStep - 1) / (totalSteps - 1)) * 100);
 
   return (
@@ -36,19 +37,26 @@ export function ProgressBar({ currentStep, totalSteps }: ProgressBarProps) {
           const isCompleted = step < currentStep;
           const isCurrent = step === currentStep;
 
+          const canClick = isCompleted && onStepClick;
+
           return (
             <div key={step} className="flex items-center flex-1">
               <div className="flex items-center w-full">
-                <div
+                <button
+                  type="button"
+                  disabled={!canClick}
+                  onClick={() => canClick && onStepClick(step)}
                   className={cn(
                     'flex items-center justify-center w-8 h-8 rounded-full border-2 text-sm font-medium transition-all shrink-0',
                     isCompleted && 'bg-primary border-primary text-primary-foreground',
                     isCurrent && 'border-primary text-primary',
-                    !isCompleted && !isCurrent && 'border-muted-foreground/30 text-muted-foreground/50'
+                    !isCompleted && !isCurrent && 'border-muted-foreground/30 text-muted-foreground/50',
+                    canClick && 'cursor-pointer hover:ring-2 hover:ring-primary/50',
+                    !canClick && 'cursor-default'
                   )}
                 >
                   {isCompleted ? <Check className="h-4 w-4" /> : step}
-                </div>
+                </button>
                 {step < totalSteps && (
                   <div
                     className={cn(
@@ -64,17 +72,26 @@ export function ProgressBar({ currentStep, totalSteps }: ProgressBarProps) {
       </div>
 
       <div className="hidden sm:flex items-center justify-between mt-2">
-        {stepLabels.map((label, i) => (
-          <span
-            key={label}
-            className={cn(
-              'text-xs text-center flex-1',
-              i + 1 <= currentStep ? 'text-primary font-medium' : 'text-muted-foreground/50'
-            )}
-          >
-            {label}
-          </span>
-        ))}
+        {stepLabels.map((label, i) => {
+          const stepNum = i + 1;
+          const canClickLabel = stepNum < currentStep && onStepClick;
+          return (
+            <button
+              key={label}
+              type="button"
+              disabled={!canClickLabel}
+              onClick={() => canClickLabel && onStepClick(stepNum)}
+              className={cn(
+                'text-xs text-center flex-1',
+                stepNum <= currentStep ? 'text-primary font-medium' : 'text-muted-foreground/50',
+                canClickLabel && 'cursor-pointer hover:text-white transition-colors',
+                !canClickLabel && 'cursor-default'
+              )}
+            >
+              {label}
+            </button>
+          );
+        })}
       </div>
     </div>
   );
