@@ -128,8 +128,13 @@ export interface ProductOption {
   inverter?: Inverter;
 }
 
+/** Marki best-seller (FoxESS) */
+const BESTSELLER_BRANDS = ['FoxESS'];
+/** Marki premium (Sigenergy) */
+const PREMIUM_BRANDS = ['Sigenergy'];
+
 /**
- * Get all eligible products sorted by capacity then price.
+ * Get all eligible products for a given min capacity.
  * Min capacity = pvPowerKwp × 2 (subsidy requirement), at least 10 kWh.
  */
 export function getAllEligibleProducts(
@@ -142,6 +147,74 @@ export function getAllEligibleProducts(
 
   const eligible = allProducts
     .filter(p => p.capacity_kwh >= minCapacity)
+    .sort((a, b) => {
+      if (a.capacity_kwh !== b.capacity_kwh) return a.capacity_kwh - b.capacity_kwh;
+      return a.price_gross - b.price_gross;
+    });
+
+  return eligible.map(p => ({
+    product: p,
+    inverter: findInverterForProduct(p.id),
+  }));
+}
+
+export interface TopPicks {
+  cheapest: ProductOption;       // Najtańszy — GoodWe/Dyness
+  bestSeller: ProductOption;     // Best Seller — FoxESS
+  premium: ProductOption;        // Premium — Sigenergy
+}
+
+/**
+ * Get 3 top picks: najtańszy, best seller (FoxESS), premium (Sigenergy).
+ * Each is the cheapest product of its category that meets subsidy min capacity.
+ */
+export function getTopPicks(
+  pvPowerKwp: number,
+  hasHeatPump: boolean,
+  hasEV: boolean,
+): TopPicks | null {
+  const minCapacity = Math.max(pvPowerKwp * 2, 10);
+
+  const eligible = allProducts
+    .filter(p => p.capacity_kwh >= minCapacity)
+    .sort((a, b) => a.price_gross - b.price_gross);
+
+  if (eligible.length === 0) return null;
+
+  // Najtańszy ogółem (zwykle GoodWe/Dyness)
+  const cheapest = eligible[0];
+
+  // Best Seller: najtańszy FoxESS
+  const bestSeller = eligible.find(p => BESTSELLER_BRANDS.includes(p.brand))
+    || eligible.find(p => !PREMIUM_BRANDS.includes(p.brand) && p.id !== cheapest.id)
+    || eligible[1] || cheapest;
+
+  // Premium: najtańszy Sigenergy
+  const premium = eligible.find(p => PREMIUM_BRANDS.includes(p.brand))
+    || eligible[eligible.length - 1] || cheapest;
+
+  return {
+    cheapest: { product: cheapest, inverter: findInverterForProduct(cheapest.id) },
+    bestSeller: { product: bestSeller, inverter: findInverterForProduct(bestSeller.id) },
+    premium: { product: premium, inverter: findInverterForProduct(premium.id) },
+  };
+}
+
+/**
+ * Get all products of a specific brand that meet subsidy requirements.
+ * Used when user clicks on a brand card to see their full range.
+ */
+export function getBrandProducts(
+  brand: string,
+  pvPowerKwp: number,
+  hasHeatPump: boolean,
+  hasEV: boolean,
+): ProductOption[] {
+  const minCapacity = Math.max(pvPowerKwp * 2, 10);
+
+  // Dla GoodWe — pokaż też GoodWe/Dyness i GoodWe/BYD
+  const eligible = allProducts
+    .filter(p => p.capacity_kwh >= minCapacity && p.brand.startsWith(brand))
     .sort((a, b) => {
       if (a.capacity_kwh !== b.capacity_kwh) return a.capacity_kwh - b.capacity_kwh;
       return a.price_gross - b.price_gross;

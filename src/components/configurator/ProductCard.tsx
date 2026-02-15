@@ -34,6 +34,7 @@ interface ProductCardProps {
   onUpgradeInverter?: (productId: string) => void;
   useBackupPrice?: boolean;
   isRetrofit?: boolean;
+  onBrandClick?: () => void;
 }
 
 export function ProductCard({
@@ -48,6 +49,7 @@ export function ProductCard({
   onUpgradeInverter,
   useBackupPrice,
   isRetrofit,
+  onBrandClick,
 }: ProductCardProps) {
   // Wariant B (pełny backup SZR) lub A (EPS / bez backup) — cena brutto za cały zestaw
   const totalPrice = useBackupPrice ? product.price_gross_b : product.price_gross;
@@ -103,9 +105,18 @@ export function ProductCard({
           <Battery className="h-20 w-20 text-muted-foreground/30" />
         )}
         <div className="absolute bottom-2 left-2 z-10">
-          <span className="text-xs bg-black/50 text-white px-2 py-1 rounded">
-            {product.brand}
-          </span>
+          {onBrandClick ? (
+            <button
+              onClick={(e) => { e.stopPropagation(); onBrandClick(); }}
+              className="text-xs bg-black/50 text-white px-2 py-1 rounded hover:bg-primary/80 transition-colors"
+            >
+              {product.brand} — więcej ›
+            </button>
+          ) : (
+            <span className="text-xs bg-black/50 text-white px-2 py-1 rounded">
+              {product.brand}
+            </span>
+          )}
         </div>
       </div>
 
