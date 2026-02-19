@@ -109,29 +109,29 @@
   }
 }
 
-/* Dark NEXBE theme for configurator pages */
+/* Dark NEXBE theme for configurator pages — aligned with magazyny.nexbe.pl */
 .nexbe-dark {
-  --background: #0f0520;
-  --foreground: #f0eaf5;
-  --card: #150830;
-  --card-foreground: #f0eaf5;
-  --popover: #1a0a35;
-  --popover-foreground: #f0eaf5;
-  --primary: #e8478f;
+  --background: #0D0019;
+  --foreground: #F0E8FF;
+  --card: #1A0033;
+  --card-foreground: #F0E8FF;
+  --popover: #1A0033;
+  --popover-foreground: #F0E8FF;
+  --primary: #B5005D;
   --primary-foreground: #ffffff;
-  --secondary: #1f0e3a;
-  --secondary-foreground: #f0eaf5;
-  --muted: #1a0a35;
-  --muted-foreground: #b8a8d0;
-  --accent: #1f0e3a;
-  --accent-foreground: #f0eaf5;
-  --border: rgba(200, 170, 255, 0.15);
-  --input: rgba(200, 170, 255, 0.12);
-  --ring: #e8478f;
+  --secondary: #230045;
+  --secondary-foreground: #F0E8FF;
+  --muted: #1A0033;
+  --muted-foreground: rgba(240, 232, 255, 0.70);
+  --accent: #230045;
+  --accent-foreground: #F0E8FF;
+  --border: rgba(181, 0, 93, 0.15);
+  --input: rgba(181, 0, 93, 0.10);
+  --ring: #B5005D;
 
   /* Apply actual color so all children inherit the dark theme foreground */
-  color: #f0eaf5;
-  background-color: #0f0520;
+  color: #F0E8FF;
+  background-color: #0D0019;
 }
 
 /* ===== Green overrides for dark theme ===== */

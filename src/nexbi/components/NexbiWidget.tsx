@@ -30,7 +30,7 @@ export default function NexbiWidget({ knowledge }: Props) {
   }, [messages, isTyping]);
 
   useEffect(() => {
-    const delay = config.bubbleDelay ?? 5000;
+    const delay = config.bubbleDelay ?? 3000;
     const timer = setTimeout(() => {
       if (!dismissed && !isOpen) setShowBubble(true);
     }, delay);
@@ -39,7 +39,7 @@ export default function NexbiWidget({ knowledge }: Props) {
 
   useEffect(() => {
     if (showBubble && !isOpen) {
-      const timer = setTimeout(() => setShowBubble(false), 8000);
+      const timer = setTimeout(() => setShowBubble(false), 12000);
       return () => clearTimeout(timer);
     }
   }, [showBubble, isOpen]);
@@ -346,7 +346,7 @@ export default function NexbiWidget({ knowledge }: Props) {
       {/* FAB */}
       <motion.button
         onClick={isOpen ? handleClose : handleOpen}
-        className="relative w-16 h-16 rounded-2xl bg-gradient-to-br from-[#B5005D] to-[#FF004E] shadow-lg shadow-[#B5005D]/40 flex items-center justify-center hover:shadow-xl hover:shadow-[#B5005D]/50 transition-shadow overflow-hidden border border-white/10"
+        className="relative w-[72px] h-[72px] rounded-2xl bg-gradient-to-br from-[#B5005D] to-[#FF004E] shadow-lg shadow-[#B5005D]/40 flex items-center justify-center hover:shadow-xl hover:shadow-[#B5005D]/50 transition-shadow overflow-hidden border border-white/10 ring-2 ring-[#B5005D]/25 ring-offset-2 ring-offset-transparent"
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         aria-label={isOpen ? 'Zamknij NEXBI' : 'Otwórz NEXBI'}
@@ -358,7 +358,7 @@ export default function NexbiWidget({ knowledge }: Props) {
             </motion.div>
           ) : (
             <motion.div key="open" initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.5, opacity: 0 }} transition={{ duration: 0.2 }}>
-              <NexbiCharacter size={48} emotion="happy" />
+              <NexbiCharacter size={54} emotion="happy" />
             </motion.div>
           )}
         </AnimatePresence>

@@ -153,7 +153,7 @@ export default function ContactForm() {
                       required
                       value={formData.name}
                       onChange={handleChange}
-                      className="w-full px-4 py-3.5 rounded-xl bg-nexbe-bg/80 border border-nexbe-border text-nexbe-text placeholder:text-nexbe-text-muted/40 focus:outline-none focus:border-nexbe-raspberry/50 focus:ring-1 focus:ring-nexbe-raspberry/20 transition-colors text-sm"
+                      className="w-full px-4 py-3.5 rounded-xl bg-nexbe-bg/80 border border-nexbe-border text-nexbe-text placeholder:text-nexbe-text-muted focus:outline-none focus:border-nexbe-raspberry/50 focus:ring-1 focus:ring-nexbe-raspberry/20 transition-colors text-sm"
                       placeholder="Jan Kowalski"
                     />
                   </div>
@@ -170,7 +170,7 @@ export default function ContactForm() {
                       required
                       value={formData.phone}
                       onChange={handleChange}
-                      className="w-full px-4 py-3.5 rounded-xl bg-nexbe-bg/80 border border-nexbe-border text-nexbe-text placeholder:text-nexbe-text-muted/40 focus:outline-none focus:border-nexbe-raspberry/50 focus:ring-1 focus:ring-nexbe-raspberry/20 transition-colors text-sm"
+                      className="w-full px-4 py-3.5 rounded-xl bg-nexbe-bg/80 border border-nexbe-border text-nexbe-text placeholder:text-nexbe-text-muted focus:outline-none focus:border-nexbe-raspberry/50 focus:ring-1 focus:ring-nexbe-raspberry/20 transition-colors text-sm"
                       placeholder="+48 xxx xxx xxx"
                     />
                   </div>
@@ -187,7 +187,7 @@ export default function ContactForm() {
                       required
                       value={formData.email}
                       onChange={handleChange}
-                      className="w-full px-4 py-3.5 rounded-xl bg-nexbe-bg/80 border border-nexbe-border text-nexbe-text placeholder:text-nexbe-text-muted/40 focus:outline-none focus:border-nexbe-raspberry/50 focus:ring-1 focus:ring-nexbe-raspberry/20 transition-colors text-sm"
+                      className="w-full px-4 py-3.5 rounded-xl bg-nexbe-bg/80 border border-nexbe-border text-nexbe-text placeholder:text-nexbe-text-muted focus:outline-none focus:border-nexbe-raspberry/50 focus:ring-1 focus:ring-nexbe-raspberry/20 transition-colors text-sm"
                       placeholder="jan@email.pl"
                     />
                   </div>
@@ -249,7 +249,7 @@ export default function ContactForm() {
                     {sending ? 'Wysyłanie...' : 'Wyślij zapytanie'}
                   </button>
 
-                  <p className="text-[11px] text-nexbe-text-muted/40 mt-3 leading-relaxed">
+                  <p className="text-[11px] text-nexbe-text-muted/70 mt-3 leading-relaxed">
                     Wysyłając formularz wyrażasz zgodę na kontakt w celu przedstawienia oferty.
                     Twoje dane są bezpieczne — nie udostępniamy ich podmiotom trzecim.
                   </p>

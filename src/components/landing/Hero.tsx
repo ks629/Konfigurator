@@ -116,16 +116,9 @@ export default function Hero() {
             </Suspense>
           </motion.div>
 
-          {/* Mobile fallback glow */}
-          <div className="md:hidden flex items-center justify-center h-40">
-            <div
-              className="w-48 h-48 rounded-full"
-              style={{
-                background: 'radial-gradient(circle, rgba(181, 0, 93, 0.3) 0%, rgba(53, 0, 102, 0.2) 40%, transparent 70%)',
-                filter: 'blur(30px)',
-                animation: 'pulse-glow 3s ease-in-out infinite',
-              }}
-            />
+          {/* Mobile — energy orb fallback */}
+          <div className="md:hidden flex items-center justify-center py-4">
+            <OrbFallback />
           </div>
         </div>
       </div>
