@@ -1,5 +1,70 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { Resend } from 'resend';
 import { saveLead, readLeads, getLeadsFileBuffer } from '@/lib/leads-xlsx';
+
+const resend = process.env.RESEND_API_KEY
+  ? new Resend(process.env.RESEND_API_KEY)
+  : null;
+
+const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'Nexbe <onboarding@resend.dev>';
+const NEXBE_LEAD_EMAIL = process.env.NEXBE_LEAD_EMAIL || 'kontakt@nexbe.pl';
+
+function buildLeadNotificationEmail(lead: {
+  leadId: string;
+  name: string;
+  email: string;
+  phone: string;
+  source: string;
+  capacity: string;
+  hasPV: string;
+  timestamp: string;
+}): string {
+  const sourceLabel = lead.source === 'landing-contact-form'
+    ? 'Formularz kontaktowy (landing)'
+    : lead.source === 'konfigurator'
+      ? 'Konfigurator AI'
+      : lead.source || 'Nieznane';
+
+  const pvLabel = lead.hasPV === 'tak' ? 'Tak, ma PV (retrofit)'
+    : lead.hasPV === 'planuje' ? 'Planuje instalację PV'
+    : lead.hasPV === 'nie' ? 'Nie ma PV'
+    : 'Nie określono';
+
+  const date = new Date(lead.timestamp);
+  const dateStr = date.toLocaleDateString('pl-PL', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+  return `
+<!DOCTYPE html>
+<html lang="pl">
+<head><meta charset="utf-8"></head>
+<body style="margin:0;padding:20px;background:#f4f0f8;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;">
+  <div style="max-width:600px;margin:0 auto;background:#fff;border-radius:12px;padding:24px;box-shadow:0 2px 10px rgba(0,0,0,0.06);">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:20px;">
+      <div style="width:12px;height:12px;border-radius:50%;background:#22c55e;"></div>
+      <h2 style="color:#B5005D;margin:0;font-size:20px;">Nowy lead — ${sourceLabel}</h2>
+    </div>
+
+    <table style="width:100%;border-collapse:collapse;font-size:14px;">
+      <tr><td style="padding:10px 12px;border-bottom:1px solid #f0f0f0;color:#888;width:140px;">Nr</td><td style="padding:10px 12px;border-bottom:1px solid #f0f0f0;font-weight:600;font-family:monospace;font-size:12px;">${lead.leadId}</td></tr>
+      <tr><td style="padding:10px 12px;border-bottom:1px solid #f0f0f0;color:#888;">Data</td><td style="padding:10px 12px;border-bottom:1px solid #f0f0f0;">${dateStr}</td></tr>
+      <tr style="background:#fdf2f8;"><td style="padding:10px 12px;border-bottom:1px solid #f0f0f0;color:#888;font-weight:600;">Imię</td><td style="padding:10px 12px;border-bottom:1px solid #f0f0f0;font-weight:700;font-size:16px;">${lead.name || '—'}</td></tr>
+      <tr style="background:#fdf2f8;"><td style="padding:10px 12px;border-bottom:1px solid #f0f0f0;color:#888;font-weight:600;">Telefon</td><td style="padding:10px 12px;border-bottom:1px solid #f0f0f0;font-weight:700;font-size:16px;"><a href="tel:${lead.phone}" style="color:#B5005D;text-decoration:none;">${lead.phone || '—'}</a></td></tr>
+      <tr style="background:#fdf2f8;"><td style="padding:10px 12px;border-bottom:1px solid #f0f0f0;color:#888;font-weight:600;">Email</td><td style="padding:10px 12px;border-bottom:1px solid #f0f0f0;"><a href="mailto:${lead.email}" style="color:#B5005D;text-decoration:none;">${lead.email || '—'}</a></td></tr>
+      <tr><td style="padding:10px 12px;border-bottom:1px solid #f0f0f0;color:#888;">Pojemność</td><td style="padding:10px 12px;border-bottom:1px solid #f0f0f0;">${lead.capacity || 'Nie wybrano'}</td></tr>
+      <tr><td style="padding:10px 12px;border-bottom:1px solid #f0f0f0;color:#888;">Fotowoltaika</td><td style="padding:10px 12px;border-bottom:1px solid #f0f0f0;">${pvLabel}</td></tr>
+      <tr><td style="padding:10px 12px;color:#888;">Źródło</td><td style="padding:10px 12px;">${sourceLabel}</td></tr>
+    </table>
+
+    <div style="margin-top:20px;padding:16px;background:#f8f4fc;border-radius:8px;text-align:center;">
+      <p style="color:#888;font-size:13px;margin:0 0 8px;">Oddzwoń w ciągu 24h</p>
+      <a href="tel:${lead.phone}" style="display:inline-block;background:#B5005D;color:#fff;text-decoration:none;padding:10px 24px;border-radius:8px;font-weight:600;font-size:15px;">${lead.phone || 'Brak numeru'}</a>
+    </div>
+
+    <p style="color:#aaa;font-size:11px;margin:20px 0 0;text-align:center;">Wygenerowano automatycznie — dotacjenamagazyny.nexbe.pl</p>
+  </div>
+</body>
+</html>`;
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -38,6 +103,7 @@ export async function POST(req: NextRequest) {
       utmSource: body.utmSource || '',
       utmMedium: body.utmMedium || '',
       utmCampaign: body.utmCampaign || '',
+      source: body.source || '',
       userAgent: req.headers.get('user-agent') || '',
       status: 'nowy',
     };
@@ -45,9 +111,45 @@ export async function POST(req: NextRequest) {
     const result = saveLead(leadRow);
     console.log(`Lead ${leadId} zapisany do XLSX: ${result.filePath}`);
 
+    // Wyślij powiadomienie email do zespołu NEXBE
+    let emailSent = false;
+    if (resend) {
+      try {
+        const sourceLabel = body.source === 'landing-contact-form'
+          ? 'formularz kontaktowy'
+          : body.source === 'konfigurator'
+            ? 'konfigurator'
+            : 'strona www';
+
+        await resend.emails.send({
+          from: FROM_EMAIL,
+          to: NEXBE_LEAD_EMAIL,
+          subject: `Nowy lead (${sourceLabel}): ${body.name || body.email || body.phone || 'Anonimowy'}`,
+          html: buildLeadNotificationEmail({
+            leadId,
+            name: body.name || '',
+            email: body.email || '',
+            phone: body.phone || '',
+            source: body.source || '',
+            capacity: body.formData?.capacity || body.product?.name || '',
+            hasPV: body.formData?.hasPV || body.config?.installationType || '',
+            timestamp,
+          }),
+        });
+        emailSent = true;
+        console.log(`Email notification sent for lead ${leadId}`);
+      } catch (emailError) {
+        console.error('Lead email notification failed:', emailError);
+        // Nie blokujemy zapisu leada jeśli email się nie wyśle
+      }
+    } else {
+      console.warn('RESEND_API_KEY not configured — lead email notification not sent');
+    }
+
     return NextResponse.json({
       success: true,
       leadId,
+      emailSent,
       message: 'Lead zapisany pomyslnie',
     });
   } catch (error) {

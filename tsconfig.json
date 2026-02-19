@@ -19,7 +19,9 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@nexbe/nexbi": ["../shared/nexbi/index.ts"],
+      "@nexbe/nexbi/*": ["../shared/nexbi/*"]
     }
   },
   "include": [

@@ -265,7 +265,7 @@ export default function OfertaPage() {
     },
     {
       icon: <Award className="h-5 w-5" />,
-      title: 'Dotacja Mój Prąd 6.0',
+      title: 'Dotacja Mój Prąd 7.0',
       desc: 'Pomoc w złożeniu wniosku',
     },
   ];
@@ -462,7 +462,7 @@ export default function OfertaPage() {
                       ))}
                     </div>
                     <p className="text-xs text-[#350066]/60 pt-1">
-                      Spełnia wymagania dotacji Mój Prąd 6.0
+                      Spełnia wymagania dotacji Mój Prąd 7.0
                     </p>
                   </div>
 
@@ -546,7 +546,7 @@ export default function OfertaPage() {
                         <Check className="h-4 w-4 text-white" />
                       </div>
                       <div>
-                        <p className="text-sm font-heading text-green-900">Mój Prąd 6.0</p>
+                        <p className="text-sm font-heading text-green-900">Mój Prąd 7.0</p>
                         <p className="text-xs text-green-700 mt-0.5">
                           Do {formatCurrency(Math.min(activeProduct.capacity_kwh * 800, 16000))} dotacji
                         </p>
@@ -646,7 +646,7 @@ export default function OfertaPage() {
                     </h3>
                     <p className="text-white/70 max-w-lg mx-auto text-sm">
                       Umów bezpłatny audyt techniczny i otrzymaj ostateczną wycenę.
-                      Pomożemy Ci uzyskać dotację Mój Prąd 6.0.
+                      Pomożemy Ci uzyskać dotację Mój Prąd 7.0.
                     </p>
 
                     <div className="flex flex-col sm:flex-row gap-4 items-center justify-center pt-4">

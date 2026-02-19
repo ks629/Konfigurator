@@ -17,7 +17,28 @@ function formatPLN(amount: number): string {
   }).format(amount) + ' zł';
 }
 
-function buildClientEmailHtml(name: string, product: { name: string; brand: string; capacity_kwh: number }, leadId: string, netCost: number): string {
+interface ClientEmailData {
+  name: string;
+  product: { name: string; brand: string; capacity_kwh: number };
+  leadId: string;
+  netCost: number;
+  totalGross: number;
+  subsidyPme: number;
+  taxRelief: number;
+  annualSavings: number;
+  roiYears: number | null;
+  lowestInstallment: number;
+  installmentPeriod: number;
+}
+
+function buildClientEmailHtml(d: ClientEmailData): string {
+  const totalSubsidy = d.subsidyPme + d.taxRelief;
+  const subsidyLines: string[] = [];
+  if (d.subsidyPme > 0) subsidyLines.push(`Mój Prąd 7.0: -${formatPLN(d.subsidyPme)}`);
+  if (d.taxRelief > 0) subsidyLines.push(`Ulga termomodernizacyjna: -${formatPLN(d.taxRelief)}`);
+
+  const roiText = d.roiYears ? `${d.roiYears} lat` : 'Ponad 15 lat';
+
   return `
 <!DOCTYPE html>
 <html lang="pl">
@@ -27,44 +48,126 @@ function buildClientEmailHtml(name: string, product: { name: string; brand: stri
     <!-- Header -->
     <div style="background:linear-gradient(135deg,#230045 0%,#350066 50%,#4a0080 100%);padding:32px 24px;text-align:center;">
       <h1 style="color:#ffffff;font-size:28px;margin:0 0 8px;font-weight:700;">Nexbe</h1>
-      <p style="color:rgba(255,255,255,0.7);font-size:14px;margin:0;">energia na życie</p>
+      <p style="color:rgba(255,255,255,0.7);font-size:14px;margin:0;">Inteligentne magazyny energii</p>
     </div>
 
     <!-- Content -->
     <div style="padding:32px 24px;">
-      <h2 style="color:#230045;font-size:22px;margin:0 0 16px;">Cześć${name ? ', ' + name : ''}!</h2>
+      <h2 style="color:#230045;font-size:22px;margin:0 0 16px;">Cześć${d.name ? ', ' + d.name : ''}!</h2>
       <p style="color:#555;font-size:15px;line-height:1.6;margin:0 0 20px;">
-        Dziękujemy za zainteresowanie magazynem energii. W załączniku znajdziesz indywidualną ofertę przygotowaną na podstawie Twojej konfiguracji.
+        Dziękujemy za zainteresowanie magazynem energii. W załączniku znajdziesz szczegółową ofertę z kalkulacją oszczędności, dofinansowaniem i analizą zwrotu inwestycji.
       </p>
 
       <!-- Product highlight -->
       <div style="background:#f8f4fc;border:1px solid #e5daf0;border-radius:12px;padding:20px;margin:0 0 20px;">
-        <p style="color:#666;font-size:13px;margin:0 0 8px;">Twój wybrany produkt:</p>
-        <h3 style="color:#230045;font-size:18px;margin:0 0 4px;">${product.brand} ${product.name}</h3>
-        <p style="color:#888;font-size:14px;margin:0 0 12px;">Pojemność: ${product.capacity_kwh} kWh</p>
-        <p style="color:#B5005D;font-size:24px;font-weight:700;margin:0;">${formatPLN(netCost)}</p>
-        <p style="color:#888;font-size:12px;margin:4px 0 0;">po uwzględnieniu dotacji</p>
+        <p style="color:#666;font-size:13px;margin:0 0 8px;">Twój wybrany magazyn energii:</p>
+        <h3 style="color:#230045;font-size:18px;margin:0 0 4px;">${d.product.brand} ${d.product.name}</h3>
+        <p style="color:#888;font-size:14px;margin:0 0 16px;">Pojemność: ${d.product.capacity_kwh} kWh</p>
+
+        <!-- Pricing breakdown -->
+        <table style="width:100%;border-collapse:collapse;font-size:14px;">
+          <tr>
+            <td style="padding:6px 0;color:#555;">Cena brutto zestawu z montażem</td>
+            <td style="padding:6px 0;text-align:right;color:#230045;font-weight:600;">${formatPLN(d.totalGross)}</td>
+          </tr>
+          ${totalSubsidy > 0 ? `
+          <tr>
+            <td style="padding:6px 0;color:#228B22;">Dofinansowanie</td>
+            <td style="padding:6px 0;text-align:right;color:#228B22;font-weight:600;">-${formatPLN(totalSubsidy)}</td>
+          </tr>
+          ${subsidyLines.map(l => `<tr><td style="padding:2px 0 2px 16px;color:#888;font-size:12px;">${l}</td><td></td></tr>`).join('')}
+          ` : ''}
+          <tr>
+            <td colspan="2" style="padding:0;"><div style="border-top:2px solid #B5005D;margin:8px 0;"></div></td>
+          </tr>
+          <tr>
+            <td style="padding:6px 0;color:#B5005D;font-weight:700;font-size:16px;">Twoja cena po dotacjach</td>
+            <td style="padding:6px 0;text-align:right;color:#B5005D;font-weight:700;font-size:20px;">${formatPLN(d.netCost)}</td>
+          </tr>
+        </table>
+
+        ${d.lowestInstallment > 0 ? `
+        <p style="color:#888;font-size:13px;margin:12px 0 0;">
+          lub <strong style="color:#230045;">${d.lowestInstallment} zł/mies.</strong> (raty ${Math.round(d.installmentPeriod / 12)} lat · Inbank)
+        </p>
+        ` : ''}
       </div>
 
-      <p style="color:#555;font-size:15px;line-height:1.6;margin:0 0 24px;">
-        Nasz doradca skontaktuje się z Tobą w ciągu 24h, aby omówić szczegóły i umówić bezpłatny audyt techniczny.
-      </p>
+      <!-- Key metrics -->
+      <table style="width:100%;border-collapse:collapse;margin:0 0 24px;">
+        <tr>
+          <td style="width:50%;padding:12px;background:#f0fdf4;border-radius:8px 0 0 8px;text-align:center;">
+            <p style="color:#888;font-size:12px;margin:0 0 4px;">Roczna oszczędność</p>
+            <p style="color:#166534;font-size:20px;font-weight:700;margin:0;">${formatPLN(d.annualSavings)}</p>
+          </td>
+          <td style="width:50%;padding:12px;background:#faf5ff;border-radius:0 8px 8px 0;text-align:center;">
+            <p style="color:#888;font-size:12px;margin:0 0 4px;">Zwrot inwestycji</p>
+            <p style="color:#350066;font-size:20px;font-weight:700;margin:0;">${roiText}</p>
+          </td>
+        </tr>
+      </table>
+
+      <!-- Next steps -->
+      <div style="background:#f8f4fc;border-left:4px solid #B5005D;border-radius:0 8px 8px 0;padding:16px 20px;margin:0 0 24px;">
+        <h3 style="color:#230045;font-size:16px;margin:0 0 12px;">Kolejne kroki</h3>
+        <table style="width:100%;border-collapse:collapse;">
+          <tr>
+            <td style="padding:6px 12px 6px 0;vertical-align:top;width:24px;">
+              <div style="background:#B5005D;color:#fff;width:22px;height:22px;border-radius:50%;text-align:center;line-height:22px;font-size:12px;font-weight:700;">1</div>
+            </td>
+            <td style="padding:6px 0;">
+              <strong style="color:#230045;font-size:14px;">Bezpłatny audyt techniczny</strong>
+              <p style="color:#888;font-size:12px;margin:2px 0 0;">Technik przyjedzie do Ciebie i oceni warunki instalacji — bez zobowiązań</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:6px 12px 6px 0;vertical-align:top;">
+              <div style="background:#B5005D;color:#fff;width:22px;height:22px;border-radius:50%;text-align:center;line-height:22px;font-size:12px;font-weight:700;">2</div>
+            </td>
+            <td style="padding:6px 0;">
+              <strong style="color:#230045;font-size:14px;">Finalna wycena i umowa</strong>
+              <p style="color:#888;font-size:12px;margin:2px 0 0;">Potwierdzamy zakres, podpisujemy umowę, decyzja o ratach online w 15 min</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:6px 12px 6px 0;vertical-align:top;">
+              <div style="background:#B5005D;color:#fff;width:22px;height:22px;border-radius:50%;text-align:center;line-height:22px;font-size:12px;font-weight:700;">3</div>
+            </td>
+            <td style="padding:6px 0;">
+              <strong style="color:#230045;font-size:14px;">Montaż i uruchomienie</strong>
+              <p style="color:#888;font-size:12px;margin:2px 0 0;">Profesjonalny montaż w 1–2 dni + szkolenie + zgłoszenie do OSD + wniosek o dotację</p>
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <!-- Contact / Advisor -->
+      <div style="background:#230045;border-radius:12px;padding:20px;text-align:center;margin:0 0 20px;">
+        <p style="color:rgba(255,255,255,0.7);font-size:13px;margin:0 0 8px;">Masz pytania? Skontaktuj się z nami:</p>
+        <p style="margin:0 0 4px;">
+          <a href="tel:+48732080101" style="color:#ffffff;text-decoration:none;font-size:18px;font-weight:700;">732 080 101</a>
+        </p>
+        <p style="margin:0;">
+          <a href="mailto:kontakt@nexbe.pl" style="color:rgba(255,255,255,0.7);text-decoration:none;font-size:14px;">kontakt@nexbe.pl</a>
+        </p>
+        <p style="color:rgba(255,255,255,0.5);font-size:12px;margin:8px 0 0;">Nasz doradca skontaktuje się z Tobą w ciągu 24h</p>
+      </div>
 
       <!-- CTA -->
       <div style="text-align:center;margin:24px 0;">
-        <a href="https://nexbe.pl" style="background:#B5005D;color:#ffffff;text-decoration:none;padding:14px 32px;border-radius:10px;font-weight:600;font-size:15px;display:inline-block;">
-          Sprawdź ofertę online
+        <a href="https://dotacjenamagazyny.nexbe.pl" style="background:#B5005D;color:#ffffff;text-decoration:none;padding:14px 32px;border-radius:10px;font-weight:600;font-size:15px;display:inline-block;">
+          Umów bezpłatny audyt
         </a>
       </div>
 
       <p style="color:#999;font-size:12px;margin:24px 0 0;text-align:center;">
-        Nr oferty: ${leadId}
+        Nr oferty: ${d.leadId}
       </p>
     </div>
 
     <!-- Footer -->
     <div style="background:#f4f0f8;padding:20px 24px;text-align:center;border-top:1px solid #e5daf0;">
-      <p style="color:#888;font-size:12px;margin:0 0 4px;">Nexbe Sp. z o.o. | kontakt@nexbe.pl</p>
+      <p style="color:#888;font-size:12px;margin:0 0 4px;">Nexbe Sp. z o.o. | kontakt@nexbe.pl | 732 080 101</p>
       <p style="color:#aaa;font-size:11px;margin:0;">Ta wiadomość została wygenerowana automatycznie.</p>
     </div>
   </div>
@@ -139,7 +242,7 @@ export async function POST(req: NextRequest) {
 
     let pdfBuffer: ArrayBuffer | null = null;
     try {
-      pdfBuffer = generateOfferPdfBuffer(pdfData);
+      pdfBuffer = await generateOfferPdfBuffer(pdfData);
     } catch (pdfError) {
       console.error('PDF generation failed:', pdfError);
       // Continue without PDF — don't block the offer sending
@@ -161,7 +264,19 @@ export async function POST(req: NextRequest) {
           from: FROM_EMAIL,
           to: email,
           subject: `Twoja oferta magazynu energii — ${product.brand} ${product.name}`,
-          html: buildClientEmailHtml(name, product, leadId, netCost),
+          html: buildClientEmailHtml({
+            name,
+            product,
+            leadId,
+            netCost,
+            totalGross,
+            subsidyPme: calculation?.investment?.subsidy_pme || 0,
+            taxRelief: calculation?.investment?.tax_relief || 0,
+            annualSavings: calculation?.annual_savings || 0,
+            roiYears: calculation?.roi_years ?? null,
+            lowestInstallment: calculation?.monthly_installment?.[120] || calculation?.monthly_installment?.[84] || 0,
+            installmentPeriod: calculation?.monthly_installment?.[120] ? 120 : 84,
+          }),
           attachments,
         });
 

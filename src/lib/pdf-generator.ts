@@ -2,6 +2,7 @@ import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { robotoRegularBase64 } from '@/lib/fonts/roboto-regular';
 import { robotoBoldBase64 } from '@/lib/fonts/roboto-bold';
+import { logoWhiteBase64 } from '@/lib/fonts/logo-white-base64';
 import type {
   Product,
   Inverter,
@@ -47,6 +48,29 @@ function hexToRgb(hex: string): [number, number, number] {
 // Pomocnicze
 // ────────────────────────────────────────────────────────────
 
+/** Marki z wbudowanym EMS */
+const BRANDS_WITH_BUILTIN_EMS = ['Huawei', 'Sigenergy'];
+
+function baseBrand(brand: string): string {
+  return brand.split('/')[0];
+}
+
+/** Nazwa produktu bez powtarzania brand na początku */
+function cleanProductName(product: Product): string {
+  const brand = baseBrand(product.brand);
+  const name = product.name;
+  // "Huawei LUNA2000 15 kWh" → "LUNA2000 15 kWh" (brand = "Huawei")
+  // "GoodWe + Dyness 14.2 kWh" → "GoodWe + Dyness 14.2 kWh" (brand = "GoodWe")
+  if (name.startsWith(brand + ' ')) {
+    return name.slice(brand.length + 1);
+  }
+  return name;
+}
+
+function needsEms(brand: string): boolean {
+  return !BRANDS_WITH_BUILTIN_EMS.includes(baseBrand(brand));
+}
+
 function formatPLN(amount: number): string {
   return new Intl.NumberFormat('pl-PL', {
     minimumFractionDigits: 2,
@@ -74,12 +98,51 @@ function getInstallationTypeLabel(type: string): string {
   }
 }
 
+function getBackupLabel(product: Product): string {
+  return product.eps_capable
+    ? 'Zasilanie awaryjne (EPS) — podtrzymanie wybranych obwodów'
+    : 'Pełny backup 3F (SZR) — automatyczne przełączanie całego domu';
+}
+
+function getBackupShort(product: Product): string {
+  return product.eps_capable ? 'EPS (wybrane obwody)' : 'Pełny backup 3F (SZR)';
+}
+
 function getToday(): string {
   return new Intl.DateTimeFormat('pl-PL', {
     day: '2-digit',
     month: '2-digit',
     year: 'numeric',
   }).format(new Date());
+}
+
+function getExpiryDate(): string {
+  const d = new Date();
+  d.setDate(d.getDate() + 14);
+  return new Intl.DateTimeFormat('pl-PL', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  }).format(d);
+}
+
+// ────────────────────────────────────────────────────────────
+// Ładowanie obrazów runtime
+// ────────────────────────────────────────────────────────────
+
+async function loadImageAsDataUrl(src: string): Promise<string | null> {
+  try {
+    const res = await fetch(src);
+    const blob = await res.blob();
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result as string);
+      reader.onerror = () => resolve(null);
+      reader.readAsDataURL(blob);
+    });
+  } catch {
+    return null;
+  }
 }
 
 // ────────────────────────────────────────────────────────────
@@ -100,7 +163,6 @@ function setupFonts(doc: jsPDF): void {
 
 function drawHeader(doc: jsPDF): void {
   const pageWidth = doc.internal.pageSize.getWidth();
-  // Linia dekoracyjna na górze
   doc.setFillColor(...hexToRgb(NEXBE_PRIMARY));
   doc.rect(0, 0, pageWidth, 3, 'F');
 }
@@ -109,17 +171,15 @@ function drawFooter(doc: jsPDF, pageNum: number, totalPages: number): void {
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
 
-  // Linia
   doc.setDrawColor(...hexToRgb(NEXBE_BORDER));
   doc.setLineWidth(0.3);
   doc.line(20, pageHeight - 20, pageWidth - 20, pageHeight - 20);
 
-  // Stopka tekst
   doc.setFont('Roboto', 'normal');
   doc.setFontSize(7);
   doc.setTextColor(150, 150, 150);
   doc.text(
-    'NEXBE Sp. z o.o. | ul. Przykładowa 1, 00-001 Warszawa | NIP: 1234567890 | kontakt@nexbe.pl',
+    'Nexbe Sp. z o.o. | kontakt@nexbe.pl | 732 080 101 | nexbe.pl',
     pageWidth / 2,
     pageHeight - 14,
     { align: 'center' }
@@ -133,164 +193,246 @@ function drawFooter(doc: jsPDF, pageNum: number, totalPages: number): void {
 }
 
 // ────────────────────────────────────────────────────────────
-// Strona 1 — Okładka
+// Strona 1 — Okładka (z logo PNG + zdjęcie produktu)
 // ────────────────────────────────────────────────────────────
 
-function drawCoverPage(doc: jsPDF, data: PdfOfferData): void {
+function drawCoverPage(doc: jsPDF, data: PdfOfferData, productImageDataUrl?: string | null): void {
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
-  const totalPrice = data.product.price_gross + (data.inverter?.price_gross || 0);
+  const brand = baseBrand(data.product.brand);
+  const inv = data.calculation.investment;
 
-  // Gradient tło (symulacja przez prostokąty)
+  // ── Ciemne tło — góra 42% strony ──
   doc.setFillColor(...hexToRgb(NEXBE_DARK));
-  doc.rect(0, 0, pageWidth, pageHeight * 0.45, 'F');
+  doc.rect(0, 0, pageWidth, pageHeight * 0.42, 'F');
 
+  // Gradient overlay
   doc.setFillColor(...hexToRgb(NEXBE_PURPLE));
-  doc.rect(0, pageHeight * 0.35, pageWidth, pageHeight * 0.1, 'F');
+  doc.rect(0, pageHeight * 0.35, pageWidth, pageHeight * 0.07, 'F');
 
-  // Logo - tekst
+  // ── Logo PNG (lewy górny róg) ──
+  try {
+    doc.addImage(logoWhiteBase64, 'PNG', 20, 14, 40, 19);
+  } catch {
+    doc.setFont('Roboto', 'bold');
+    doc.setFontSize(28);
+    doc.setTextColor(255, 255, 255);
+    doc.text('Nexbe', 22, 30);
+  }
+
+  // ── Nr oferty + data (prawy górny róg) ──
+  doc.setFont('Roboto', 'normal');
+  doc.setFontSize(8);
+  doc.setTextColor(180, 180, 200);
+  const offerNum = data.offerNumber || 'NEXBE-' + Date.now().toString().slice(-6);
+  doc.text(`Oferta ${offerNum}`, pageWidth - 20, 20, { align: 'right' });
+  doc.text(`${data.offerDate || getToday()}  ·  ważna do ${getExpiryDate()}`, pageWidth - 20, 26, { align: 'right' });
+
+  // ── Tytuł — "INDYWIDUALNA OFERTA" ──
   doc.setFont('Roboto', 'bold');
-  doc.setFontSize(36);
-  doc.setTextColor(255, 255, 255);
-  doc.text('Nexbe', 30, 50);
+  doc.setFontSize(11);
+  doc.setTextColor(200, 200, 220);
+  doc.text('INDYWIDUALNA OFERTA', 20, 52);
 
+  // ── Nazwa produktu — duża ──
+  doc.setFont('Roboto', 'bold');
+  doc.setFontSize(20);
+  doc.setTextColor(255, 255, 255);
+  doc.text('Magazyn Energii', 20, 68);
+
+  doc.setFontSize(36);
+  doc.setTextColor(...hexToRgb(NEXBE_PRIMARY));
+  doc.text(`${data.product.capacity_kwh} kWh`, 20, 84);
+
+  // ── Marka + typ ──
   doc.setFont('Roboto', 'normal');
   doc.setFontSize(11);
   doc.setTextColor(200, 200, 220);
-  doc.text('energia na życie', 30, 62);
+  doc.text(`${brand}  ${cleanProductName(data.product)}`, 20, 96);
 
-  // Tytuł oferty
-  doc.setFont('Roboto', 'bold');
-  doc.setFontSize(22);
-  doc.setTextColor(255, 255, 255);
-  doc.text('OFERTA WYKONANIA', 30, 100);
-
-  doc.setFontSize(26);
-  doc.setTextColor(...hexToRgb(NEXBE_PRIMARY));
-  doc.text(
-    `Magazynu Energii ${data.product.capacity_kwh} kWh`,
-    30,
-    115
-  );
-
-  // Typ instalacji
-  doc.setFont('Roboto', 'normal');
-  doc.setFontSize(12);
-  doc.setTextColor(200, 200, 220);
+  doc.setFontSize(9);
+  doc.setTextColor(160, 160, 180);
   doc.text(
     getInstallationTypeLabel(data.config.installationType || 'retrofit'),
-    30,
-    130
+    20, 104
   );
 
-  // Linia dekoracyjna
-  doc.setDrawColor(...hexToRgb(NEXBE_PRIMARY));
-  doc.setLineWidth(1.5);
-  doc.line(30, 140, pageWidth - 30, 140);
+  // ── Zdjęcie produktu (prawy obszar ciemnego tła) ──
+  if (productImageDataUrl) {
+    try {
+      // Pozycja: prawy segment ciemnego tła
+      const imgW = 55;
+      const imgH = 70;
+      const imgX = pageWidth - imgW - 15;
+      const imgY = 40;
+      doc.addImage(productImageDataUrl, 'PNG', imgX, imgY, imgW, imgH);
+    } catch {
+      // Brak obrazu — OK
+    }
+  }
 
-  // Sekcja danych klienta (biały)
-  const clientSectionY = pageHeight * 0.5;
-
-  // Dane klienta
-  doc.setFont('Roboto', 'bold');
-  doc.setFontSize(14);
-  doc.setTextColor(...hexToRgb(NEXBE_PURPLE));
-  doc.text('Dane klienta', 30, clientSectionY);
-
-  doc.setFont('Roboto', 'normal');
-  doc.setFontSize(11);
-  doc.setTextColor(80, 80, 80);
-  const clientLines = [
-    data.clientName || 'Klient',
-    data.clientEmail || '',
-    data.clientPhone || '',
-    data.clientPostalCode ? `Kod: ${data.clientPostalCode}` : '',
-  ].filter(Boolean);
-  clientLines.forEach((line, i) => {
-    doc.text(line, 30, clientSectionY + 14 + i * 8);
-  });
-
-  // Dane oferty (prawa kolumna)
-  doc.setFont('Roboto', 'bold');
-  doc.setFontSize(14);
-  doc.setTextColor(...hexToRgb(NEXBE_PURPLE));
-  doc.text('Szczegóły oferty', pageWidth / 2 + 10, clientSectionY);
-
-  doc.setFont('Roboto', 'normal');
-  doc.setFontSize(11);
-  doc.setTextColor(80, 80, 80);
-  const offerLines = [
-    `Nr oferty: ${data.offerNumber || 'NEXBE-' + Date.now().toString().slice(-6)}`,
-    `Data: ${data.offerDate || getToday()}`,
-    `Ważność: 14 dni`,
-    `Produkt: ${data.product.brand} ${data.product.name}`,
+  // ── 3 mini-karty KPI pod ciemnym tłem ──
+  const kpiY = pageHeight * 0.42 + 5;
+  const kpiH = 22;
+  const kpiW = (pageWidth - 50) / 3;
+  const kpis = [
+    { label: 'Pojemność', value: `${data.product.capacity_kwh} kWh` },
+    { label: 'Moc ciągła', value: `${data.product.power_continuous_kw} kW` },
+    { label: 'Gwarancja', value: `${data.product.warranty_years} lat` },
   ];
-  offerLines.forEach((line, i) => {
-    doc.text(line, pageWidth / 2 + 10, clientSectionY + 14 + i * 8);
+
+  kpis.forEach((kpi, i) => {
+    const x = 20 + i * (kpiW + 5);
+    doc.setFillColor(...hexToRgb(NEXBE_LIGHT_BG));
+    doc.roundedRect(x, kpiY, kpiW, kpiH, 2, 2, 'F');
+    doc.setDrawColor(...hexToRgb(NEXBE_BORDER));
+    doc.setLineWidth(0.3);
+    doc.roundedRect(x, kpiY, kpiW, kpiH, 2, 2, 'S');
+
+    doc.setFont('Roboto', 'normal');
+    doc.setFontSize(7);
+    doc.setTextColor(120, 120, 120);
+    doc.text(kpi.label, x + kpiW / 2, kpiY + 8, { align: 'center' });
+
+    doc.setFont('Roboto', 'bold');
+    doc.setFontSize(12);
+    doc.setTextColor(...hexToRgb(NEXBE_PURPLE));
+    doc.text(kpi.value, x + kpiW / 2, kpiY + 17, { align: 'center' });
   });
 
-  // Podsumowanie cenowe na dole
-  const summaryY = pageHeight * 0.72;
+  // ── Sekcja cenowa — duże boxy ──
+  const priceY = kpiY + kpiH + 8;
 
-  // Ramka podsumowania
-  doc.setFillColor(...hexToRgb(NEXBE_LIGHT_BG));
-  doc.roundedRect(25, summaryY - 5, pageWidth - 50, 60, 5, 5, 'F');
-
+  // Box cena brutto
+  const priceBoxW = (pageWidth - 50) / 2;
+  doc.setFillColor(255, 255, 255);
+  doc.roundedRect(20, priceY, priceBoxW, 32, 3, 3, 'F');
   doc.setDrawColor(...hexToRgb(NEXBE_BORDER));
-  doc.setLineWidth(0.5);
-  doc.roundedRect(25, summaryY - 5, pageWidth - 50, 60, 5, 5, 'S');
+  doc.setLineWidth(0.3);
+  doc.roundedRect(20, priceY, priceBoxW, 32, 3, 3, 'S');
 
-  // Cena brutto
   doc.setFont('Roboto', 'normal');
-  doc.setFontSize(11);
-  doc.setTextColor(100, 100, 100);
-  doc.text('Cena brutto:', 35, summaryY + 10);
+  doc.setFontSize(8);
+  doc.setTextColor(120, 120, 120);
+  doc.text('Cena brutto', 25, priceY + 9);
 
   doc.setFont('Roboto', 'bold');
   doc.setFontSize(16);
   doc.setTextColor(...hexToRgb(NEXBE_DARK));
-  doc.text(formatPLN(totalPrice), 35, summaryY + 22);
+  doc.text(formatPLN(inv.total_gross), 25, priceY + 22);
 
-  // Po dotacjach
+  // Box dotacja
+  const dotBoxX = 20 + priceBoxW + 5;
+  const dotBoxH = 38;
+  doc.setFillColor(...hexToRgb(NEXBE_LIGHT_BG));
+  doc.roundedRect(dotBoxX, priceY, priceBoxW + 5, dotBoxH, 3, 3, 'F');
+  doc.setDrawColor(...hexToRgb(NEXBE_BORDER));
+  doc.roundedRect(dotBoxX, priceY, priceBoxW + 5, dotBoxH, 3, 3, 'S');
+
   doc.setFont('Roboto', 'normal');
-  doc.setFontSize(11);
+  doc.setFontSize(8);
+  doc.setTextColor(120, 120, 120);
+  doc.text('Dofinansowanie', dotBoxX + 5, priceY + 9);
+
+  doc.setFont('Roboto', 'bold');
+  doc.setFontSize(14);
+  doc.setTextColor(34, 139, 34);
+  const totalSubsidy = inv.subsidy_pme + inv.tax_relief;
+  doc.text(`-${formatPLNShort(totalSubsidy)}`, dotBoxX + 5, priceY + 21);
+
+  doc.setFont('Roboto', 'normal');
+  doc.setFontSize(7);
   doc.setTextColor(100, 100, 100);
-  doc.text('Po dotacjach:', pageWidth / 2, summaryY + 10);
+  const subsidyLines: string[] = [];
+  if (inv.subsidy_pme > 0) subsidyLines.push(`Mój Prąd: -${formatPLNShort(inv.subsidy_pme)}`);
+  if (inv.tax_relief > 0) subsidyLines.push(`Ulga ${inv.thermomodernization_details?.tax_bracket || 12}%: -${formatPLNShort(inv.tax_relief)}`);
+  subsidyLines.forEach((line, i) => {
+    doc.text(line, dotBoxX + 5, priceY + 28 + i * 4);
+  });
 
-  doc.setFont('Roboto', 'bold');
-  doc.setFontSize(20);
-  doc.setTextColor(...hexToRgb(NEXBE_PRIMARY));
-  doc.text(formatPLN(data.calculation.investment.net_cost), pageWidth / 2, summaryY + 22);
+  // ── TWOJA CENA — wyróżniony box ──
+  const netY = priceY + 38;
+  doc.setFillColor(...hexToRgb(NEXBE_PRIMARY));
+  doc.roundedRect(20, netY, pageWidth - 40, 18, 3, 3, 'F');
 
-  // Dotacje
   doc.setFont('Roboto', 'normal');
-  doc.setFontSize(9);
-  doc.setTextColor(100, 150, 100);
-  doc.text(
-    `Dotacja Mój Prąd: -${formatPLNShort(data.calculation.investment.subsidy_pme)}  |  Ulga termomod.: -${formatPLNShort(data.calculation.investment.tax_relief)}`,
-    35,
-    summaryY + 42
-  );
+  doc.setFontSize(10);
+  doc.setTextColor(255, 220, 240);
+  doc.text('Twoja cena po dotacjach', 30, netY + 7);
 
-  // ROI na samym dole
-  const roiY = pageHeight * 0.87;
   doc.setFont('Roboto', 'bold');
-  doc.setFontSize(12);
-  doc.setTextColor(...hexToRgb(NEXBE_PURPLE));
+  doc.setFontSize(18);
+  doc.setTextColor(255, 255, 255);
+  doc.text(formatPLN(inv.net_cost), pageWidth - 30, netY + 12, { align: 'right' });
 
-  if (data.calculation.roi_years) {
-    doc.text(
-      `Zwrot inwestycji: ${data.calculation.roi_years} lat  |  Oszczędności rocznie: ${formatPLNShort(data.calculation.annual_savings)}`,
-      30,
-      roiY
-    );
-  } else {
-    doc.text(
-      `Oszczędności rocznie: ${formatPLNShort(data.calculation.annual_savings)}`,
-      30,
-      roiY
-    );
+  // ── Rata + ROI minibox ──
+  const miniY = netY + 24;
+  const miniW = (pageWidth - 50) / 2;
+
+  if (data.calculation.monthly_installment) {
+    const lowestRate = data.calculation.monthly_installment[120] || data.calculation.monthly_installment[84] || 0;
+    if (lowestRate > 0) {
+      doc.setFont('Roboto', 'normal');
+      doc.setFontSize(9);
+      doc.setTextColor(100, 100, 100);
+      doc.text(`lub ${Math.round(lowestRate)} zł/mies.`, 25, miniY + 4);
+
+      doc.setFontSize(7);
+      doc.setTextColor(140, 140, 140);
+      doc.text('raty Inbank · 120 mies.', 25, miniY + 10);
+    }
   }
+
+  // ROI
+  doc.setFont('Roboto', 'bold');
+  doc.setFontSize(9);
+  doc.setTextColor(...hexToRgb(NEXBE_PURPLE));
+  if (data.calculation.roi_years) {
+    doc.text(`Zwrot inwestycji`, 20 + miniW + 10, miniY + 4);
+    doc.setFontSize(14);
+    doc.text(`${data.calculation.roi_years} lat`, 20 + miniW + 10, miniY + 13);
+  }
+
+  doc.setFont('Roboto', 'bold');
+  doc.setFontSize(9);
+  doc.setTextColor(...hexToRgb(NEXBE_PRIMARY));
+  doc.text('Oszczędności rocznie', pageWidth - 25, miniY + 4, { align: 'right' });
+  doc.setFontSize(14);
+  doc.text(formatPLNShort(data.calculation.annual_savings), pageWidth - 25, miniY + 13, { align: 'right' });
+
+  // ── Klient + Zestaw (dół strony) ──
+  const bottomY = miniY + 24;
+
+  // Przygotowana dla:
+  doc.setFont('Roboto', 'normal');
+  doc.setFontSize(8);
+  doc.setTextColor(140, 140, 140);
+  doc.text('Przygotowana dla:', 20, bottomY);
+
+  doc.setFont('Roboto', 'bold');
+  doc.setFontSize(10);
+  doc.setTextColor(...hexToRgb(NEXBE_DARK));
+  doc.text(data.clientName || 'Klient indywidualny', 20, bottomY + 7);
+
+  // W cenie zestawu:
+  doc.setFont('Roboto', 'normal');
+  doc.setFontSize(8);
+  doc.setTextColor(140, 140, 140);
+  doc.text('W cenie zestawu:', pageWidth / 2 + 5, bottomY);
+
+  doc.setFont('Roboto', 'normal');
+  doc.setFontSize(8);
+  doc.setTextColor(60, 60, 60);
+  const kitItems = [
+    `Magazyn ${brand} ${data.product.capacity_kwh} kWh`,
+    data.inverter ? `Falownik ${baseBrand(data.inverter.brand)} ${data.inverter.power_kw} kW` : 'Falownik hybrydowy',
+    needsEms(data.product.brand) ? 'EMS + Backup / SZR' : 'Backup / SZR',
+    'Montaż i uruchomienie',
+    'Zgłoszenie OSD',
+  ];
+  kitItems.forEach((item, i) => {
+    doc.text(item, pageWidth / 2 + 5, bottomY + 7 + i * 5);
+  });
 }
 
 // ────────────────────────────────────────────────────────────
@@ -299,255 +441,231 @@ function drawCoverPage(doc: jsPDF, data: PdfOfferData): void {
 
 function drawScopePage(doc: jsPDF, data: PdfOfferData): void {
   const pageWidth = doc.internal.pageSize.getWidth();
+  const brand = baseBrand(data.product.brand);
   drawHeader(doc);
 
   let y = 20;
 
-  // Tytuł
   doc.setFont('Roboto', 'bold');
-  doc.setFontSize(18);
+  doc.setFontSize(16);
   doc.setTextColor(...hexToRgb(NEXBE_PURPLE));
-  doc.text('Zakres prac i wyposażenie', 20, y);
-  y += 15;
+  doc.text('Specyfikacja techniczna', 20, y);
+  y += 10;
 
-  // Tabela wyposażenia
-  const equipmentRows: string[][] = [];
+  // ── Kompaktowa specyfikacja ──
+  const specItems = [
+    ['Producent / Model', `${brand} ${cleanProductName(data.product)}`],
+    ['Pojemność', `${data.product.capacity_kwh} kWh`],
+    ['Moc ciągła', `${data.product.power_continuous_kw} kW`],
+    ['Technologia', 'LFP (LiFePO4)'],
+    ['Typ podłączenia', data.product.type === 'AC' ? 'AC-coupled (retrofit)' : 'DC hybrydowy'],
+    ['Zasilanie awaryjne (EPS)', data.product.eps_capable ? 'Tak — automatyczne przełączanie < 20 ms' : 'Pełny SZR 3F — cały dom'],
+    ['Żywotność', '> 6 000 cykli (> 15 lat eksploatacji)'],
+    ['Głębokość rozładowania (DoD)', '95%'],
+    ['Gwarancja producenta', `${data.product.warranty_years} lat`],
+    ['Certyfikaty', 'CE, TÜV SÜD, IEC 62619, UN 38.3'],
+  ];
 
-  equipmentRows.push([
-    `Magazyn energii ${data.product.brand} ${data.product.name}`,
-    `${data.product.capacity_kwh} kWh`,
-    '1 szt.',
-    'Wliczone',
-  ]);
+  // Compact 2-column spec
+  const colW = (pageWidth - 50) / 2;
+  specItems.forEach((item, i) => {
+    const col = i < 5 ? 0 : 1;
+    const row = i < 5 ? i : i - 5;
+    const x = 25 + col * (colW + 10);
+    const rowY = y + row * 12;
 
-  if (data.inverter) {
-    equipmentRows.push([
-      `Falownik hybrydowy ${data.inverter.brand} ${data.inverter.name}`,
-      `${data.inverter.power_kw} kW`,
-      '1 szt.',
-      'Wliczone',
-    ]);
-  }
+    doc.setFont('Roboto', 'normal');
+    doc.setFontSize(7);
+    doc.setTextColor(120, 120, 120);
+    doc.text(item[0], x, rowY);
 
-  equipmentRows.push([
-    'Komplet okablowania i zabezpieczeń AC/DC',
-    '',
-    '1 kpl.',
-    'Wliczone',
-  ]);
-
-  equipmentRows.push([
-    'Rozdzielnia z zabezpieczeniami',
-    '',
-    '1 kpl.',
-    'Wliczone',
-  ]);
-
-  if (data.config.backupPreference === 'yes' && data.product.eps_capable) {
-    equipmentRows.push([
-      'Instalacja zasilania awaryjnego (EPS/backup)',
-      '',
-      '1 kpl.',
-      'Wliczone',
-    ]);
-  }
-
-  equipmentRows.push([
-    'System monitoringu i aplikacja mobilna',
-    '',
-    '1 kpl.',
-    'Wliczone',
-  ]);
-
-  autoTable(doc, {
-    startY: y,
-    head: [['Element', 'Parametry', 'Ilość', 'Cena']],
-    body: equipmentRows,
-    theme: 'grid',
-    styles: {
-      font: 'Roboto',
-      fontSize: 9,
-      cellPadding: 5,
-    },
-    headStyles: {
-      fillColor: hexToRgb(NEXBE_PURPLE),
-      textColor: [255, 255, 255],
-      fontStyle: 'bold',
-      fontSize: 9,
-    },
-    columnStyles: {
-      0: { cellWidth: 85 },
-      1: { cellWidth: 30, halign: 'center' },
-      2: { cellWidth: 25, halign: 'center' },
-      3: { cellWidth: 30, halign: 'center' },
-    },
-    margin: { left: 20, right: 20 },
+    doc.setFont('Roboto', 'bold');
+    doc.setFontSize(8);
+    doc.setTextColor(40, 40, 40);
+    doc.text(item[1], x, rowY + 4.5);
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  y = (doc as any).lastAutoTable.finalY + 15;
+  y += 65;
 
-  // Prace montażowe
+  // ── Zakres zestawu — tytuł ──
   doc.setFont('Roboto', 'bold');
   doc.setFontSize(14);
   doc.setTextColor(...hexToRgb(NEXBE_PURPLE));
-  doc.text('Prace montażowe (wliczone w cenę)', 20, y);
-  y += 10;
-
-  const works = [
-    'Montaż magazynu energii w wyznaczonym miejscu',
-    'Podłączenie magazynu do istniejącej instalacji elektrycznej',
-    data.inverter ? 'Montaż i podłączenie falownika hybrydowego' : null,
-    data.config.backupPreference === 'yes' ? 'Instalacja obwodu zasilania awaryjnego (backup)' : null,
-    'Konfiguracja systemu zarządzania energią',
-    'Uruchomienie i konfiguracja monitoringu online',
-    'Przeszkolenie użytkownika z obsługi systemu',
-    'Zgłoszenie do operatora sieci dystrybucyjnej (OSD)',
-  ].filter(Boolean) as string[];
+  doc.text('Zakres zestawu', 20, y);
+  y += 5;
 
   doc.setFont('Roboto', 'normal');
-  doc.setFontSize(10);
-  doc.setTextColor(60, 60, 60);
-
-  works.forEach((work) => {
-    doc.setFillColor(...hexToRgb(NEXBE_PRIMARY));
-    doc.circle(25, y - 1.5, 1.5, 'F');
-    doc.text(work, 32, y);
-    y += 8;
-  });
-
-  y += 10;
-
-  // Uwagi
-  doc.setFillColor(...hexToRgb(NEXBE_LIGHT_BG));
-  doc.roundedRect(20, y, pageWidth - 40, 35, 3, 3, 'F');
-
-  doc.setFont('Roboto', 'bold');
   doc.setFontSize(9);
-  doc.setTextColor(...hexToRgb(NEXBE_PURPLE));
-  doc.text('Uwaga:', 25, y + 10);
+  doc.setTextColor(120, 120, 120);
+  doc.text('Kompletny system magazynowania energii z montażem i uruchomieniem', 20, y);
+  y += 10;
 
+  // Helper do rysowania sekcji
+  const drawSection = (num: string, title: string, subtitle: string, items: string[]) => {
+    // Numer sekcji
+    doc.setFont('Roboto', 'bold');
+    doc.setFontSize(16);
+    doc.setTextColor(...hexToRgb(NEXBE_PRIMARY));
+    doc.text(num, 22, y + 1);
+
+    // Tytuł + podtytuł
+    doc.setFont('Roboto', 'bold');
+    doc.setFontSize(10);
+    doc.setTextColor(...hexToRgb(NEXBE_DARK));
+    doc.text(title, 35, y);
+
+    doc.setFont('Roboto', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor(140, 140, 140);
+    doc.text(subtitle, 35 + doc.getTextWidth(title) + 3, y);
+
+    y += 7;
+
+    // Pozycje
+    items.forEach((item) => {
+      doc.setFont('Roboto', 'normal');
+      doc.setFontSize(8);
+      doc.setTextColor(60, 60, 60);
+      doc.text(`•  ${item}`, 38, y);
+      y += 6;
+    });
+
+    y += 4;
+  };
+
+  // 01 — Falownik + Magazyn
+  const section1Items = [
+    `Magazyn energii ${brand} ${cleanProductName(data.product)} ${data.product.capacity_kwh} kWh · LFP`,
+    data.inverter
+      ? `Falownik hybrydowy ${data.inverter.name} ${data.inverter.power_kw} kW`
+      : 'Falownik hybrydowy dopasowany do magazynu',
+    'Okablowanie i zabezpieczenia AC/DC  1 kpl.',
+    'Rozdzielnia z zabezpieczeniami  1 kpl.',
+  ];
+  drawSection('01', 'Falownik + Magazyn Energii', 'Serce systemu', section1Items);
+
+  // 02 — System EMS
+  const section2Items = [
+    'Inteligentny system zarządzania energią (EMS)  optymalizacja 24/7',
+    'Monitoring produkcji PV, zużycia i stanu baterii  w czasie rzeczywistym',
+    'Aplikacja mobilna do zdalnego sterowania  iOS / Android',
+    'Arbitraż cenowy i optymalizacja net-billingu  max. oszczędności',
+  ];
+  drawSection('02', 'System EMS', 'Inteligentne zarządzanie', section2Items);
+
+  // 03 — Backup + Montaż
+  const section3Items = [
+    data.product.eps_capable
+      ? 'Zasilanie awaryjne EPS (Emergency Power Supply)  przełączanie < 20 ms'
+      : 'Pełny backup trójfazowy (SZR)  automatyczne przełączenie całego domu',
+    'Automatyczny przełącznik SZR  1 kpl.',
+    'Montaż, uruchomienie i szkolenie użytkownika  certyfikowany instalator',
+    'Zgłoszenie przyłączenia do OSD  w imieniu klienta',
+  ];
+  drawSection('03', 'Rozwiązanie Backupowe + Montaż', 'Bezpieczeństwo i realizacja', section3Items);
+
+  // ── Nota VAT + certyfikaty ──
+  doc.setFillColor(...hexToRgb(NEXBE_LIGHT_BG));
+  doc.roundedRect(20, y, pageWidth - 40, 20, 2, 2, 'F');
   doc.setFont('Roboto', 'normal');
-  doc.setFontSize(8);
-  doc.setTextColor(80, 80, 80);
-  doc.text(
-    'Ostateczny zakres prac zostanie potwierdzony po audycie technicznym na miejscu instalacji.',
-    25,
-    y + 18
-  );
-  doc.text(
-    'Cena zawiera materiały, transport, montaż oraz uruchomienie systemu.',
-    25,
-    y + 25
-  );
+  doc.setFontSize(7);
+  doc.setTextColor(100, 100, 100);
+  doc.text('Cena brutto zawiera 8% VAT za usługę montażu (stawka preferencyjna dla budownictwa mieszkaniowego).', 25, y + 7);
+  doc.text('Spełnia kryteria programu dofinansowań NFOŚiGW', 25, y + 12);
+
+  // Certyfikaty badge
+  doc.setFont('Roboto', 'bold');
+  doc.setFontSize(7);
+  doc.setTextColor(...hexToRgb(NEXBE_PRIMARY));
+  doc.text('Mój Prąd 7.0 · Czyste Powietrze', pageWidth - 25, y + 12, { align: 'right' });
 }
 
 // ────────────────────────────────────────────────────────────
-// Strona 3 — Wycena i specyfikacja
+// Strona 3 — Specyfikacja techniczna i wycena
 // ────────────────────────────────────────────────────────────
 
 function drawPricingPage(doc: jsPDF, data: PdfOfferData): void {
   const pageWidth = doc.internal.pageSize.getWidth();
+  const brand = baseBrand(data.product.brand);
   drawHeader(doc);
 
   let y = 20;
 
-  // Tytuł
   doc.setFont('Roboto', 'bold');
-  doc.setFontSize(18);
+  doc.setFontSize(16);
   doc.setTextColor(...hexToRgb(NEXBE_PURPLE));
-  doc.text('Specyfikacja techniczna i wycena', 20, y);
-  y += 15;
+  doc.text('Wycena inwestycji', 20, y);
+  y += 5;
 
-  // Tabela specyfikacji technicznej
+  doc.setFont('Roboto', 'normal');
+  doc.setFontSize(9);
+  doc.setTextColor(120, 120, 120);
+  doc.text('Szczegółowy kosztorys z uwzględnieniem dotacji', 20, y);
+  y += 10;
+
+  // ── Tabela specyfikacji (kompaktowa) ──
   const specRows: string[][] = [
-    ['Producent', data.product.brand],
-    ['Model', data.product.name],
+    ['Producent / Model', `${brand} ${cleanProductName(data.product)}`],
     ['Pojemność', `${data.product.capacity_kwh} kWh`],
     ['Moc ciągła', `${data.product.power_continuous_kw} kW`],
-    ['Moc szczytowa', `${data.product.power_peak_kw} kW`],
-    ['Typ podłączenia', data.product.type === 'AC' ? 'AC (retrofit)' : 'DC (hybrydowy)'],
-    ['Zasilanie awaryjne (EPS)', data.product.eps_capable ? 'Tak' : 'Nie'],
+    ['Technologia', 'LFP (LiFePO4)'],
+    ['Typ podłączenia', data.product.type === 'AC' ? 'AC-coupled (retrofit)' : 'DC hybrydowy'],
     ['Gwarancja', `${data.product.warranty_years} lat`],
+    ['EPS backup', data.product.eps_capable ? 'Tak (< 20 ms)' : 'Pełny SZR 3F'],
+    ['Certyfikaty', 'CE, TÜV, IEC 62619'],
   ];
 
   if (data.inverter) {
-    specRows.push(
-      ['', ''],
-      ['Falownik', `${data.inverter.brand} ${data.inverter.name}`],
-      ['Moc falownika', `${data.inverter.power_kw} kW`],
-    );
+    specRows.push(['Falownik', `${data.inverter.name} ${data.inverter.power_kw} kW`]);
+  }
+
+  if (needsEms(data.product.brand)) {
+    specRows.push(['System EMS', 'Tak — zewnętrzny moduł']);
   }
 
   autoTable(doc, {
     startY: y,
-    head: [['Parametr', 'Wartość']],
     body: specRows,
     theme: 'striped',
     styles: {
       font: 'Roboto',
-      fontSize: 9,
-      cellPadding: 4,
-    },
-    headStyles: {
-      fillColor: hexToRgb(NEXBE_PURPLE),
-      textColor: [255, 255, 255],
-      fontStyle: 'bold',
+      fontSize: 8,
+      cellPadding: 3,
     },
     columnStyles: {
-      0: { cellWidth: 60, fontStyle: 'bold' },
-      1: { cellWidth: 110 },
+      0: { cellWidth: 50, fontStyle: 'bold' },
+      1: { cellWidth: 120 },
     },
     margin: { left: 20, right: 20 },
   });
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  y = (doc as any).lastAutoTable.finalY + 15;
+  y = (doc as any).lastAutoTable.finalY + 12;
 
-  // Wycena
-  doc.setFont('Roboto', 'bold');
-  doc.setFontSize(14);
-  doc.setTextColor(...hexToRgb(NEXBE_PURPLE));
-  doc.text('Wycena', 20, y);
-  y += 10;
-
+  // ── Wycena ──
   const inv = data.calculation.investment;
-  const totalPrice = data.product.price_gross + (data.inverter?.price_gross || 0);
 
   const priceRows: string[][] = [
-    ['Magazyn energii', formatPLN(inv.battery)],
+    ['Pozycja', 'Kwota brutto'],
+    ['Magazyn energii — kompletny zestaw z montażem', formatPLN(inv.total_gross)],
   ];
 
-  if (inv.inverter > 0) {
-    priceRows.push(['Falownik hybrydowy', formatPLN(inv.inverter)]);
-  }
+  priceRows.push(['', '']);
 
-  priceRows.push(
-    ['Montaż i uruchomienie', 'Wliczone'],
-  );
-
-  if (inv.backup > 0) {
-    priceRows.push(['Instalacja backup', formatPLN(inv.backup)]);
-  }
-
-  priceRows.push(
-    ['', ''],
-    ['RAZEM BRUTTO', formatPLN(totalPrice)],
-  );
+  // Dofinansowanie header
+  priceRows.push(['Dofinansowanie', '']);
 
   if (inv.subsidy_pme > 0) {
-    priceRows.push(['Dotacja Mój Prąd 6.0', `- ${formatPLN(inv.subsidy_pme)}`]);
+    priceRows.push([' Mój Prąd 7.0', `- ${formatPLN(inv.subsidy_pme)}`]);
   }
 
   if (inv.tax_relief > 0) {
     const bracket = inv.thermomodernization_details?.tax_bracket || 12;
-    priceRows.push([`Ulga termomodernizacyjna (${bracket}%)`, `- ${formatPLN(inv.tax_relief)}`]);
+    priceRows.push([` Ulga termomodernizacyjna (${bracket}%)`, `- ${formatPLN(inv.tax_relief)}`]);
   }
 
-  priceRows.push(
-    ['', ''],
-    ['KOSZT PO DOTACJACH', formatPLN(inv.net_cost)],
-  );
+  priceRows.push(['', '']);
+  priceRows.push(['TWÓJ KOSZT PO DOTACJACH:', formatPLN(inv.net_cost)]);
 
   autoTable(doc, {
     startY: y,
@@ -555,8 +673,8 @@ function drawPricingPage(doc: jsPDF, data: PdfOfferData): void {
     theme: 'plain',
     styles: {
       font: 'Roboto',
-      fontSize: 10,
-      cellPadding: 4,
+      fontSize: 9,
+      cellPadding: 3,
     },
     columnStyles: {
       0: { cellWidth: 100 },
@@ -564,26 +682,39 @@ function drawPricingPage(doc: jsPDF, data: PdfOfferData): void {
     },
     didParseCell: (hookData) => {
       const text = hookData.cell.raw as string;
-      if (text === 'RAZEM BRUTTO' || text === 'KOSZT PO DOTACJACH') {
+      // Header — Pozycja / Kwota brutto
+      if (text === 'Pozycja' || text === 'Kwota brutto') {
+        hookData.cell.styles.fontStyle = 'bold';
+        hookData.cell.styles.fillColor = hexToRgb(NEXBE_PURPLE);
+        hookData.cell.styles.textColor = [255, 255, 255];
+        hookData.cell.styles.fontSize = 9;
+      }
+      // Dofinansowanie header
+      if (text === 'Dofinansowanie') {
+        hookData.cell.styles.fontStyle = 'bold';
+        hookData.cell.styles.fontSize = 10;
+        hookData.cell.styles.textColor = hexToRgb(NEXBE_PURPLE);
+      }
+      if (text === 'TWÓJ KOSZT PO DOTACJACH:') {
         hookData.cell.styles.fontStyle = 'bold';
         hookData.cell.styles.fontSize = 11;
-      }
-      if (text === 'KOSZT PO DOTACJACH') {
         hookData.cell.styles.textColor = hexToRgb(NEXBE_PRIMARY);
       }
-      // Row with RAZEM BRUTTO or KOSZT PO DOTACJACH — make value bold too
+      // Wartości — bold dla total
       if (hookData.column.index === 1) {
         const rowData = hookData.row.raw as string[];
-        if (rowData && (rowData[0] === 'RAZEM BRUTTO' || rowData[0] === 'KOSZT PO DOTACJACH')) {
+        if (rowData && rowData[0] === 'TWÓJ KOSZT PO DOTACJACH:') {
           hookData.cell.styles.fontStyle = 'bold';
           hookData.cell.styles.fontSize = 11;
-        }
-        if (rowData && rowData[0] === 'KOSZT PO DOTACJACH') {
           hookData.cell.styles.textColor = hexToRgb(NEXBE_PRIMARY);
         }
       }
-      // Subsidy rows — green
+      // Dotacje — zielony
       if (typeof text === 'string' && text.startsWith('- ')) {
+        hookData.cell.styles.textColor = [34, 139, 34];
+      }
+      // Dotacja opisy — mniejsze, z checkiem
+      if (typeof text === 'string' && text.startsWith(' ')) {
         hookData.cell.styles.textColor = [34, 139, 34];
       }
     },
@@ -591,89 +722,384 @@ function drawPricingPage(doc: jsPDF, data: PdfOfferData): void {
   });
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  y = (doc as any).lastAutoTable.finalY + 15;
+  y = (doc as any).lastAutoTable.finalY + 4;
 
-  // Finansowanie
+  doc.setFont('Roboto', 'normal');
+  doc.setFontSize(7);
+  doc.setTextColor(130, 130, 130);
+  doc.text('Cena brutto zawiera 8% VAT za usługę montażu (stawka preferencyjna dla budownictwa mieszkaniowego).', 20, y);
+  y += 10;
+
+  // ── Finansowanie ratalne — kompaktowe karty ──
   if (data.calculation.monthly_installment) {
     doc.setFont('Roboto', 'bold');
-    doc.setFontSize(12);
+    doc.setFontSize(11);
     doc.setTextColor(...hexToRgb(NEXBE_PURPLE));
-    doc.text('Opcje finansowania (Inbank)', 20, y);
-    y += 8;
+    doc.text('Finansowanie ratalne', 20, y);
+    y += 5;
 
     doc.setFont('Roboto', 'normal');
-    doc.setFontSize(9);
-    doc.setTextColor(80, 80, 80);
-    doc.text('Oprocentowanie stałe 8,99%, RRSO 11,09%, opłata 10 zł/mies.', 20, y);
+    doc.setFontSize(8);
+    doc.setTextColor(100, 100, 100);
+    doc.text('Inbank — oprocentowanie 8,99%, RRSO 11,09%', 20, y);
     y += 8;
 
     const periods = [36, 60, 84, 120];
-    const finRows: string[][] = periods
-      .filter((p) => data.calculation.monthly_installment[p])
-      .map((p) => [
-        `${p} miesięcy (${Math.round(p / 12)} lat)`,
-        formatPLN(data.calculation.monthly_installment[p]),
-      ]);
+    const validPeriods = periods.filter((p) => data.calculation.monthly_installment[p]);
+    const cardWidth = (pageWidth - 40 - (validPeriods.length - 1) * 5) / validPeriods.length;
 
-    if (finRows.length > 0) {
-      autoTable(doc, {
-        startY: y,
-        head: [['Okres', 'Rata miesięczna']],
-        body: finRows,
-        theme: 'grid',
-        styles: {
-          font: 'Roboto',
-          fontSize: 9,
-          cellPadding: 4,
-        },
-        headStyles: {
-          fillColor: hexToRgb(NEXBE_PURPLE),
-          textColor: [255, 255, 255],
-          fontStyle: 'bold',
-        },
-        columnStyles: {
-          0: { cellWidth: 80 },
-          1: { cellWidth: 50, halign: 'right' },
-        },
-        margin: { left: 20, right: 20 },
-      });
+    validPeriods.forEach((p, i) => {
+      const x = 20 + i * (cardWidth + 5);
+      const isLowest = i === validPeriods.length - 1;
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      y = (doc as any).lastAutoTable.finalY + 15;
-    }
+      doc.setFillColor(isLowest ? 240 : 248, isLowest ? 248 : 244, isLowest ? 255 : 252);
+      doc.roundedRect(x, y, cardWidth, 28, 2, 2, 'F');
+      doc.setDrawColor(...hexToRgb(isLowest ? NEXBE_PRIMARY : NEXBE_BORDER));
+      doc.setLineWidth(isLowest ? 0.6 : 0.3);
+      doc.roundedRect(x, y, cardWidth, 28, 2, 2, 'S');
+
+      doc.setFont('Roboto', 'normal');
+      doc.setFontSize(7);
+      doc.setTextColor(100, 100, 100);
+      doc.text(`${p} mies. (${Math.round(p / 12)} lat)`, x + cardWidth / 2, y + 8, { align: 'center' });
+
+      doc.setFont('Roboto', 'bold');
+      doc.setFontSize(12);
+      doc.setTextColor(...hexToRgb(isLowest ? NEXBE_PRIMARY : NEXBE_DARK));
+      doc.text(`${Math.round(data.calculation.monthly_installment[p])} zł`, x + cardWidth / 2, y + 18, { align: 'center' });
+
+      doc.setFont('Roboto', 'normal');
+      doc.setFontSize(6);
+      doc.setTextColor(130, 130, 130);
+      doc.text('/mies.', x + cardWidth / 2, y + 23, { align: 'center' });
+
+      if (isLowest) {
+        doc.setFontSize(6);
+        doc.setTextColor(...hexToRgb(NEXBE_PRIMARY));
+        doc.text('NAJNIŻSZA RATA', x + cardWidth / 2, y + 32, { align: 'center' });
+      }
+    });
+
+    y += 38;
+
+    doc.setFont('Roboto', 'normal');
+    doc.setFontSize(7);
+    doc.setTextColor(140, 140, 140);
+    doc.text(
+      'Opłata 10 zł/mies. wliczona w ratę. Kalkulacja na podstawie kosztu po dotacjach. Decyzja kredytowa w 15 min.',
+      20, y
+    );
+
   }
+}
 
-  // Warunki
-  doc.setFillColor(...hexToRgb(NEXBE_LIGHT_BG));
-  const condHeight = 55;
-  doc.roundedRect(20, y, pageWidth - 40, condHeight, 3, 3, 'F');
+// ────────────────────────────────────────────────────────────
+// Strona 4 — Analiza opłacalności (ROI)
+// ────────────────────────────────────────────────────────────
+
+function drawROIPage(doc: jsPDF, data: PdfOfferData): void {
+  drawHeader(doc);
+
+  let y = 20;
 
   doc.setFont('Roboto', 'bold');
-  doc.setFontSize(11);
+  doc.setFontSize(18);
   doc.setTextColor(...hexToRgb(NEXBE_PURPLE));
-  doc.text('Warunki realizacji', 25, y + 10);
+  doc.text('Analiza opłacalności', 20, y);
+  y += 8;
+
+  doc.setFont('Roboto', 'normal');
+  doc.setFontSize(10);
+  doc.setTextColor(120, 120, 120);
+  doc.text(`Projekcja oszczędności na ${data.calculation.horizon_years} lat`, 20, y);
+  y += 12;
+
+  // ── Kluczowe wskaźniki ──
+  const metrics = [
+    { label: 'Roczna oszczędność', value: formatPLNShort(data.calculation.annual_savings) },
+    { label: 'Zwrot inwestycji', value: data.calculation.roi_years ? `${data.calculation.roi_years} lat` : 'Ponad 15 lat' },
+    { label: 'Łączne oszczędności', value: formatPLNShort(data.calculation.total_savings) },
+  ];
+
+  const boxWidth = 50;
+  const startX = 20;
+  metrics.forEach((m, i) => {
+    const x = startX + i * (boxWidth + 10);
+    doc.setFillColor(...hexToRgb(NEXBE_LIGHT_BG));
+    doc.roundedRect(x, y, boxWidth, 22, 3, 3, 'F');
+
+    doc.setFont('Roboto', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor(100, 100, 100);
+    doc.text(m.label, x + boxWidth / 2, y + 8, { align: 'center' });
+
+    doc.setFont('Roboto', 'bold');
+    doc.setFontSize(13);
+    doc.setTextColor(...hexToRgb(NEXBE_PRIMARY));
+    doc.text(m.value, x + boxWidth / 2, y + 18, { align: 'center' });
+  });
+
+  y += 30;
+
+  // ── Tabela projekcji ──
+  const projection = data.calculation.projection;
+  if (projection && projection.length > 0) {
+    const projRows: string[][] = projection.map((row) => [
+      `Rok ${row.year}`,
+      `${Math.round(row.production).toLocaleString('pl-PL')} kWh`,
+      `${Math.round(row.selfConsumption).toLocaleString('pl-PL')} kWh`,
+      formatPLNShort(row.savings),
+      formatPLNShort(row.cumulative),
+    ]);
+
+    autoTable(doc, {
+      startY: y,
+      head: [['Rok', 'Produkcja PV', 'Autokonsumpcja', 'Oszczędność', 'Kumulatywnie']],
+      body: projRows,
+      theme: 'striped',
+      styles: {
+        font: 'Roboto',
+        fontSize: 8,
+        cellPadding: 3,
+      },
+      headStyles: {
+        fillColor: hexToRgb(NEXBE_PURPLE),
+        textColor: [255, 255, 255],
+        fontStyle: 'bold',
+        fontSize: 8,
+      },
+      columnStyles: {
+        0: { cellWidth: 25 },
+        1: { cellWidth: 35, halign: 'right' },
+        2: { cellWidth: 35, halign: 'right' },
+        3: { cellWidth: 35, halign: 'right' },
+        4: { cellWidth: 35, halign: 'right', fontStyle: 'bold' },
+      },
+      didParseCell: (hookData) => {
+        // Podświetl rok ROI
+        if (
+          data.calculation.roi_years &&
+          hookData.section === 'body' &&
+          hookData.row.index === data.calculation.roi_years - 1
+        ) {
+          hookData.cell.styles.fillColor = [240, 255, 240];
+        }
+        // Negatywne kumulatywnie — czerwone
+        if (hookData.column.index === 4 && hookData.section === 'body') {
+          const val = hookData.cell.raw as string;
+          if (val && val.includes('-')) {
+            hookData.cell.styles.textColor = [180, 60, 60];
+          } else {
+            hookData.cell.styles.textColor = [34, 139, 34];
+          }
+        }
+      },
+      margin: { left: 20, right: 20 },
+    });
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    y = (doc as any).lastAutoTable.finalY + 8;
+  }
+
+  doc.setFont('Roboto', 'normal');
+  doc.setFontSize(7);
+  doc.setTextColor(140, 140, 140);
+  doc.text(
+    'Uwzględniono: degradację PV (1%/rok), degradację baterii (2,5%/rok), wzrost cen energii (5%/rok).',
+    20,
+    y
+  );
+}
+
+// ────────────────────────────────────────────────────────────
+// Strona 5 — Warunki realizacji i kolejne kroki
+// ────────────────────────────────────────────────────────────
+
+function drawConditionsPage(doc: jsPDF, data: PdfOfferData): void {
+  const pageWidth = doc.internal.pageSize.getWidth();
+  drawHeader(doc);
+
+  let y = 20;
+
+  // ══════════════════════════════════════════════════════════
+  // Motywujący banner na górze
+  // ══════════════════════════════════════════════════════════
+  doc.setFillColor(...hexToRgb(NEXBE_DARK));
+  doc.roundedRect(20, y, pageWidth - 40, 30, 4, 4, 'F');
+
+  doc.setFont('Roboto', 'bold');
+  doc.setFontSize(14);
+  doc.setTextColor(255, 255, 255);
+  doc.text('To dobra decyzja.', pageWidth / 2, y + 12, { align: 'center' });
 
   doc.setFont('Roboto', 'normal');
   doc.setFontSize(9);
-  doc.setTextColor(60, 60, 60);
+  doc.setTextColor(200, 200, 220);
+  const roiMsg = data.calculation.roi_years
+    ? `Inwestycja zwróci się w ${data.calculation.roi_years} lat, a przez ${data.calculation.horizon_years} lat zaoszczędzisz ${formatPLNShort(data.calculation.total_savings)}.`
+    : `Przez ${data.calculation.horizon_years} lat zaoszczędzisz ${formatPLNShort(data.calculation.total_savings)}.`;
+  doc.text(roiMsg, pageWidth / 2, y + 22, { align: 'center' });
 
-  const conditions = [
-    `Gwarancja: ${data.product.warranty_years} lat na magazyn energii`,
-    'Termin realizacji: do 4 tygodni od podpisania umowy',
-    'Oferta ważna: 14 dni od daty wystawienia',
-    'Cena zawiera materiały, montaż, uruchomienie oraz pomoc w uzyskaniu dotacji',
+  y += 38;
+
+  // ══════════════════════════════════════════════════════════
+  // Dlaczego NEXBE?
+  // ══════════════════════════════════════════════════════════
+  doc.setFont('Roboto', 'bold');
+  doc.setFontSize(14);
+  doc.setTextColor(...hexToRgb(NEXBE_PURPLE));
+  doc.text('Dlaczego Nexbe?', 20, y);
+  y += 10;
+
+  const nexbePoints = [
+    {
+      title: 'Dobór AI — najlepsza konfiguracja dla Ciebie',
+      desc: 'Nasz konfigurator AI analizuje Twoje zużycie, taryfę, PV i profil, dobierając optymalny magazyn i falownik spośród 6 producentów premium.',
+    },
+    {
+      title: 'Gwarancja zwrotu z inwestycji',
+      desc: 'Kalkulacja oparta na rzeczywistych cenach energii i Twoim profilu zużycia. Jeśli oszczędności nie pokryją inwestycji w deklarowanym czasie — zwrócimy różnicę.',
+    },
+    {
+      title: 'Kompleksowa obsługa od A do Z',
+      desc: 'Jeden dostawca na wszystko: dobór, montaż, uruchomienie, zgłoszenie OSD, wniosek o dotację. Bez stresu, bez szukania podwykonawców.',
+    },
+    {
+      title: 'Tylko marki premium z pełnym wsparciem',
+      desc: 'Huawei, Sigenergy, FoxESS, GoodWe, BYD, Dyness — certyfikowane urządzenia z gwarancją producenta i serwisem pogwarancyjnym Nexbe.',
+    },
   ];
 
-  conditions.forEach((cond, i) => {
-    doc.text(`• ${cond}`, 25, y + 20 + i * 8);
+  nexbePoints.forEach((pt) => {
+    doc.setFillColor(...hexToRgb(NEXBE_PRIMARY));
+    doc.circle(25, y - 1, 1.5, 'F');
+
+    doc.setFont('Roboto', 'bold');
+    doc.setFontSize(9);
+    doc.setTextColor(...hexToRgb(NEXBE_DARK));
+    doc.text(pt.title, 32, y);
+
+    doc.setFont('Roboto', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor(80, 80, 80);
+    // Wrap text to max width
+    const lines = doc.splitTextToSize(pt.desc, pageWidth - 55);
+    doc.text(lines, 32, y + 5);
+    y += 5 + lines.length * 4 + 4;
   });
+
+  y += 5;
+
+  // ══════════════════════════════════════════════════════════
+  // Warunki i gwarancje (kompaktowe)
+  // ══════════════════════════════════════════════════════════
+  doc.setFont('Roboto', 'bold');
+  doc.setFontSize(12);
+  doc.setTextColor(...hexToRgb(NEXBE_PURPLE));
+  doc.text('Warunki i gwarancje', 20, y);
+  y += 8;
+
+  const conditions = [
+    `${data.product.warranty_years} lat gwarancji producenta na magazyn energii`,
+    '24 miesiące gwarancji na prace montażowe (Nexbe)',
+    `Oferta ważna 14 dni (do ${getExpiryDate()})`,
+    'Realizacja: do 4 tygodni od podpisania umowy',
+    'Serwis gwarancyjny i pogwarancyjny w cenie',
+  ];
+
+  doc.setFont('Roboto', 'normal');
+  doc.setFontSize(8);
+  doc.setTextColor(60, 60, 60);
+  conditions.forEach((c) => {
+    doc.text(`•  ${c}`, 25, y);
+    y += 6;
+  });
+
+  y += 8;
+
+  // ══════════════════════════════════════════════════════════
+  // Kolejne kroki — rozbudowane
+  // ══════════════════════════════════════════════════════════
+  doc.setFont('Roboto', 'bold');
+  doc.setFontSize(12);
+  doc.setTextColor(...hexToRgb(NEXBE_PURPLE));
+  doc.text('Kolejne kroki', 20, y);
+  y += 3;
+  doc.setFont('Roboto', 'normal');
+  doc.setFontSize(8);
+  doc.setTextColor(120, 120, 120);
+  doc.text('Od akceptacji oferty do niezależności energetycznej — 5 prostych kroków', 20, y);
+  y += 8;
+
+  const steps = [
+    {
+      num: '1', title: 'Bezpłatny audyt techniczny',
+      desc: 'Certyfikowany technik Nexbe przyjedzie do Ciebie i oceni warunki instalacji — bez kosztów i zobowiązań.',
+    },
+    {
+      num: '2', title: 'Finalna wycena i umowa',
+      desc: 'Potwierdzamy zakres i podpisujemy umowę. Decyzja o finansowaniu ratalnym online w 15 minut.',
+    },
+    {
+      num: '3', title: 'Profesjonalny montaż',
+      desc: 'Montaż przez certyfikowaną ekipę Nexbe w 1–2 dni roboczych. Pełne szkolenie z obsługi i aplikacji mobilnej.',
+    },
+    {
+      num: '4', title: 'Zgłoszenie do OSD i formalności',
+      desc: 'Zajmujemy się całą dokumentacją — zgłoszenie do operatora sieci, protokoły, niezbędne pozwolenia.',
+    },
+    {
+      num: '5', title: 'Wniosek o dotację Mój Prąd 7.0',
+      desc: 'Pomagamy przygotować i złożyć wniosek o dofinansowanie. Maksymalizujemy Twoje korzyści finansowe.',
+    },
+  ];
+
+  steps.forEach((step) => {
+    doc.setFillColor(...hexToRgb(NEXBE_PRIMARY));
+    doc.circle(26, y - 1.2, 3.5, 'F');
+    doc.setFont('Roboto', 'bold');
+    doc.setFontSize(9);
+    doc.setTextColor(255, 255, 255);
+    doc.text(step.num, 26, y, { align: 'center' });
+
+    doc.setFont('Roboto', 'bold');
+    doc.setFontSize(9);
+    doc.setTextColor(...hexToRgb(NEXBE_DARK));
+    doc.text(step.title, 35, y);
+
+    doc.setFont('Roboto', 'normal');
+    doc.setFontSize(7.5);
+    doc.setTextColor(100, 100, 100);
+    const descLines = doc.splitTextToSize(step.desc, pageWidth - 60);
+    doc.text(descLines, 35, y + 5);
+    y += 5 + descLines.length * 3.5 + 4;
+  });
+
+  y += 5;
+
+  // ══════════════════════════════════════════════════════════
+  // CTA
+  // ══════════════════════════════════════════════════════════
+  doc.setFillColor(...hexToRgb(NEXBE_PRIMARY));
+  doc.roundedRect(20, y, pageWidth - 40, 22, 4, 4, 'F');
+
+  doc.setFont('Roboto', 'bold');
+  doc.setFontSize(12);
+  doc.setTextColor(255, 255, 255);
+  doc.text('Gotowy? Umów bezpłatny audyt — to Cię do niczego nie zobowiązuje.', pageWidth / 2, y + 9, { align: 'center' });
+
+  doc.setFont('Roboto', 'normal');
+  doc.setFontSize(10);
+  doc.setTextColor(255, 220, 240);
+  doc.text('kontakt@nexbe.pl  ·  732 080 101  ·  nexbe.pl', pageWidth / 2, y + 17, { align: 'center' });
+
 }
 
 // ────────────────────────────────────────────────────────────
 // Główna funkcja eksportująca
 // ────────────────────────────────────────────────────────────
 
-export function generateOfferPdf(data: PdfOfferData): jsPDF {
+export async function generateOfferPdf(data: PdfOfferData): Promise<jsPDF> {
   const doc = new jsPDF({
     orientation: 'portrait',
     unit: 'mm',
@@ -682,8 +1108,13 @@ export function generateOfferPdf(data: PdfOfferData): jsPDF {
 
   setupFonts(doc);
 
+  // Załaduj zdjęcie produktu (async)
+  const productImageDataUrl = data.product.image
+    ? await loadImageAsDataUrl(data.product.image)
+    : null;
+
   // Strona 1 — Okładka
-  drawCoverPage(doc, data);
+  drawCoverPage(doc, data, productImageDataUrl);
 
   // Strona 2 — Zakres prac
   doc.addPage();
@@ -692,6 +1123,14 @@ export function generateOfferPdf(data: PdfOfferData): jsPDF {
   // Strona 3 — Wycena
   doc.addPage();
   drawPricingPage(doc, data);
+
+  // Strona 4 — Analiza opłacalności
+  doc.addPage();
+  drawROIPage(doc, data);
+
+  // Strona 5 — Warunki i kolejne kroki
+  doc.addPage();
+  drawConditionsPage(doc, data);
 
   // Dodaj stopki
   const totalPages = doc.getNumberOfPages();
@@ -706,15 +1145,15 @@ export function generateOfferPdf(data: PdfOfferData): jsPDF {
 /**
  * Generuje PDF i zwraca jako Blob (do pobrania w przeglądarce)
  */
-export function generateOfferPdfBlob(data: PdfOfferData): Blob {
-  const doc = generateOfferPdf(data);
+export async function generateOfferPdfBlob(data: PdfOfferData): Promise<Blob> {
+  const doc = await generateOfferPdf(data);
   return doc.output('blob');
 }
 
 /**
  * Generuje PDF i zwraca jako ArrayBuffer (do wysyłki API)
  */
-export function generateOfferPdfBuffer(data: PdfOfferData): ArrayBuffer {
-  const doc = generateOfferPdf(data);
+export async function generateOfferPdfBuffer(data: PdfOfferData): Promise<ArrayBuffer> {
+  const doc = await generateOfferPdf(data);
   return doc.output('arraybuffer');
 }

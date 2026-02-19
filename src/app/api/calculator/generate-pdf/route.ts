@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const pdfBuffer = generateOfferPdfBuffer(body);
+    const pdfBuffer = await generateOfferPdfBuffer(body);
 
     return new NextResponse(pdfBuffer, {
       status: 200,

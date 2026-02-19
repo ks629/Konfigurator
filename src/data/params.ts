@@ -21,7 +21,7 @@ export const defaultCalcParams: CalcParams = {
   battery_efficiency: 0.90,
   battery_degradation_yearly: 0.025,
 
-  // Dotacje Mój Prąd 6.0
+  // Dotacje Mój Prąd 7.0
   subsidy_pme_netbilling_percent: 0.30,
   subsidy_pme_netbilling_per_kwh: 800,
   subsidy_pme_netbilling_max: 16000,
@@ -33,7 +33,7 @@ export const defaultCalcParams: CalcParams = {
   // Koszty montażu (wliczone w cenę produktu)
   installation_cost_base: 0,
   installation_cost_per_kwh: 0,
-  backup_installation_cost: 2000,
+  backup_installation_cost: 0, // backup/SZR wliczony w cenę zestawu
 
   // Finansowanie
   financing_rrso: 0.1109,

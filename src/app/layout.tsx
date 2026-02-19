@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Geist } from 'next/font/google';
 import { Toaster } from '@/components/ui/sonner';
+import NexbiLoader from '@/components/NexbiLoader';
 import './globals.css';
 
 const geist = Geist({
@@ -10,6 +11,7 @@ const geist = Geist({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://dotacjenamagazyny.nexbe.pl'),
   title: 'Konfigurator Magazynu Energii | Nexbe',
   description:
     'Dobierz magazyn energii do swojej instalacji PV. Kalkulator oszczędności, dotacje Mój Prąd do 16 000 zł, raty. Bezpłatny audyt.',
@@ -18,6 +20,9 @@ export const metadata: Metadata = {
     description:
       'Konfigurator magazynu energii Nexbe — dobierz system, oblicz oszczędności, uzyskaj dotacje.',
     type: 'website',
+  },
+  alternates: {
+    canonical: 'https://dotacjenamagazyny.nexbe.pl',
   },
 };
 
@@ -31,6 +36,7 @@ export default function RootLayout({
       <body className={`${geist.variable} antialiased`}>
         {children}
         <Toaster position="top-right" richColors />
+        <NexbiLoader />
       </body>
     </html>
   );

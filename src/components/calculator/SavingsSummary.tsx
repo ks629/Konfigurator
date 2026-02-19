@@ -1,15 +1,22 @@
 'use client';
 
-import { CalculationResult } from '@/lib/types';
+import { CalculationResult, Product, Inverter } from '@/lib/types';
 import { formatCurrency, formatNumber } from '@/lib/calculations';
-import { Wallet, TrendingUp, Target, Banknote, Percent, ArrowDown } from 'lucide-react';
+import { Wallet, TrendingUp, Target, Banknote, Percent, ArrowDown, Battery, Cpu, ShieldCheck, Settings } from 'lucide-react';
 
 interface SavingsSummaryProps {
   result: CalculationResult;
+  product?: Product | null;
+  inverter?: Inverter | null;
 }
 
-export function SavingsSummary({ result }: SavingsSummaryProps) {
+// Marki z wbudowanym EMS — nie potrzebują dodatkowego
+const BRANDS_WITH_BUILTIN_EMS = ['Huawei', 'Sigenergy'];
+
+export function SavingsSummary({ result, product, inverter }: SavingsSummaryProps) {
   const { investment, annual_savings, roi_years, total_savings, horizon_years } = result;
+
+  const needsEms = product ? !BRANDS_WITH_BUILTIN_EMS.includes(product.brand.split('/')[0]) : false;
 
   return (
     <div className="space-y-6">
@@ -20,32 +27,55 @@ export function SavingsSummary({ result }: SavingsSummaryProps) {
           <h3 className="font-heading text-lg text-white">Koszt inwestycji</h3>
         </div>
 
-        <div className="space-y-2 text-sm">
-          {investment.battery > 0 && (
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Magazyn energii</span>
-              <span className="font-medium">{formatCurrency(investment.battery)}</span>
+        {/* Skład zestawu */}
+        {product && (
+          <div className="bg-muted/30 rounded-lg p-4 space-y-3">
+            <p className="text-xs text-muted-foreground uppercase tracking-wide">W zestawie</p>
+            <div className="space-y-2.5 text-sm">
+              <div className="flex items-start gap-2.5">
+                <Battery className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                <div>
+                  <p className="font-medium text-white">Magazyn energii {product.brand.split('/')[0]}</p>
+                  <p className="text-xs text-muted-foreground">{product.name} · {product.capacity_kwh} kWh</p>
+                </div>
+              </div>
+              {inverter && (
+                <div className="flex items-start gap-2.5">
+                  <Cpu className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                  <div>
+                    <p className="font-medium text-white">Falownik hybrydowy {inverter.brand}</p>
+                    <p className="text-xs text-muted-foreground">{inverter.name} · {inverter.power_kw} kW</p>
+                  </div>
+                </div>
+              )}
+              <div className="flex items-start gap-2.5">
+                <ShieldCheck className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                <div>
+                  <p className="font-medium text-white">
+                    {product.eps_capable ? 'Zasilanie awaryjne EPS' : 'Pełny backup 3F (SZR)'}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {product.eps_capable ? 'Podtrzymanie wybranych obwodów' : 'Automatyczne przełączanie całego domu'}
+                  </p>
+                </div>
+              </div>
+              {needsEms && (
+                <div className="flex items-start gap-2.5">
+                  <Settings className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                  <div>
+                    <p className="font-medium text-white">System zarządzania energią (EMS)</p>
+                    <p className="text-xs text-muted-foreground">Optymalizacja zużycia i ładowania</p>
+                  </div>
+                </div>
+              )}
             </div>
-          )}
-          {investment.inverter > 0 && (
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Falownik hybrydowy</span>
-              <span className="font-medium">{formatCurrency(investment.inverter)}</span>
-            </div>
-          )}
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Montaż i uruchomienie</span>
-            <span className="font-medium">{formatCurrency(investment.installation)}</span>
           </div>
-          {investment.backup > 0 && (
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Instalacja backup</span>
-              <span className="font-medium">{formatCurrency(investment.backup)}</span>
-            </div>
-          )}
+        )}
 
-          <div className="border-t border-white/10 pt-2 flex justify-between font-heading text-base text-white">
-            <span>RAZEM BRUTTO</span>
+        {/* Jedna cena */}
+        <div className="space-y-2 text-sm">
+          <div className="flex justify-between font-heading text-base text-white">
+            <span>Cena kompleksowa z montażem</span>
             <span>{formatCurrency(investment.total_gross)}</span>
           </div>
         </div>

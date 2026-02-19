@@ -201,7 +201,7 @@ export function StepAdditionalNeeds() {
           <Label className="text-base font-medium">Dotacje i ulgi</Label>
         </div>
 
-        {/* Dotacja Mój Prąd 6.0 */}
+        {/* Dotacja Mój Prąd 7.0 */}
         <div
           className={cn(
             'flex items-center gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all',
@@ -214,7 +214,7 @@ export function StepAdditionalNeeds() {
             onCheckedChange={(val) => setWantsSubsidy(val as boolean)}
           />
           <span className="text-sm font-medium">
-            Chcę skorzystać z dotacji Mój Prąd 6.0
+            Chcę skorzystać z dotacji Mój Prąd 7.0
           </span>
         </div>
 

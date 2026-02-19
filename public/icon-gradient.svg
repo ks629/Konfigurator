@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Warstwa_1" data-name="Warstwa 1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 16 16">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: url(#Gradient_bez_nazwy_4);
+      }
+
+      .cls-2 {
+        fill: #fff;
+      }
+    </style>
+    <linearGradient id="Gradient_bez_nazwy_4" data-name="Gradient bez nazwy 4" x1="12.06" y1="13.91" x2="3.94" y2="6.09" gradientTransform="translate(0 18) scale(1 -1)" gradientUnits="userSpaceOnUse">
+      <stop offset=".24" stop-color="#ff004e"/>
+      <stop offset=".44" stop-color="#b5005d"/>
+      <stop offset=".7" stop-color="#3d0076"/>
+    </linearGradient>
+  </defs>
+  <rect class="cls-2" width="16" height="16"/>
+  <path class="cls-2" d="M11.91,3.94v8.13h-3.57L5.84,3.94h1.81l2.51,8.13V3.94h1.75ZM4.09,12.06V3.94h1.75v8.13h-1.75Z"/>
+  <path class="cls-1" d="M11.91,3.94v8.13h-3.57L5.84,3.94h1.81l2.51,8.13V3.94h1.75ZM4.09,12.06V3.94h1.75v8.13h-1.75Z"/>
+</svg>

@@ -4,7 +4,6 @@ import { useMemo, useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { useConfigurator } from '@/hooks/useConfigurator';
 import { Header } from '@/components/layout/Header';
-import { Footer } from '@/components/layout/Footer';
 import { ProgressBar } from '@/components/configurator/ProgressBar';
 import { StepInstallationType } from '@/components/configurator/StepInstallationType';
 import { StepPVData } from '@/components/configurator/StepPVData';
@@ -17,11 +16,13 @@ import { ProjectionTable } from '@/components/calculator/ProjectionTable';
 import { FinancingSimulator } from '@/components/calculator/FinancingSimulator';
 import { ContactForm } from '@/components/forms/ContactForm';
 import { Button } from '@/components/ui/button';
+import { ResumeProgressBanner } from '@/components/ui/ResumeProgressBanner';
 import { ArrowLeft, ArrowRight, FileText, CalendarCheck, Zap } from 'lucide-react';
 import { calculateROI, calculateMonthlyFromBill } from '@/lib/calculations';
 import { allProducts } from '@/data/products';
 import { inverters } from '@/data/products';
 import { ContactFormData } from '@/lib/validations';
+import { generateOfferPdfBlob, type PdfOfferData } from '@/lib/pdf-generator';
 
 const TOTAL_STEPS = 5;
 
@@ -29,6 +30,7 @@ export default function KonfiguratorPage() {
   const store = useConfigurator();
   const { currentStep, nextStep, prevStep, setStep, selectedProductId, selectedInverterId } = store;
   const [contactFormOpen, setContactFormOpen] = useState(false);
+  const [contactData, setContactData] = useState<ContactFormData | null>(null);
 
   const selectedProduct = useMemo(
     () => allProducts.find((p) => p.id === selectedProductId) || null,
@@ -140,10 +142,37 @@ export default function KonfiguratorPage() {
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || 'Błąd wysyłki');
       console.log('Offer sent:', result);
+      setContactData(data); // Save for PDF download
     } catch (error) {
       console.error('Failed to send offer:', error);
       throw error;
     }
+  };
+
+  const handleDownloadPdf = async () => {
+    if (!selectedProduct || !calculation || !contactData) return;
+
+    const pdfData: PdfOfferData = {
+      clientName: contactData.name,
+      clientEmail: contactData.email,
+      clientPhone: contactData.phone,
+      clientPostalCode: contactData.postalCode || '',
+      product: selectedProduct,
+      inverter: selectedInverter || undefined,
+      calculation,
+      config: store,
+      offerNumber: `NEXBE-${Date.now()}`,
+    };
+
+    const blob = await generateOfferPdfBlob(pdfData);
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `oferta-nexbe-${selectedProduct.brand}-${selectedProduct.capacity_kwh}kWh.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   };
 
   const renderStep = () => {
@@ -181,10 +210,30 @@ export default function KonfiguratorPage() {
         <div className="energy-orb energy-orb-3" />
 
         <div className="container mx-auto px-4 py-6 md:py-10 relative z-10">
+          {/* Resume progress banner */}
+          <div className="max-w-3xl mx-auto">
+            <ResumeProgressBanner />
+          </div>
+
           {/* Progress */}
           <div className="max-w-3xl mx-auto mb-8">
             <ProgressBar currentStep={currentStep} totalSteps={TOTAL_STEPS} onStepClick={setStep} />
           </div>
+
+          {/* Social proof */}
+          {(currentStep === 1 || currentStep === 5) && (
+            <div className="max-w-3xl mx-auto mb-6 flex items-center justify-center gap-4 text-xs text-gray-500">
+              <span className="flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                500+ instalacji w 2025
+              </span>
+              <span className="w-px h-3 bg-white/10" />
+              <span className="flex items-center gap-1">
+                {'★★★★★'.split('').map((s, i) => <span key={i} className="text-amber-400">{s}</span>)}
+                <span className="ml-1">4.8/5</span>
+              </span>
+            </div>
+          )}
 
           {/* Step Content */}
           <AnimatePresence mode="wait">
@@ -223,7 +272,7 @@ export default function KonfiguratorPage() {
               </div>
 
               <div className="grid gap-8 lg:grid-cols-2">
-                <SavingsSummary result={calculation} />
+                <SavingsSummary result={calculation} product={selectedProduct} inverter={selectedInverter} />
                 <div className="space-y-8">
                   <FinancingSimulator result={calculation} />
                 </div>
@@ -318,13 +367,12 @@ export default function KonfiguratorPage() {
         </div>
       </main>
 
-      <Footer />
-
       {/* Contact Form Dialog */}
       <ContactForm
         open={contactFormOpen}
         onOpenChange={setContactFormOpen}
         onSubmit={handleContactSubmit}
+        onDownloadPdf={handleDownloadPdf}
       />
     </div>
   );

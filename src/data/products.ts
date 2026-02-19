@@ -1,183 +1,405 @@
 import { Product, Inverter } from '@/lib/types';
 
 // =====================================================
-// WSZYSTKIE ZESTAWY — jedna lista 28 pozycji z XLS cennika
+// WSZYSTKIE ZESTAWY — jedna lista pozycji z XLS cennika
 // Ceny brutto (8% VAT) za KOMPLETNY ZESTAW: magazyn + falownik + montaż
-// Wariant A (EPS / bez pełnego backup)
-// Źródło: Konfiguracja_Magazynow_Energii_Cennik.xlsx → "Cennik Zestawów"
+// Źródło: CENNIKI_ZATWIERDZONE_LUTY.xlsx → "Cennik Zestawów" v3.0 (18.02.2026)
+// Lp1 ukryty (marża 1.7% po redukcji — za niska)
 // =====================================================
 
 export const allProducts: Product[] = [
-  // --- Sigenergy (PREMIUM) ---
-  // Lp1: SigenStor 10kW + 9 kWh
+  // ──────────────────────────────────────────────────────
+  // Sigenergy PREMIUM (All-in-One SigenStor) — Lp2–Lp9
+  // ──────────────────────────────────────────────────────
+  // Lp2: SigenStor 10kW + 11 kWh (BAT 6 + BAT 5)
   {
-    id: 'sigen-9-10kw',
-    name: 'Sigenergy 9 kWh',
+    id: 'sigen-11-10kw',
+    name: 'Sigenergy 11 kWh',
     brand: 'Sigenergy',
-    capacity_kwh: 9.0,
-    power_continuous_kw: 4.6,
-    power_peak_kw: 4.6,
+    capacity_kwh: 11,
+    power_continuous_kw: 5.0,
+    power_peak_kw: 5.0,
     type: 'DC',
     inverter_power_kw: 10,
-    inverter_cost_net: 6873, // XLS kol.I Lp1
+    inverter_cost_net: 6750,
     segment: 'PREMIUM',
     warranty_years: 10,
-    price_gross: 29193, // XLS Lp1 war.A
-    price_gross_b: 32772, // XLS Lp1 war.B
+    price_gross: 33000,
+    price_gross_b: 33000,
     eps_capable: true,
     image: '/products/sigenergy.png',
   },
-  // Lp2: SigenStor 10kW + 12 kWh
+  // Lp3: SigenStor 10kW + 14 kWh (BAT 10.0 + BAT 5)
   {
-    id: 'sigen-12-10kw',
-    name: 'Sigenergy 12 kWh',
+    id: 'sigen-14-10kw',
+    name: 'Sigenergy 14 kWh',
     brand: 'Sigenergy',
-    capacity_kwh: 12.0,
+    capacity_kwh: 14,
+    power_continuous_kw: 7.0,
+    power_peak_kw: 7.0,
+    type: 'DC',
+    inverter_power_kw: 10,
+    inverter_cost_net: 6750,
+    segment: 'PREMIUM',
+    warranty_years: 10,
+    price_gross: 42000,
+    price_gross_b: 42000,
+    eps_capable: true,
+    image: '/products/sigenergy.png',
+  },
+  // Lp4: SigenStor 10kW + 16 kWh (BAT 6 + 2× BAT 5)
+  {
+    id: 'sigen-16-10kw',
+    name: 'Sigenergy 16 kWh',
+    brand: 'Sigenergy',
+    capacity_kwh: 16,
+    power_continuous_kw: 8.0,
+    power_peak_kw: 8.0,
+    type: 'DC',
+    inverter_power_kw: 10,
+    inverter_cost_net: 6750,
+    segment: 'PREMIUM',
+    warranty_years: 10,
+    price_gross: 48000,
+    price_gross_b: 48000,
+    eps_capable: true,
+    image: '/products/sigenergy.png',
+  },
+  // Lp5: SigenStor 10kW + 17 kWh (2× BAT 6 + BAT 5)
+  {
+    id: 'sigen-17-10kw',
+    name: 'Sigenergy 17 kWh',
+    brand: 'Sigenergy',
+    capacity_kwh: 17,
+    power_continuous_kw: 8.5,
+    power_peak_kw: 8.5,
+    type: 'DC',
+    inverter_power_kw: 10,
+    inverter_cost_net: 6750,
+    segment: 'PREMIUM',
+    warranty_years: 10,
+    price_gross: 51000,
+    price_gross_b: 51000,
+    eps_capable: true,
+    image: '/products/sigenergy.png',
+  },
+  // Lp6: SigenStor 10kW + 20 kWh (BAT 10.0 + BAT 6 + BAT 5)
+  {
+    id: 'sigen-20-10kw',
+    name: 'Sigenergy 20 kWh',
+    brand: 'Sigenergy',
+    capacity_kwh: 20,
+    power_continuous_kw: 10.0,
+    power_peak_kw: 10.0,
+    type: 'DC',
+    inverter_power_kw: 10,
+    inverter_cost_net: 6750,
+    segment: 'PREMIUM',
+    warranty_years: 10,
+    price_gross: 60000,
+    price_gross_b: 60000,
+    eps_capable: true,
+    image: '/products/sigenergy.png',
+  },
+  // Lp7: SigenStor 15kW + 23 kWh (2× BAT 10.0 + BAT 5)
+  {
+    id: 'sigen-23-15kw',
+    name: 'Sigenergy 23 kWh (15kW)',
+    brand: 'Sigenergy',
+    capacity_kwh: 23,
+    power_continuous_kw: 11.5,
+    power_peak_kw: 11.5,
+    type: 'DC',
+    inverter_power_kw: 15,
+    inverter_cost_net: 8954,
+    segment: 'PREMIUM',
+    warranty_years: 10,
+    price_gross: 69000,
+    price_gross_b: 69000,
+    eps_capable: true,
+    image: '/products/sigenergy.png',
+  },
+  // Lp8: SigenStor 15kW + 24 kWh (2× BAT 10.0 + BAT 6)
+  {
+    id: 'sigen-24-15kw',
+    name: 'Sigenergy 24 kWh (15kW)',
+    brand: 'Sigenergy',
+    capacity_kwh: 24,
+    power_continuous_kw: 12.0,
+    power_peak_kw: 12.0,
+    type: 'DC',
+    inverter_power_kw: 15,
+    inverter_cost_net: 8954,
+    segment: 'PREMIUM',
+    warranty_years: 10,
+    price_gross: 70201,
+    price_gross_b: 70201,
+    eps_capable: true,
+    image: '/products/sigenergy.png',
+  },
+  // Lp9: SigenStor 15kW + 27 kWh (3× BAT 10.0)
+  {
+    id: 'sigen-27-15kw',
+    name: 'Sigenergy 27 kWh (15kW)',
+    brand: 'Sigenergy',
+    capacity_kwh: 27,
+    power_continuous_kw: 13.5,
+    power_peak_kw: 13.5,
+    type: 'DC',
+    inverter_power_kw: 15,
+    inverter_cost_net: 8954,
+    segment: 'PREMIUM',
+    warranty_years: 10,
+    price_gross: 73836,
+    price_gross_b: 73836,
+    eps_capable: true,
+    image: '/products/sigenergy.png',
+  },
+
+  // ──────────────────────────────────────────────────────
+  // Sigenergy PREMIUM RETROFIT (Hybrid TP2) — Lp10–Lp22
+  // ──────────────────────────────────────────────────────
+  // Lp10: Sigen Hybrid TP2 10kW + 10 kWh (2× BAT 5)
+  {
+    id: 'sigen-retro-10-10kw',
+    name: 'Sigenergy Retrofit 10 kWh',
+    brand: 'Sigenergy',
+    capacity_kwh: 10,
+    power_continuous_kw: 5.0,
+    power_peak_kw: 5.0,
+    type: 'DC',
+    inverter_power_kw: 10,
+    inverter_cost_net: 3756,
+    segment: 'PREMIUM RETROFIT',
+    warranty_years: 10,
+    price_gross: 30000,
+    price_gross_b: 30000,
+    eps_capable: true,
+    image: '/products/sigenergy.png',
+  },
+  // Lp11: Sigen Hybrid TP2 10kW + 11 kWh (BAT 6 + BAT 5)
+  {
+    id: 'sigen-retro-11-10kw',
+    name: 'Sigenergy Retrofit 11 kWh',
+    brand: 'Sigenergy',
+    capacity_kwh: 11,
+    power_continuous_kw: 5.5,
+    power_peak_kw: 5.5,
+    type: 'DC',
+    inverter_power_kw: 10,
+    inverter_cost_net: 3756,
+    segment: 'PREMIUM RETROFIT',
+    warranty_years: 10,
+    price_gross: 33000,
+    price_gross_b: 33000,
+    eps_capable: true,
+    image: '/products/sigenergy.png',
+  },
+  // Lp12: Sigen Hybrid TP2 10kW + 12 kWh (2× BAT 6)
+  {
+    id: 'sigen-retro-12-10kw',
+    name: 'Sigenergy Retrofit 12 kWh',
+    brand: 'Sigenergy',
+    capacity_kwh: 12,
     power_continuous_kw: 6.0,
     power_peak_kw: 6.0,
     type: 'DC',
     inverter_power_kw: 10,
-    inverter_cost_net: 6873, // XLS kol.I Lp2
-    segment: 'PREMIUM',
-    warranty_years: 10,
-    price_gross: 30086, // XLS Lp2 war.A
-    price_gross_b: 33665, // XLS Lp2 war.B
-    eps_capable: true,
-    image: '/products/sigenergy.png',
-  },
-  // Lp3: SigenStor 10kW + 15 kWh
-  {
-    id: 'sigen-15-10kw',
-    name: 'Sigenergy 15 kWh',
-    brand: 'Sigenergy',
-    capacity_kwh: 15.0,
-    power_continuous_kw: 7.6,
-    power_peak_kw: 7.6,
-    type: 'DC',
-    inverter_power_kw: 10,
-    inverter_cost_net: 6873, // XLS kol.I Lp3
-    segment: 'PREMIUM',
-    warranty_years: 10,
-    price_gross: 41627, // XLS Lp3 war.A
-    price_gross_b: 45206, // XLS Lp3 war.B
-    eps_capable: true,
-    image: '/products/sigenergy.png',
-  },
-  // Lp4: SigenStor 10kW + 18 kWh
-  {
-    id: 'sigen-18-10kw',
-    name: 'Sigenergy 18 kWh',
-    brand: 'Sigenergy',
-    capacity_kwh: 18.0,
-    power_continuous_kw: 9.2,
-    power_peak_kw: 9.2,
-    type: 'DC',
-    inverter_power_kw: 10,
-    inverter_cost_net: 6873, // XLS kol.I Lp4
-    segment: 'PREMIUM',
-    warranty_years: 10,
-    price_gross: 42519, // XLS Lp4 war.A
-    price_gross_b: 46098, // XLS Lp4 war.B
-    eps_capable: true,
-    image: '/products/sigenergy.png',
-  },
-  // Lp5: SigenStor 15kW + 15 kWh
-  {
-    id: 'sigen-15-15kw',
-    name: 'Sigenergy 15 kWh (15kW)',
-    brand: 'Sigenergy',
-    capacity_kwh: 15.0,
-    power_continuous_kw: 7.6,
-    power_peak_kw: 7.6,
-    type: 'DC',
-    inverter_power_kw: 15,
-    inverter_cost_net: 9116, // XLS kol.I Lp5
-    segment: 'PREMIUM',
-    warranty_years: 10,
-    price_gross: 45353, // XLS Lp5 war.A
-    price_gross_b: 48932, // XLS Lp5 war.B
-    eps_capable: true,
-    image: '/products/sigenergy.png',
-  },
-  // Lp6: SigenStor 15kW + 18 kWh
-  {
-    id: 'sigen-18-15kw',
-    name: 'Sigenergy 18 kWh (15kW)',
-    brand: 'Sigenergy',
-    capacity_kwh: 18.0,
-    power_continuous_kw: 9.2,
-    power_peak_kw: 9.2,
-    type: 'DC',
-    inverter_power_kw: 15,
-    inverter_cost_net: 9116, // XLS kol.I Lp6
-    segment: 'PREMIUM',
-    warranty_years: 10,
-    price_gross: 49994, // XLS Lp6 war.A
-    price_gross_b: 53573, // XLS Lp6 war.B
-    eps_capable: true,
-    image: '/products/sigenergy.png',
-  },
-  // Lp7: SigenStor 20kW + 21 kWh
-  {
-    id: 'sigen-21-20kw',
-    name: 'Sigenergy 21 kWh (20kW)',
-    brand: 'Sigenergy',
-    capacity_kwh: 21.0,
-    power_continuous_kw: 10.6,
-    power_peak_kw: 10.6,
-    type: 'DC',
-    inverter_power_kw: 20,
-    inverter_cost_net: 10178, // XLS kol.I Lp7
-    segment: 'PREMIUM',
-    warranty_years: 10,
-    price_gross: 56398, // XLS Lp7 war.A
-    price_gross_b: 59977, // XLS Lp7 war.B
-    eps_capable: true,
-    image: '/products/sigenergy.png',
-  },
-
-  // --- Sigenergy RETROFIT (PREMIUM RETROFIT) ---
-  // Lp8: Sigen Hybrid TP2 10kW + 9 kWh
-  {
-    id: 'sigen-retro-9-10kw',
-    name: 'Sigenergy Retrofit 9 kWh',
-    brand: 'Sigenergy',
-    capacity_kwh: 9.0,
-    power_continuous_kw: 4.6,
-    power_peak_kw: 4.6,
-    type: 'DC',
-    inverter_power_kw: 10,
-    inverter_cost_net: 3876, // XLS kol.I Lp8
+    inverter_cost_net: 3756,
     segment: 'PREMIUM RETROFIT',
     warranty_years: 10,
-    price_gross: 25885, // XLS Lp8 war.A
-    price_gross_b: 29464, // XLS Lp8 war.B
+    price_gross: 36000,
+    price_gross_b: 36000,
     eps_capable: true,
     image: '/products/sigenergy.png',
   },
-  // Lp9: Sigen Hybrid TP2 12kW + 15 kWh
+  // Lp13: Sigen Hybrid TP2 10kW + 14 kWh (BAT 10.0 + BAT 5)
+  {
+    id: 'sigen-retro-14-10kw',
+    name: 'Sigenergy Retrofit 14 kWh',
+    brand: 'Sigenergy',
+    capacity_kwh: 14,
+    power_continuous_kw: 7.0,
+    power_peak_kw: 7.0,
+    type: 'DC',
+    inverter_power_kw: 10,
+    inverter_cost_net: 3756,
+    segment: 'PREMIUM RETROFIT',
+    warranty_years: 10,
+    price_gross: 43576,
+    price_gross_b: 42000,
+    eps_capable: true,
+    image: '/products/sigenergy.png',
+  },
+  // Lp14: Sigen Hybrid TP2 10kW + 15 kWh (BAT 6 + BAT 10.0)
+  {
+    id: 'sigen-retro-15-10kw',
+    name: 'Sigenergy Retrofit 15 kWh',
+    brand: 'Sigenergy',
+    capacity_kwh: 15,
+    power_continuous_kw: 7.5,
+    power_peak_kw: 7.5,
+    type: 'DC',
+    inverter_power_kw: 10,
+    inverter_cost_net: 3756,
+    segment: 'PREMIUM RETROFIT',
+    warranty_years: 10,
+    price_gross: 44074,
+    price_gross_b: 47321,
+    eps_capable: true,
+    image: '/products/sigenergy.png',
+  },
+  // Lp15: Sigen Hybrid TP2 10kW + 16 kWh (BAT 6 + 2× BAT 5)
+  {
+    id: 'sigen-retro-16-10kw',
+    name: 'Sigenergy Retrofit 16 kWh',
+    brand: 'Sigenergy',
+    capacity_kwh: 16,
+    power_continuous_kw: 8.0,
+    power_peak_kw: 8.0,
+    type: 'DC',
+    inverter_power_kw: 10,
+    inverter_cost_net: 3756,
+    segment: 'PREMIUM RETROFIT',
+    warranty_years: 10,
+    price_gross: 48000,
+    price_gross_b: 48000,
+    eps_capable: true,
+    image: '/products/sigenergy.png',
+  },
+  // Lp16: Sigen Hybrid TP2 10kW + 17 kWh (2× BAT 6 + BAT 5)
+  {
+    id: 'sigen-retro-17-10kw',
+    name: 'Sigenergy Retrofit 17 kWh',
+    brand: 'Sigenergy',
+    capacity_kwh: 17,
+    power_continuous_kw: 8.5,
+    power_peak_kw: 8.5,
+    type: 'DC',
+    inverter_power_kw: 10,
+    inverter_cost_net: 3756,
+    segment: 'PREMIUM RETROFIT',
+    warranty_years: 10,
+    price_gross: 52864,
+    price_gross_b: 51000,
+    eps_capable: true,
+    image: '/products/sigenergy.png',
+  },
+  // Lp17: Sigen Hybrid TP2 10kW + 18 kWh (2× BAT 10.0)
+  {
+    id: 'sigen-retro-18-10kw',
+    name: 'Sigenergy Retrofit 18 kWh',
+    brand: 'Sigenergy',
+    capacity_kwh: 18,
+    power_continuous_kw: 9.0,
+    power_peak_kw: 9.0,
+    type: 'DC',
+    inverter_power_kw: 10,
+    inverter_cost_net: 3756,
+    segment: 'PREMIUM RETROFIT',
+    warranty_years: 10,
+    price_gross: 47709,
+    price_gross_b: 50955,
+    eps_capable: true,
+    image: '/products/sigenergy.png',
+  },
+  // Lp18: Sigen Hybrid TP2 10kW + 20 kWh (BAT 10.0 + BAT 6 + BAT 5)
+  {
+    id: 'sigen-retro-20-10kw',
+    name: 'Sigenergy Retrofit 20 kWh',
+    brand: 'Sigenergy',
+    capacity_kwh: 20,
+    power_continuous_kw: 10.0,
+    power_peak_kw: 10.0,
+    type: 'DC',
+    inverter_power_kw: 10,
+    inverter_cost_net: 3756,
+    segment: 'PREMIUM RETROFIT',
+    warranty_years: 10,
+    price_gross: 56498,
+    price_gross_b: 59745,
+    eps_capable: true,
+    image: '/products/sigenergy.png',
+  },
+  // Lp19: Sigen Hybrid TP2 10kW + 24 kWh (BAT 6 + 2× BAT 10.0)
+  {
+    id: 'sigen-retro-24-10kw',
+    name: 'Sigenergy Retrofit 24 kWh',
+    brand: 'Sigenergy',
+    capacity_kwh: 24,
+    power_continuous_kw: 12.0,
+    power_peak_kw: 12.0,
+    type: 'DC',
+    inverter_power_kw: 10,
+    inverter_cost_net: 3756,
+    segment: 'PREMIUM RETROFIT',
+    warranty_years: 10,
+    price_gross: 60631,
+    price_gross_b: 63878,
+    eps_capable: true,
+    image: '/products/sigenergy.png',
+  },
+  // Lp20: Sigen Hybrid TP2 12kW + 15 kWh (BAT 6 + BAT 10.0)
   {
     id: 'sigen-retro-15-12kw',
     name: 'Sigenergy Retrofit 15 kWh (12kW)',
     brand: 'Sigenergy',
-    capacity_kwh: 15.0,
-    power_continuous_kw: 7.6,
-    power_peak_kw: 7.6,
+    capacity_kwh: 15,
+    power_continuous_kw: 7.5,
+    power_peak_kw: 7.5,
     type: 'DC',
     inverter_power_kw: 12,
-    inverter_cost_net: 3987, // XLS kol.I Lp9
+    inverter_cost_net: 3863,
     segment: 'PREMIUM RETROFIT',
     warranty_years: 10,
-    price_gross: 38502, // XLS Lp9 war.A
-    price_gross_b: 42081, // XLS Lp9 war.B
+    price_gross: 44252,
+    price_gross_b: 47499,
+    eps_capable: true,
+    image: '/products/sigenergy.png',
+  },
+  // Lp21: Sigen Hybrid TP2 12kW + 24 kWh (BAT 6 + 2× BAT 10.0)
+  {
+    id: 'sigen-retro-24-12kw',
+    name: 'Sigenergy Retrofit 24 kWh (12kW)',
+    brand: 'Sigenergy',
+    capacity_kwh: 24,
+    power_continuous_kw: 12.0,
+    power_peak_kw: 12.0,
+    type: 'DC',
+    inverter_power_kw: 12,
+    inverter_cost_net: 3863,
+    segment: 'PREMIUM RETROFIT',
+    warranty_years: 10,
+    price_gross: 60809,
+    price_gross_b: 64056,
+    eps_capable: true,
+    image: '/products/sigenergy.png',
+  },
+  // Lp22: Sigen Hybrid TP2 12kW + 27 kWh (3× BAT 10.0)
+  {
+    id: 'sigen-retro-27-12kw',
+    name: 'Sigenergy Retrofit 27 kWh (12kW)',
+    brand: 'Sigenergy',
+    capacity_kwh: 27,
+    power_continuous_kw: 13.5,
+    power_peak_kw: 13.5,
+    type: 'DC',
+    inverter_power_kw: 12,
+    inverter_cost_net: 3863,
+    segment: 'PREMIUM RETROFIT',
+    warranty_years: 10,
+    price_gross: 64443,
+    price_gross_b: 67690,
     eps_capable: true,
     image: '/products/sigenergy.png',
   },
 
-  // --- FoxESS (STANDARD) ---
-  // Lp10: P3-10.0-SH 10kW + 10.36 kWh
+  // ──────────────────────────────────────────────────────
+  // FoxESS STANDARD — Lp23–Lp37
+  // ──────────────────────────────────────────────────────
+  // Lp23: P3-10.0-SH + EP11 (10.36 kWh)
   {
-    id: 'foxess-10-10kw',
+    id: 'foxess-10.36-10kw',
     name: 'FoxESS 10.36 kWh',
     brand: 'FoxESS',
     capacity_kwh: 10.36,
@@ -185,17 +407,17 @@ export const allProducts: Product[] = [
     power_peak_kw: 5.2,
     type: 'DC',
     inverter_power_kw: 10,
-    inverter_cost_net: 5164, // XLS kol.I Lp10
+    inverter_cost_net: 4843,
     segment: 'STANDARD',
     warranty_years: 10,
-    price_gross: 22823, // XLS Lp10 war.A
-    price_gross_b: 25754, // XLS Lp10 war.B
+    price_gross: 21328,
+    price_gross_b: 25196,
     eps_capable: true,
     image: '/products/foxess-ecs.png',
   },
-  // Lp11: P3-10.0-SH 10kW + 11.52 kWh
+  // Lp24: P3-10.0-SH + EP12 (11.52 kWh)
   {
-    id: 'foxess-11-10kw',
+    id: 'foxess-11.52-10kw',
     name: 'FoxESS 11.52 kWh',
     brand: 'FoxESS',
     capacity_kwh: 11.52,
@@ -203,183 +425,331 @@ export const allProducts: Product[] = [
     power_peak_kw: 5.8,
     type: 'DC',
     inverter_power_kw: 10,
-    inverter_cost_net: 5164, // XLS kol.I Lp11
+    inverter_cost_net: 4843,
     segment: 'STANDARD',
     warranty_years: 10,
-    price_gross: 22849, // XLS Lp11 war.A
-    price_gross_b: 25781, // XLS Lp11 war.B
+    price_gross: 22792,
+    price_gross_b: 26660,
     eps_capable: true,
     image: '/products/foxess-ecs.png',
   },
-  // Lp12: P3-12.0-SH 12kW + 10.36 kWh
+  // Lp25: P3-10.0-SH + EP11 + EP5 (15.54 kWh)
   {
-    id: 'foxess-10-12kw',
-    name: 'FoxESS 10.36 kWh (12kW)',
-    brand: 'FoxESS',
-    capacity_kwh: 10.36,
-    power_continuous_kw: 5.2,
-    power_peak_kw: 5.2,
-    type: 'DC',
-    inverter_power_kw: 12,
-    inverter_cost_net: 5526, // XLS kol.I Lp12
-    segment: 'STANDARD',
-    warranty_years: 10,
-    price_gross: 23382, // XLS Lp12 war.A
-    price_gross_b: 26314, // XLS Lp12 war.B
-    eps_capable: true,
-    image: '/products/foxess-ecs.png',
-  },
-  // Lp13: P3-15.0-SH 15kW + 11.52 kWh (2xEP6)
-  {
-    id: 'foxess-11-15kw',
-    name: 'FoxESS 11.52 kWh (15kW)',
-    brand: 'FoxESS',
-    capacity_kwh: 11.52,
-    power_continuous_kw: 5.8,
-    power_peak_kw: 5.8,
-    type: 'DC',
-    inverter_power_kw: 15,
-    inverter_cost_net: 5952, // XLS kol.I Lp13
-    segment: 'STANDARD',
-    warranty_years: 10,
-    price_gross: 26678, // XLS Lp13 war.A
-    price_gross_b: 29609, // XLS Lp13 war.B
-    eps_capable: true,
-    image: '/products/foxess-ecs.png',
-  },
-  // Lp14: P3-15.0-SH 15kW + 15.54 kWh
-  {
-    id: 'foxess-15-15kw',
-    name: 'FoxESS 15.54 kWh (15kW)',
+    id: 'foxess-15.54-10kw',
+    name: 'FoxESS 15.54 kWh',
     brand: 'FoxESS',
     capacity_kwh: 15.54,
     power_continuous_kw: 7.8,
     power_peak_kw: 7.8,
     type: 'DC',
-    inverter_power_kw: 15,
-    inverter_cost_net: 5952, // XLS kol.I Lp14
+    inverter_power_kw: 10,
+    inverter_cost_net: 4843,
     segment: 'STANDARD',
     warranty_years: 10,
-    price_gross: 30191, // XLS Lp14 war.A
-    price_gross_b: 33122, // XLS Lp14 war.B
+    price_gross: 28096,
+    price_gross_b: 31965,
     eps_capable: true,
     image: '/products/foxess-ecs.png',
   },
-  // Lp15: P3-PRO-15.0 15kW + 10.36 kWh
+  // Lp26: P3-10.0-SH + EP11 + EP6 (16.12 kWh)
   {
-    id: 'foxess-10-pro15kw',
-    name: 'FoxESS PRO 10.36 kWh (15kW)',
+    id: 'foxess-16.12-10kw',
+    name: 'FoxESS 16.12 kWh',
     brand: 'FoxESS',
-    capacity_kwh: 10.36,
-    power_continuous_kw: 5.2,
-    power_peak_kw: 5.2,
+    capacity_kwh: 16.12,
+    power_continuous_kw: 8.1,
+    power_peak_kw: 8.1,
     type: 'DC',
-    inverter_power_kw: 15,
-    inverter_cost_net: 7368, // XLS kol.I Lp15 (PRO)
+    inverter_power_kw: 10,
+    inverter_cost_net: 4843,
     segment: 'STANDARD',
     warranty_years: 10,
-    price_gross: 28802, // XLS Lp15 war.A
-    price_gross_b: 29637, // XLS Lp15 war.B
+    price_gross: 29031,
+    price_gross_b: 32900,
     eps_capable: true,
     image: '/products/foxess-ecs.png',
   },
-  // Lp16: P3-PRO-20.0 20kW + 20.72 kWh (2xEP11)
+  // Lp27: P3-10.0-SH + EP12 + EP5 (16.70 kWh)
   {
-    id: 'foxess-20-pro20kw',
-    name: 'FoxESS 20.72 kWh (20kW)',
+    id: 'foxess-16.70-10kw',
+    name: 'FoxESS 16.70 kWh',
+    brand: 'FoxESS',
+    capacity_kwh: 16.7,
+    power_continuous_kw: 8.4,
+    power_peak_kw: 8.4,
+    type: 'DC',
+    inverter_power_kw: 10,
+    inverter_cost_net: 4843,
+    segment: 'STANDARD',
+    warranty_years: 10,
+    price_gross: 29560,
+    price_gross_b: 33429,
+    eps_capable: true,
+    image: '/products/foxess-ecs.png',
+  },
+  // Lp28: P3-10.0-SH + EP12 + EP6 (17.28 kWh)
+  {
+    id: 'foxess-17.28-10kw',
+    name: 'FoxESS 17.28 kWh',
+    brand: 'FoxESS',
+    capacity_kwh: 17.28,
+    power_continuous_kw: 8.6,
+    power_peak_kw: 8.6,
+    type: 'DC',
+    inverter_power_kw: 10,
+    inverter_cost_net: 4843,
+    segment: 'STANDARD',
+    warranty_years: 10,
+    price_gross: 30495,
+    price_gross_b: 34364,
+    eps_capable: true,
+    image: '/products/foxess-ecs.png',
+  },
+  // Lp29: P3-12.0-SH + 2× EP11 (20.72 kWh)
+  {
+    id: 'foxess-20.72-12kw',
+    name: 'FoxESS 20.72 kWh (12kW)',
     brand: 'FoxESS',
     capacity_kwh: 20.72,
-    power_continuous_kw: 11.6,
-    power_peak_kw: 11.6,
+    power_continuous_kw: 10.4,
+    power_peak_kw: 10.4,
     type: 'DC',
-    inverter_power_kw: 20,
-    inverter_cost_net: 8187, // XLS kol.I Lp16 (PRO)
+    inverter_power_kw: 12,
+    inverter_cost_net: 5181,
     segment: 'STANDARD',
     warranty_years: 10,
-    price_gross: 41623, // XLS Lp16 war.A
-    price_gross_b: 42459, // XLS Lp16 war.B
+    price_gross: 32573,
+    price_gross_b: 36441,
+    eps_capable: true,
+    image: '/products/foxess-ecs.png',
+  },
+  // Lp30: P3-12.0-SH + EP11 + EP12 (21.88 kWh)
+  {
+    id: 'foxess-21.88-12kw',
+    name: 'FoxESS 21.88 kWh (12kW)',
+    brand: 'FoxESS',
+    capacity_kwh: 21.88,
+    power_continuous_kw: 10.9,
+    power_peak_kw: 10.9,
+    type: 'DC',
+    inverter_power_kw: 12,
+    inverter_cost_net: 5181,
+    segment: 'STANDARD',
+    warranty_years: 10,
+    price_gross: 34037,
+    price_gross_b: 37905,
+    eps_capable: true,
+    image: '/products/foxess-ecs.png',
+  },
+  // Lp31: P3-12.0-SH + 2× EP12 (23.04 kWh)
+  {
+    id: 'foxess-23.04-12kw',
+    name: 'FoxESS 23.04 kWh (12kW)',
+    brand: 'FoxESS',
+    capacity_kwh: 23.04,
+    power_continuous_kw: 11.5,
+    power_peak_kw: 11.5,
+    type: 'DC',
+    inverter_power_kw: 12,
+    inverter_cost_net: 5181,
+    segment: 'STANDARD',
+    warranty_years: 10,
+    price_gross: 35501,
+    price_gross_b: 39369,
+    eps_capable: true,
+    image: '/products/foxess-ecs.png',
+  },
+  // Lp32: P3-15.0-SH + 2× EP11 + EP5 (25.90 kWh)
+  {
+    id: 'foxess-25.90-15kw',
+    name: 'FoxESS 25.90 kWh (15kW)',
+    brand: 'FoxESS',
+    capacity_kwh: 25.9,
+    power_continuous_kw: 13.0,
+    power_peak_kw: 13.0,
+    type: 'DC',
+    inverter_power_kw: 15,
+    inverter_cost_net: 5577,
+    segment: 'STANDARD',
+    warranty_years: 10,
+    price_gross: 39335,
+    price_gross_b: 43204,
+    eps_capable: true,
+    image: '/products/foxess-ecs.png',
+  },
+  // Lp33: P3-15.0-SH + 2× EP11 + EP6 (26.48 kWh)
+  {
+    id: 'foxess-26.48-15kw',
+    name: 'FoxESS 26.48 kWh (15kW)',
+    brand: 'FoxESS',
+    capacity_kwh: 26.48,
+    power_continuous_kw: 13.2,
+    power_peak_kw: 13.2,
+    type: 'DC',
+    inverter_power_kw: 15,
+    inverter_cost_net: 5577,
+    segment: 'STANDARD',
+    warranty_years: 10,
+    price_gross: 40270,
+    price_gross_b: 44138,
+    eps_capable: true,
+    image: '/products/foxess-ecs.png',
+  },
+  // Lp34: P3-15.0-SH + EP11 + EP12 + EP5 (27.06 kWh)
+  {
+    id: 'foxess-27.06-15kw',
+    name: 'FoxESS 27.06 kWh (15kW)',
+    brand: 'FoxESS',
+    capacity_kwh: 27.06,
+    power_continuous_kw: 13.5,
+    power_peak_kw: 13.5,
+    type: 'DC',
+    inverter_power_kw: 15,
+    inverter_cost_net: 5577,
+    segment: 'STANDARD',
+    warranty_years: 10,
+    price_gross: 40799,
+    price_gross_b: 44668,
+    eps_capable: true,
+    image: '/products/foxess-ecs.png',
+  },
+  // Lp35: P3-15.0-SH + EP11 + EP12 + EP6 (27.64 kWh)
+  {
+    id: 'foxess-27.64-15kw',
+    name: 'FoxESS 27.64 kWh (15kW)',
+    brand: 'FoxESS',
+    capacity_kwh: 27.64,
+    power_continuous_kw: 13.8,
+    power_peak_kw: 13.8,
+    type: 'DC',
+    inverter_power_kw: 15,
+    inverter_cost_net: 5577,
+    segment: 'STANDARD',
+    warranty_years: 10,
+    price_gross: 41734,
+    price_gross_b: 45602,
+    eps_capable: true,
+    image: '/products/foxess-ecs.png',
+  },
+  // Lp36: P3-15.0-SH + 2× EP12 + EP5 (28.22 kWh)
+  {
+    id: 'foxess-28.22-15kw',
+    name: 'FoxESS 28.22 kWh (15kW)',
+    brand: 'FoxESS',
+    capacity_kwh: 28.22,
+    power_continuous_kw: 14.1,
+    power_peak_kw: 14.1,
+    type: 'DC',
+    inverter_power_kw: 15,
+    inverter_cost_net: 5577,
+    segment: 'STANDARD',
+    warranty_years: 10,
+    price_gross: 42263,
+    price_gross_b: 46132,
+    eps_capable: true,
+    image: '/products/foxess-ecs.png',
+  },
+  // Lp37: P3-15.0-SH + 2× EP12 + EP6 (28.80 kWh)
+  {
+    id: 'foxess-28.80-15kw',
+    name: 'FoxESS 28.80 kWh (15kW)',
+    brand: 'FoxESS',
+    capacity_kwh: 28.8,
+    power_continuous_kw: 14.4,
+    power_peak_kw: 14.4,
+    type: 'DC',
+    inverter_power_kw: 15,
+    inverter_cost_net: 5577,
+    segment: 'STANDARD',
+    warranty_years: 10,
+    price_gross: 43198,
+    price_gross_b: 47066,
     eps_capable: true,
     image: '/products/foxess-ecs.png',
   },
 
-  // --- GoodWe Lynx (STANDARD) ---
-  // Lp17: GW10K-ET 10kW + 10 kWh
+  // ──────────────────────────────────────────────────────
+  // GoodWe Lynx STANDARD — Lp38–Lp41
+  // ──────────────────────────────────────────────────────
+  // Lp38: GW10K-ET G2 + Lynx D 2×5kWh (10 kWh)
   {
     id: 'goodwe-10-10kw',
     name: 'GoodWe Lynx 10 kWh',
     brand: 'GoodWe',
-    capacity_kwh: 10.0,
+    capacity_kwh: 10,
     power_continuous_kw: 6.0,
     power_peak_kw: 6.0,
     type: 'DC',
     inverter_power_kw: 10,
-    inverter_cost_net: 4264, // XLS kol.I Lp17
+    inverter_cost_net: 4153,
     segment: 'STANDARD',
     warranty_years: 10,
-    price_gross: 24168, // XLS Lp17 war.A
-    price_gross_b: 29080, // XLS Lp17 war.B
-    eps_capable: true,
+    price_gross: 25660,
+    price_gross_b: 30000,
+    eps_capable: false,
     image: '/products/goodwe-lynx.png',
   },
-  // Lp18: GW10K-ET 10kW + 15 kWh
+  // Lp39: GW10K-ET G2 + Lynx D 3×5kWh (15 kWh)
   {
     id: 'goodwe-15-10kw',
     name: 'GoodWe Lynx 15 kWh',
     brand: 'GoodWe',
-    capacity_kwh: 15.0,
+    capacity_kwh: 15,
     power_continuous_kw: 9.0,
     power_peak_kw: 9.0,
     type: 'DC',
     inverter_power_kw: 10,
-    inverter_cost_net: 4264, // XLS kol.I Lp18
+    inverter_cost_net: 4153,
     segment: 'STANDARD',
     warranty_years: 10,
-    price_gross: 31918, // XLS Lp18 war.A
-    price_gross_b: 36829, // XLS Lp18 war.B
-    eps_capable: true,
+    price_gross: 33248,
+    price_gross_b: 38057,
+    eps_capable: false,
     image: '/products/goodwe-lynx.png',
   },
-  // Lp19: GW15K-ET 15kW + 15 kWh
+  // Lp40: GW15K-ET G2 + Lynx D 4×5kWh (20 kWh)
   {
-    id: 'goodwe-15-15kw',
-    name: 'GoodWe Lynx 15 kWh (15kW)',
+    id: 'goodwe-20-15kw',
+    name: 'GoodWe Lynx 20 kWh (15kW)',
     brand: 'GoodWe',
-    capacity_kwh: 15.0,
-    power_continuous_kw: 9.0,
-    power_peak_kw: 9.0,
-    type: 'DC',
-    inverter_power_kw: 15,
-    inverter_cost_net: 4417, // XLS kol.I Lp19
-    segment: 'STANDARD',
-    warranty_years: 10,
-    price_gross: 32154, // XLS Lp19 war.A
-    price_gross_b: 37066, // XLS Lp19 war.B
-    eps_capable: true,
-    image: '/products/goodwe-lynx.png',
-  },
-  // Lp20: GW20K-ET 20kW + 20 kWh
-  {
-    id: 'goodwe-20-20kw',
-    name: 'GoodWe Lynx 20 kWh (20kW)',
-    brand: 'GoodWe',
-    capacity_kwh: 20.0,
+    capacity_kwh: 20,
     power_continuous_kw: 12.0,
     power_peak_kw: 12.0,
     type: 'DC',
-    inverter_power_kw: 20,
-    inverter_cost_net: 8089, // XLS kol.I Lp20
+    inverter_power_kw: 15,
+    inverter_cost_net: 4302,
     segment: 'STANDARD',
     warranty_years: 10,
-    price_gross: 45568, // XLS Lp20 war.A
-    price_gross_b: 50607, // XLS Lp20 war.B
-    eps_capable: true,
+    price_gross: 41076,
+    price_gross_b: 45885,
+    eps_capable: false,
+    image: '/products/goodwe-lynx.png',
+  },
+  // Lp41: GW15K-ET G2 + Lynx D 5×5kWh (25 kWh)
+  {
+    id: 'goodwe-25-15kw',
+    name: 'GoodWe Lynx 25 kWh (15kW)',
+    brand: 'GoodWe',
+    capacity_kwh: 25,
+    power_continuous_kw: 15.0,
+    power_peak_kw: 15.0,
+    type: 'DC',
+    inverter_power_kw: 15,
+    inverter_cost_net: 4302,
+    segment: 'STANDARD',
+    warranty_years: 10,
+    price_gross: 48664,
+    price_gross_b: 53473,
+    eps_capable: false,
     image: '/products/goodwe-lynx.png',
   },
 
-  // --- GoodWe/Dyness (STANDARD CROSS) ---
-  // Lp21: GW10K-ET 10kW + Dyness 10.65 kWh
+  // ──────────────────────────────────────────────────────
+  // GoodWe/Dyness STANDARD CROSS — Lp42–Lp45
+  // ──────────────────────────────────────────────────────
+  // Lp42: GW10K-ET G2 + Dyness Tower S 3×3.55kWh (10.65 kWh)
   {
-    id: 'goodwe-dyness-10-10kw',
+    id: 'goodwe-dyness-10.65-10kw',
     name: 'GoodWe + Dyness 10.65 kWh',
     brand: 'GoodWe/Dyness',
     capacity_kwh: 10.65,
@@ -387,143 +757,147 @@ export const allProducts: Product[] = [
     power_peak_kw: 6.39,
     type: 'DC',
     inverter_power_kw: 10,
-    inverter_cost_net: 4264, // XLS kol.I Lp21 (GoodWe 10kW)
+    inverter_cost_net: 4153,
     segment: 'STANDARD CROSS',
     warranty_years: 10,
-    price_gross: 20885, // XLS Lp21 war.A
-    price_gross_b: 25796, // XLS Lp21 war.B
-    eps_capable: true,
+    price_gross: 22250,
+    price_gross_b: 27059,
+    eps_capable: false,
     image: '/products/dyness-tower.png',
   },
-  // Lp22: GW15K-ET 15kW + Dyness 14.2 kWh
+  // Lp43: GW10K-ET G2 + Dyness Tower S 4×3.55kWh (14.20 kWh)
   {
-    id: 'goodwe-dyness-14-15kw',
-    name: 'GoodWe + Dyness 14.2 kWh (15kW)',
+    id: 'goodwe-dyness-14.20-10kw',
+    name: 'GoodWe + Dyness 14.20 kWh',
     brand: 'GoodWe/Dyness',
     capacity_kwh: 14.2,
     power_continuous_kw: 8.52,
     power_peak_kw: 8.52,
     type: 'DC',
-    inverter_power_kw: 15,
-    inverter_cost_net: 4417, // XLS kol.I Lp22 (GoodWe 15kW)
+    inverter_power_kw: 10,
+    inverter_cost_net: 4153,
     segment: 'STANDARD CROSS',
     warranty_years: 10,
-    price_gross: 24707, // XLS Lp22 war.A
-    price_gross_b: 29618, // XLS Lp22 war.B
-    eps_capable: true,
+    price_gross: 25714,
+    price_gross_b: 30523,
+    eps_capable: false,
+    image: '/products/dyness-tower.png',
+  },
+  // Lp44: GW15K-ET G2 + Dyness Tower S 5×3.55kWh (17.75 kWh)
+  {
+    id: 'goodwe-dyness-17.75-15kw',
+    name: 'GoodWe + Dyness 17.75 kWh (15kW)',
+    brand: 'GoodWe/Dyness',
+    capacity_kwh: 17.75,
+    power_continuous_kw: 10.65,
+    power_peak_kw: 10.65,
+    type: 'DC',
+    inverter_power_kw: 15,
+    inverter_cost_net: 4302,
+    segment: 'STANDARD CROSS',
+    warranty_years: 10,
+    price_gross: 29418,
+    price_gross_b: 34228,
+    eps_capable: false,
+    image: '/products/dyness-tower.png',
+  },
+  // Lp45: GW15K-ET G2 + Dyness Tower S 6×3.55kWh (21.30 kWh)
+  {
+    id: 'goodwe-dyness-21.30-15kw',
+    name: 'GoodWe + Dyness 21.30 kWh (15kW)',
+    brand: 'GoodWe/Dyness',
+    capacity_kwh: 21.3,
+    power_continuous_kw: 12.78,
+    power_peak_kw: 12.78,
+    type: 'DC',
+    inverter_power_kw: 15,
+    inverter_cost_net: 4302,
+    segment: 'STANDARD CROSS',
+    warranty_years: 10,
+    price_gross: 32882,
+    price_gross_b: 37692,
+    eps_capable: false,
     image: '/products/dyness-tower.png',
   },
 
-  // --- GoodWe/BYD (STANDARD CROSS) ---
-  // Lp23: GW10K-ET 10kW + BYD 11.04 kWh
-  {
-    id: 'goodwe-byd-11-10kw',
-    name: 'GoodWe + BYD 11.04 kWh',
-    brand: 'GoodWe/BYD',
-    capacity_kwh: 11.04,
-    power_continuous_kw: 5.1,
-    power_peak_kw: 5.1,
-    type: 'DC',
-    inverter_power_kw: 10,
-    inverter_cost_net: 4264, // XLS kol.I Lp23 (GoodWe 10kW)
-    segment: 'STANDARD CROSS',
-    warranty_years: 10,
-    price_gross: 30476, // XLS Lp23 war.A
-    price_gross_b: 35388, // XLS Lp23 war.B
-    eps_capable: true,
-    image: '/products/goodwe-lynx.png',
-  },
-  // Lp24: GW15K-ET 15kW + BYD 16.56 kWh
-  {
-    id: 'goodwe-byd-16-15kw',
-    name: 'GoodWe + BYD 16.56 kWh (15kW)',
-    brand: 'GoodWe/BYD',
-    capacity_kwh: 16.56,
-    power_continuous_kw: 7.68,
-    power_peak_kw: 7.68,
-    type: 'DC',
-    inverter_power_kw: 15,
-    inverter_cost_net: 4417, // XLS kol.I Lp24 (GoodWe 15kW)
-    segment: 'STANDARD CROSS',
-    warranty_years: 10,
-    price_gross: 40410, // XLS Lp24 war.A
-    price_gross_b: 45322, // XLS Lp24 war.B
-    eps_capable: true,
-    image: '/products/goodwe-lynx.png',
-  },
-
-  // --- Huawei (STANDARD) ---
-  // Lp25: SUN2000-10K 10kW + LUNA2000 10 kWh
+  // ──────────────────────────────────────────────────────
+  // Huawei STANDARD — Lp46–Lp48
+  // ──────────────────────────────────────────────────────
+  // Lp46: SUN2000-10K-MAP0 + LUNA2000 2×5kWh (10 kWh)
   {
     id: 'huawei-10-10kw',
     name: 'Huawei LUNA2000 10 kWh',
     brand: 'Huawei',
-    capacity_kwh: 10.0,
+    capacity_kwh: 10,
     power_continuous_kw: 5.0,
     power_peak_kw: 5.0,
     type: 'DC',
     inverter_power_kw: 10,
-    inverter_cost_net: 5517, // XLS kol.I Lp25
+    inverter_cost_net: 5410,
     segment: 'STANDARD',
     warranty_years: 10,
-    price_gross: 36163, // XLS Lp25 war.A
-    price_gross_b: 41392, // XLS Lp25 war.B
-    eps_capable: true,
+    price_gross: 30000,
+    price_gross_b: 30000,
+    eps_capable: false,
     image: '/products/huawei-luna.png',
   },
-  // Lp26: SUN2000-10K 10kW + LUNA2000 15 kWh
+  // Lp47: SUN2000-10K-MAP0 + LUNA2000 3×5kWh (15 kWh)
   {
     id: 'huawei-15-10kw',
     name: 'Huawei LUNA2000 15 kWh',
     brand: 'Huawei',
-    capacity_kwh: 15.0,
+    capacity_kwh: 15,
     power_continuous_kw: 7.5,
     power_peak_kw: 7.5,
     type: 'DC',
     inverter_power_kw: 10,
-    inverter_cost_net: 5517, // XLS kol.I Lp26
+    inverter_cost_net: 5410,
     segment: 'STANDARD',
     warranty_years: 10,
-    price_gross: 46998, // XLS Lp26 war.A
-    price_gross_b: 52227, // XLS Lp26 war.B
-    eps_capable: true,
+    price_gross: 45000,
+    price_gross_b: 45000,
+    eps_capable: false,
     image: '/products/huawei-luna.png',
   },
-  // Lp27: SUN2000-15K 15kW + LUNA2000 15 kWh
+  // Lp48: SUN2000-12K-MAP0 + LUNA2000-21-S1 3×6.9kWh (20.7 kWh)
   {
-    id: 'huawei-15-15kw',
-    name: 'Huawei LUNA2000 15 kWh (15kW)',
+    id: 'huawei-20.7-12kw',
+    name: 'Huawei LUNA2000 20.7 kWh (12kW)',
     brand: 'Huawei',
-    capacity_kwh: 15.0,
-    power_continuous_kw: 7.5,
-    power_peak_kw: 7.5,
+    capacity_kwh: 20.7,
+    power_continuous_kw: 10.35,
+    power_peak_kw: 10.35,
     type: 'DC',
-    inverter_power_kw: 15,
-    inverter_cost_net: 7961, // XLS kol.I Lp27
-    segment: 'STANDARD',
+    inverter_power_kw: 12,
+    inverter_cost_net: 5849,
+    segment: 'PREMIUM',
     warranty_years: 10,
-    price_gross: 50767, // XLS Lp27 war.A
-    price_gross_b: 55996, // XLS Lp27 war.B
-    eps_capable: true,
+    price_gross: 62100,
+    price_gross_b: 62100,
+    eps_capable: false,
     image: '/products/huawei-luna.png',
   },
-  // Lp28: SUN2000-20K 20kW + LUNA2000 15 kWh
+
+  // ──────────────────────────────────────────────────────
+  // GoodWe/Dyness BUDGET — Lp49
+  // ──────────────────────────────────────────────────────
+  // Lp49: GW10K-ET G2 + Dyness Tower S 3×3.55kWh (10.65 kWh) — marża 30%
   {
-    id: 'huawei-15-20kw',
-    name: 'Huawei LUNA2000 15 kWh (20kW)',
-    brand: 'Huawei',
-    capacity_kwh: 15.0,
-    power_continuous_kw: 7.5,
-    power_peak_kw: 7.5,
+    id: 'goodwe-dyness-budget-10.65-10kw',
+    name: 'GoodWe + Dyness 10.65 kWh (BUDGET)',
+    brand: 'GoodWe/Dyness',
+    capacity_kwh: 10.65,
+    power_continuous_kw: 6.39,
+    power_peak_kw: 6.39,
     type: 'DC',
-    inverter_power_kw: 20,
-    inverter_cost_net: 8579, // XLS kol.I Lp28
-    segment: 'STANDARD',
+    inverter_power_kw: 10,
+    inverter_cost_net: 4153,
+    segment: 'BUDGET',
     warranty_years: 10,
-    price_gross: 51721, // XLS Lp28 war.A
-    price_gross_b: 56950, // XLS Lp28 war.B
-    eps_capable: true,
-    image: '/products/huawei-luna.png',
+    price_gross: 21296,
+    price_gross_b: 25900,
+    eps_capable: false,
+    image: '/products/dyness-tower.png',
   },
 ];
 
@@ -538,44 +912,139 @@ export const productsDC: Product[] = allProducts;
 
 export const inverters: Inverter[] = [
   {
-    id: 'huawei-sun2000-10ktl',
-    name: 'Huawei SUN2000-10KTL',
-    brand: 'Huawei',
-    power_kw: 10.0,
-    type: 'hybrid',
-    price_gross: 0,
-    compatible_batteries: ['huawei-10-10kw', 'huawei-15-10kw', 'huawei-15-15kw', 'huawei-15-20kw'],
-  },
-  {
-    id: 'sigenergy-10kw',
-    name: 'Sigenergy Falownik 10 kW',
+    id: 'sigenergy-sigenstor-10kw',
+    name: 'Sigenergy SigenStor 10 kW',
     brand: 'Sigenergy',
     power_kw: 10.0,
     type: 'hybrid',
     price_gross: 0,
-    compatible_batteries: ['sigen-9-10kw', 'sigen-12-10kw', 'sigen-15-10kw', 'sigen-18-10kw', 'sigen-15-15kw', 'sigen-18-15kw', 'sigen-21-20kw', 'sigen-retro-9-10kw', 'sigen-retro-15-12kw'],
+    compatible_batteries: [
+      'sigen-11-10kw', 'sigen-14-10kw', 'sigen-16-10kw',
+      'sigen-17-10kw', 'sigen-20-10kw',
+    ],
   },
   {
-    id: 'goodwe-10kw',
-    name: 'GoodWe Falownik 10 kW',
-    brand: 'GoodWe',
+    id: 'sigenergy-sigenstor-15kw',
+    name: 'Sigenergy SigenStor 15 kW',
+    brand: 'Sigenergy',
+    power_kw: 15.0,
+    type: 'hybrid',
+    price_gross: 0,
+    compatible_batteries: [
+      'sigen-23-15kw', 'sigen-24-15kw', 'sigen-27-15kw',
+    ],
+  },
+  {
+    id: 'sigenergy-hybrid-tp2-10kw',
+    name: 'Sigenergy Hybrid TP2 10 kW',
+    brand: 'Sigenergy',
     power_kw: 10.0,
     type: 'hybrid',
     price_gross: 0,
-    compatible_batteries: ['goodwe-10-10kw', 'goodwe-15-10kw', 'goodwe-15-15kw', 'goodwe-20-20kw', 'goodwe-dyness-10-10kw', 'goodwe-dyness-14-15kw', 'goodwe-byd-11-10kw', 'goodwe-byd-16-15kw'],
+    compatible_batteries: [
+      'sigen-retro-10-10kw', 'sigen-retro-11-10kw', 'sigen-retro-12-10kw',
+      'sigen-retro-14-10kw', 'sigen-retro-15-10kw', 'sigen-retro-16-10kw',
+      'sigen-retro-17-10kw', 'sigen-retro-18-10kw', 'sigen-retro-20-10kw',
+      'sigen-retro-24-10kw',
+    ],
   },
   {
-    id: 'foxess-10kw',
-    name: 'FoxESS Falownik 10 kW',
+    id: 'sigenergy-hybrid-tp2-12kw',
+    name: 'Sigenergy Hybrid TP2 12 kW',
+    brand: 'Sigenergy',
+    power_kw: 12.0,
+    type: 'hybrid',
+    price_gross: 0,
+    compatible_batteries: [
+      'sigen-retro-15-12kw', 'sigen-retro-24-12kw', 'sigen-retro-27-12kw',
+    ],
+  },
+  {
+    id: 'foxess-p3-10kw',
+    name: 'FoxESS P3-10.0-SH',
     brand: 'FoxESS',
     power_kw: 10.0,
     type: 'hybrid',
     price_gross: 0,
-    compatible_batteries: ['foxess-10-10kw', 'foxess-11-10kw', 'foxess-10-12kw', 'foxess-11-15kw', 'foxess-15-15kw', 'foxess-10-pro15kw', 'foxess-20-pro20kw'],
+    compatible_batteries: [
+      'foxess-10.36-10kw', 'foxess-11.52-10kw', 'foxess-15.54-10kw',
+      'foxess-16.12-10kw', 'foxess-16.70-10kw', 'foxess-17.28-10kw',
+    ],
+  },
+  {
+    id: 'foxess-p3-12kw',
+    name: 'FoxESS P3-12.0-SH',
+    brand: 'FoxESS',
+    power_kw: 12.0,
+    type: 'hybrid',
+    price_gross: 0,
+    compatible_batteries: [
+      'foxess-20.72-12kw', 'foxess-21.88-12kw', 'foxess-23.04-12kw',
+    ],
+  },
+  {
+    id: 'foxess-p3-15kw',
+    name: 'FoxESS P3-15.0-SH',
+    brand: 'FoxESS',
+    power_kw: 15.0,
+    type: 'hybrid',
+    price_gross: 0,
+    compatible_batteries: [
+      'foxess-25.90-15kw', 'foxess-26.48-15kw', 'foxess-27.06-15kw',
+      'foxess-27.64-15kw', 'foxess-28.22-15kw', 'foxess-28.80-15kw',
+    ],
+  },
+  {
+    id: 'goodwe-gw10k-et-g2',
+    name: 'GoodWe GW10K-ET G2',
+    brand: 'GoodWe',
+    power_kw: 10.0,
+    type: 'hybrid',
+    price_gross: 0,
+    compatible_batteries: [
+      'goodwe-10-10kw', 'goodwe-15-10kw',
+      'goodwe-dyness-10.65-10kw', 'goodwe-dyness-14.20-10kw',
+      'goodwe-dyness-budget-10.65-10kw',
+    ],
+  },
+  {
+    id: 'goodwe-gw15k-et-g2',
+    name: 'GoodWe GW15K-ET G2',
+    brand: 'GoodWe',
+    power_kw: 15.0,
+    type: 'hybrid',
+    price_gross: 0,
+    compatible_batteries: [
+      'goodwe-20-15kw', 'goodwe-25-15kw',
+      'goodwe-dyness-17.75-15kw', 'goodwe-dyness-21.30-15kw',
+    ],
+  },
+  {
+    id: 'huawei-sun2000-10k-map0',
+    name: 'Huawei SUN2000-10K-MAP0',
+    brand: 'Huawei',
+    power_kw: 10.0,
+    type: 'hybrid',
+    price_gross: 0,
+    compatible_batteries: ['huawei-10-10kw', 'huawei-15-10kw'],
+  },
+  {
+    id: 'huawei-sun2000-12k-map0',
+    name: 'Huawei SUN2000-12K-MAP0',
+    brand: 'Huawei',
+    power_kw: 12.0,
+    type: 'hybrid',
+    price_gross: 0,
+    compatible_batteries: ['huawei-20.7-12kw'],
   },
 ];
 
-export const availableCapacities = [10, 11, 12, 14, 15, 16, 17, 18, 20, 21, 23];
+export const availableCapacities = [
+  10, 10.36, 10.65, 11, 11.52, 12, 14, 14.2, 15, 15.54,
+  16, 16.12, 16.7, 17, 17.28, 17.75, 18, 20, 20.7, 20.72,
+  21.3, 21.88, 23, 23.04, 24, 25, 25.9, 26.48, 27, 27.06,
+  27.64, 28.22, 28.8,
+];
 
 export const inverterBrands = [
   'Huawei',

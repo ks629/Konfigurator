@@ -7,6 +7,7 @@ import { Footer } from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
 import { HouseCrossSectionSVG } from '@/components/home/HouseCrossSectionSVG';
+import ContactForm from '@/components/landing/ContactForm';
 import {
   ArrowRight,
   Zap,
@@ -52,6 +53,7 @@ import {
   Settings,
   Power,
   LineChart,
+  Send,
 } from 'lucide-react';
 
 /* ============================================================
@@ -557,17 +559,24 @@ export default function Home() {
               <Button asChild size="lg" className="text-lg px-8 h-14 w-full sm:w-auto bg-gradient-to-r from-[#B5005D] to-[#8B0048] hover:from-[#D4006E] hover:to-[#9A0050] text-white transition-all shadow-lg shadow-[#B5005D]/25 hover:shadow-xl hover:shadow-[#B5005D]/30">
                 <Link href="/konfigurator">
                   <Zap className="h-5 w-5 mr-2" />
-                  Dobierz magazyn za darmo
+                  Konfigurator Magazynu z AI
                   <ArrowRight className="h-5 w-5 ml-2" />
                 </Link>
               </Button>
-              {/* Pulsating subsidy button */}
-              <Button asChild size="lg" className="text-base px-6 h-14 w-full sm:w-auto bg-[#FF004E]/10 border-2 border-[#FF004E]/50 text-[#FF004E] hover:bg-[#FF004E]/20 transition-all animate-pulse hover:animate-none shadow-lg shadow-[#FF004E]/10">
-                <Link href="#dotacje">
-                  <BadgePercent className="h-5 w-5 mr-2" />
-                  Sprawd&#378; nowy program dofinansowa&#324;
-                </Link>
+              <Button asChild size="lg" className="text-base px-6 h-14 w-full sm:w-auto bg-white/5 border-2 border-white/20 text-white hover:bg-white/10 transition-all">
+                <a href="#kontakt">
+                  <Send className="h-5 w-5 mr-2" />
+                  Zostaw kontakt — oddzwonimy
+                </a>
               </Button>
+            </motion.div>
+
+            {/* Subsidy info */}
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6, delay: 0.3 }} className="flex items-center justify-center pt-3">
+              <a href="#dotacje" className="inline-flex items-center gap-2 text-sm text-[#FF004E] hover:text-[#FF004E]/80 transition-colors animate-pulse hover:animate-none">
+                <BadgePercent className="h-4 w-4" />
+                Dofinansowanie do 16 000 zł — sprawdź Mój Prąd 7.0
+              </a>
             </motion.div>
 
             {/* Trust badges */}
@@ -668,13 +677,18 @@ export default function Home() {
             </div>
 
             {/* CTA */}
-            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mt-12">
-              <Button asChild size="lg" className="bg-gradient-to-r from-[#B5005D] to-[#8B0048] hover:from-[#D4006E] hover:to-[#9A0050] text-white shadow-lg shadow-[#B5005D]/20">
-                <Link href="/konfigurator">
-                  Rozpocznij konfiguracj&#281;
-                  <ArrowRight className="h-5 w-5 ml-2" />
-                </Link>
-              </Button>
+            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mt-12 space-y-3">
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <Button asChild size="lg" className="bg-gradient-to-r from-[#B5005D] to-[#8B0048] hover:from-[#D4006E] hover:to-[#9A0050] text-white shadow-lg shadow-[#B5005D]/20">
+                  <Link href="/konfigurator">
+                    Rozpocznij konfigurację
+                    <ArrowRight className="h-5 w-5 ml-2" />
+                  </Link>
+                </Button>
+                <a href="#kontakt" className="text-sm text-gray-400 hover:text-white transition-colors underline underline-offset-4 decoration-white/20 hover:decoration-white/40">
+                  lub zostaw kontakt — oddzwonimy
+                </a>
+              </div>
             </motion.div>
           </div>
         </div>
@@ -896,14 +910,19 @@ export default function Home() {
             </motion.div>
 
             {/* CTA */}
-            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mt-10">
-              <Button asChild size="lg" className="bg-[#FF004E]/10 border-2 border-[#FF004E]/50 text-[#FF004E] hover:bg-[#FF004E]/20 shadow-lg shadow-[#FF004E]/10 animate-pulse hover:animate-none">
-                <Link href="/konfigurator">
-                  <Calculator className="h-5 w-5 mr-2" />
-                  Oblicz swoj&#261; dotacj&#281;
-                  <ArrowRight className="h-5 w-5 ml-2" />
-                </Link>
-              </Button>
+            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mt-10 space-y-3">
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <Button asChild size="lg" className="bg-[#FF004E]/10 border-2 border-[#FF004E]/50 text-[#FF004E] hover:bg-[#FF004E]/20 shadow-lg shadow-[#FF004E]/10 animate-pulse hover:animate-none">
+                  <Link href="/konfigurator">
+                    <Calculator className="h-5 w-5 mr-2" />
+                    Oblicz swoją dotację w konfiguratorze
+                    <ArrowRight className="h-5 w-5 ml-2" />
+                  </Link>
+                </Button>
+                <a href="#kontakt" className="text-sm text-gray-400 hover:text-white transition-colors underline underline-offset-4 decoration-white/20 hover:decoration-white/40">
+                  Wolisz porozmawiać? Zostaw numer
+                </a>
+              </div>
             </motion.div>
           </div>
         </div>
@@ -1089,6 +1108,9 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ==================== FORMULARZ KONTAKTOWY ==================== */}
+      <ContactForm />
+
       {/* ==================== SOCIAL PROOF NUMBERS ==================== */}
       <section className="py-16 md:py-20 bg-gradient-to-r from-[#1a0a35] via-[#0f0520] to-[#1a0a35] border-y border-white/5">
         <div className="container mx-auto px-4">
@@ -1115,24 +1137,30 @@ export default function Home() {
         <div className="container mx-auto px-4 text-center relative z-10">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
             <h2 className="font-heading text-2xl md:text-4xl mb-4 text-white">
-              Nie wiesz, od czego zacz&#261;&#263;?{' '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#B5005D] to-[#FF004E]">Pomo&#380;emy.</span>
+              Nie wiesz, od czego zacząć?{' '}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#B5005D] to-[#FF004E]">Pomożemy.</span>
             </h2>
             <p className="text-gray-400 mb-10 max-w-xl mx-auto">
-              Nasz konfigurator AI dobierze magazyn w 2 minuty. Sprawdzisz dofinansowanie, kalkulacj&#281; oszcz&#281;dno&#347;ci i por&oacute;wnanie wariant&oacute;w — bezp&#322;atnie i bez zobowi&#261;za&#324;.
+              Skonfiguruj magazyn z AI w 2 minuty lub po prostu zostaw kontakt — odezwiemy się w 24h z bezpłatną wyceną.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Button asChild size="lg" className="text-lg px-8 h-14 bg-gradient-to-r from-[#B5005D] to-[#8B0048] hover:from-[#D4006E] hover:to-[#9A0050] text-white shadow-lg shadow-[#B5005D]/25">
                 <Link href="/konfigurator">
                   <Zap className="h-5 w-5 mr-2" />
-                  Bezp&#322;atna wycena
+                  Konfigurator AI
                   <ArrowRight className="h-5 w-5 ml-2" />
                 </Link>
+              </Button>
+              <Button asChild size="lg" className="text-lg px-8 h-14 bg-white/5 border-2 border-[#FF004E]/40 text-white hover:bg-[#FF004E]/10 transition-all">
+                <a href="#kontakt">
+                  <Send className="h-5 w-5 mr-2" />
+                  Zostaw kontakt
+                </a>
               </Button>
               <Button asChild size="lg" variant="outline" className="text-lg px-8 h-14 border-white/20 text-white hover:bg-white/5">
                 <Link href="tel:+48732080101">
                   <Phone className="h-5 w-5 mr-2" />
-                  Zadzwo&#324; do nas
+                  Zadzwoń do nas
                 </Link>
               </Button>
             </div>

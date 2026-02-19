@@ -95,7 +95,7 @@ function resolveSelfConsumption(
 }
 
 /**
- * Obliczenie dotacji Mój Prąd 6.0 z walidacją pojemności.
+ * Obliczenie dotacji Mój Prąd 7.0 z walidacją pojemności.
  */
 function calculateSubsidy(
   input: CalcInput,

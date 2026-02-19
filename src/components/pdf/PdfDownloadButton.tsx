@@ -27,7 +27,7 @@ export function PdfDownloadButton({
 
     try {
       // Generuj PDF (dynamiczny import aby zmniejszyć bundle)
-      const blob = generateOfferPdfBlob(data);
+      const blob = await generateOfferPdfBlob(data);
 
       // Stwórz link do pobrania
       const url = URL.createObjectURL(blob);

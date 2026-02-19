@@ -15,19 +15,21 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
-import { Loader2, Send, Lock, CheckCircle } from 'lucide-react';
+import { Loader2, Send, Lock, CheckCircle, Download } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface ContactFormProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSubmit: (data: ContactFormData) => Promise<void>;
+  onDownloadPdf?: () => void;
   title?: string;
 }
 
-export function ContactForm({ open, onOpenChange, onSubmit, title = 'Wyślij ofertę na e-mail' }: ContactFormProps) {
+export function ContactForm({ open, onOpenChange, onSubmit, onDownloadPdf, title = 'Wyślij ofertę na e-mail' }: ContactFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
 
   const form = useForm<ContactFormData>({
     resolver: zodResolver(contactFormSchema),
@@ -66,7 +68,37 @@ export function ContactForm({ open, onOpenChange, onSubmit, title = 'Wyślij ofe
             <p className="text-sm text-muted-foreground">
               Sprawdź swoją skrzynkę e-mail. Nasz doradca skontaktuje się z Tobą w ciągu 24 godzin.
             </p>
-            <Button onClick={() => onOpenChange(false)} className="w-full">
+            {onDownloadPdf && (
+              <Button
+                onClick={async () => {
+                  setIsDownloading(true);
+                  try {
+                    onDownloadPdf();
+                    toast.success('PDF został pobrany!');
+                  } catch {
+                    toast.error('Nie udało się pobrać PDF.');
+                  } finally {
+                    setIsDownloading(false);
+                  }
+                }}
+                className="w-full bg-gradient-to-r from-[#B5005D] to-[#8B0048] hover:from-[#D4006E] hover:to-[#9A0050] text-white"
+                size="lg"
+                disabled={isDownloading}
+              >
+                {isDownloading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Generowanie PDF...
+                  </>
+                ) : (
+                  <>
+                    <Download className="h-4 w-4 mr-2" />
+                    Pobierz ofertę PDF
+                  </>
+                )}
+              </Button>
+            )}
+            <Button variant="outline" onClick={() => onOpenChange(false)} className="w-full">
               Zamknij
             </Button>
           </div>
