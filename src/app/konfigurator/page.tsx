@@ -53,16 +53,20 @@ export default function KonfiguratorPage() {
     if (store.hasHeatPump) annualConsumption += 3000;
     if (store.hasEV) annualConsumption += 3000;
 
+    const batteryPrice = store.backupVariant === 'B'
+      ? selectedProduct.price_gross_b
+      : selectedProduct.price_gross;
+
     return calculateROI({
       pv_power_kwp: store.pvPowerKwp,
       annual_consumption_kwh: annualConsumption,
       billing_system: store.billingSystem,
       battery_capacity_kwh: selectedProduct.capacity_kwh,
-      battery_price_gross: selectedProduct.price_gross,
+      battery_price_gross: batteryPrice,
       installation_type: store.installationType,
       needs_inverter_upgrade: false, // falownik wliczony w cenę zestawu
       inverter_price_gross: 0, // falownik wliczony w cenę zestawu
-      needs_backup: true, // backup/SZR wliczony w cenę zestawu
+      needs_backup: store.backupVariant === 'B', // backup SZR tylko w wariancie B
       // Nowe pola
       user_profile: store.userProfile,
       energy_operator: store.energyOperator,
@@ -86,16 +90,20 @@ export default function KonfiguratorPage() {
     if (store.hasHeatPump) annualConsumption += 3000;
     if (store.hasEV) annualConsumption += 3000;
 
+    const batteryPriceDyn = store.backupVariant === 'B'
+      ? selectedProduct.price_gross_b
+      : selectedProduct.price_gross;
+
     return calculateROI({
       pv_power_kwp: store.pvPowerKwp,
       annual_consumption_kwh: annualConsumption,
       billing_system: store.billingSystem,
       battery_capacity_kwh: selectedProduct.capacity_kwh,
-      battery_price_gross: selectedProduct.price_gross,
+      battery_price_gross: batteryPriceDyn,
       installation_type: store.installationType,
       needs_inverter_upgrade: false,
       inverter_price_gross: 0,
-      needs_backup: true,
+      needs_backup: store.backupVariant === 'B',
       user_profile: store.userProfile,
       energy_operator: store.energyOperator,
       tariff: 'dynamic',
@@ -272,7 +280,7 @@ export default function KonfiguratorPage() {
               </div>
 
               <div className="grid gap-8 lg:grid-cols-2">
-                <SavingsSummary result={calculation} product={selectedProduct} inverter={selectedInverter} />
+                <SavingsSummary result={calculation} product={selectedProduct} inverter={selectedInverter} backupVariant={store.backupVariant} />
                 <div className="space-y-8">
                   <FinancingSimulator result={calculation} />
                 </div>

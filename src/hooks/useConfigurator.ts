@@ -6,6 +6,7 @@ import {
   BillingSystem,
   Tariff,
   BackupPreference,
+  BackupVariant,
   Priority,
   UserProfile,
   EnergyOperator,
@@ -30,6 +31,7 @@ interface ConfiguratorStore extends ConfiguratorState {
   setHasHeatPump: (val: boolean) => void;
   setHasEV: (val: boolean) => void;
   setBackupPreference: (pref: BackupPreference) => void;
+  setBackupVariant: (variant: BackupVariant) => void;
   setPriorities: (priorities: Priority[]) => void;
   togglePriority: (priority: Priority) => void;
   setSelectedProductId: (id: string | null) => void;
@@ -59,6 +61,7 @@ const initialState: ConfiguratorState = {
   hasHeatPump: false,
   hasEV: false,
   backupPreference: 'no',
+  backupVariant: 'A',
   priorities: [],
   selectedProductId: null,
   selectedInverterId: null,
@@ -93,6 +96,7 @@ export const useConfigurator = create<ConfiguratorStore>()(
       setHasHeatPump: (val) => set({ hasHeatPump: val }),
       setHasEV: (val) => set({ hasEV: val }),
       setBackupPreference: (pref) => set({ backupPreference: pref }),
+      setBackupVariant: (variant) => set({ backupVariant: variant }),
       setPriorities: (priorities) => set({ priorities }),
       togglePriority: (priority) =>
         set((state) => ({

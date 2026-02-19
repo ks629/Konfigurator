@@ -1,6 +1,6 @@
 'use client';
 
-import { CalculationResult, Product, Inverter } from '@/lib/types';
+import { CalculationResult, Product, Inverter, BackupVariant } from '@/lib/types';
 import { formatCurrency, formatNumber } from '@/lib/calculations';
 import { Wallet, TrendingUp, Target, Banknote, Percent, ArrowDown, Battery, Cpu, ShieldCheck, Settings } from 'lucide-react';
 
@@ -8,12 +8,13 @@ interface SavingsSummaryProps {
   result: CalculationResult;
   product?: Product | null;
   inverter?: Inverter | null;
+  backupVariant?: BackupVariant;
 }
 
 // Marki z wbudowanym EMS — nie potrzebują dodatkowego
 const BRANDS_WITH_BUILTIN_EMS = ['Huawei', 'Sigenergy'];
 
-export function SavingsSummary({ result, product, inverter }: SavingsSummaryProps) {
+export function SavingsSummary({ result, product, inverter, backupVariant = 'A' }: SavingsSummaryProps) {
   const { investment, annual_savings, roi_years, total_savings, horizon_years } = result;
 
   const needsEms = product ? !BRANDS_WITH_BUILTIN_EMS.includes(product.brand.split('/')[0]) : false;
@@ -52,10 +53,18 @@ export function SavingsSummary({ result, product, inverter }: SavingsSummaryProp
                 <ShieldCheck className="h-4 w-4 text-primary mt-0.5 shrink-0" />
                 <div>
                   <p className="font-medium text-white">
-                    {product.eps_capable ? 'Zasilanie awaryjne EPS' : 'Pełny backup 3F (SZR)'}
+                    {backupVariant === 'B'
+                      ? 'Pełny backup 3F (SZR) z rozdzielnicą SZR EPS BOX PRO'
+                      : product.eps_capable
+                        ? 'Zasilanie awaryjne (EPS)'
+                        : 'Magazynowanie energii'}
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    {product.eps_capable ? 'Podtrzymanie wybranych obwodów' : 'Automatyczne przełączanie całego domu'}
+                    {backupVariant === 'B'
+                      ? 'Automatyczne przełączanie wszystkich obwodów w 3 fazach'
+                      : product.eps_capable
+                        ? 'Podtrzymanie wybranych obwodów'
+                        : 'Bez zasilania awaryjnego'}
                   </p>
                 </div>
               </div>

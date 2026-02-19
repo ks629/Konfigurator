@@ -175,7 +175,7 @@ export const allProducts: Product[] = [
     price_gross: 30000,
     price_gross_b: 30000,
     eps_capable: true,
-    image: '/products/sigenergy.png',
+    image: '/products/sigenergy-tp2-inv.png',
   },
   // Lp11: Sigen Hybrid TP2 10kW + 11 kWh (BAT 6 + BAT 5)
   {
@@ -193,7 +193,7 @@ export const allProducts: Product[] = [
     price_gross: 33000,
     price_gross_b: 33000,
     eps_capable: true,
-    image: '/products/sigenergy.png',
+    image: '/products/sigenergy-tp2-inv.png',
   },
   // Lp12: Sigen Hybrid TP2 10kW + 12 kWh (2× BAT 6)
   {
@@ -211,7 +211,7 @@ export const allProducts: Product[] = [
     price_gross: 36000,
     price_gross_b: 36000,
     eps_capable: true,
-    image: '/products/sigenergy.png',
+    image: '/products/sigenergy-tp2-inv.png',
   },
   // Lp13: Sigen Hybrid TP2 10kW + 14 kWh (BAT 10.0 + BAT 5)
   {
@@ -229,7 +229,7 @@ export const allProducts: Product[] = [
     price_gross: 43576,
     price_gross_b: 42000,
     eps_capable: true,
-    image: '/products/sigenergy.png',
+    image: '/products/sigenergy-tp2-inv.png',
   },
   // Lp14: Sigen Hybrid TP2 10kW + 15 kWh (BAT 6 + BAT 10.0)
   {
@@ -247,7 +247,7 @@ export const allProducts: Product[] = [
     price_gross: 44074,
     price_gross_b: 47321,
     eps_capable: true,
-    image: '/products/sigenergy.png',
+    image: '/products/sigenergy-tp2-inv.png',
   },
   // Lp15: Sigen Hybrid TP2 10kW + 16 kWh (BAT 6 + 2× BAT 5)
   {
@@ -265,7 +265,7 @@ export const allProducts: Product[] = [
     price_gross: 48000,
     price_gross_b: 48000,
     eps_capable: true,
-    image: '/products/sigenergy.png',
+    image: '/products/sigenergy-tp2-inv.png',
   },
   // Lp16: Sigen Hybrid TP2 10kW + 17 kWh (2× BAT 6 + BAT 5)
   {
@@ -283,7 +283,7 @@ export const allProducts: Product[] = [
     price_gross: 52864,
     price_gross_b: 51000,
     eps_capable: true,
-    image: '/products/sigenergy.png',
+    image: '/products/sigenergy-tp2-inv.png',
   },
   // Lp17: Sigen Hybrid TP2 10kW + 18 kWh (2× BAT 10.0)
   {
@@ -301,7 +301,7 @@ export const allProducts: Product[] = [
     price_gross: 47709,
     price_gross_b: 50955,
     eps_capable: true,
-    image: '/products/sigenergy.png',
+    image: '/products/sigenergy-tp2-inv.png',
   },
   // Lp18: Sigen Hybrid TP2 10kW + 20 kWh (BAT 10.0 + BAT 6 + BAT 5)
   {
@@ -319,7 +319,7 @@ export const allProducts: Product[] = [
     price_gross: 56498,
     price_gross_b: 59745,
     eps_capable: true,
-    image: '/products/sigenergy.png',
+    image: '/products/sigenergy-tp2-inv.png',
   },
   // Lp19: Sigen Hybrid TP2 10kW + 24 kWh (BAT 6 + 2× BAT 10.0)
   {
@@ -337,7 +337,7 @@ export const allProducts: Product[] = [
     price_gross: 60631,
     price_gross_b: 63878,
     eps_capable: true,
-    image: '/products/sigenergy.png',
+    image: '/products/sigenergy-tp2-inv.png',
   },
   // Lp20: Sigen Hybrid TP2 12kW + 15 kWh (BAT 6 + BAT 10.0)
   {
@@ -355,7 +355,7 @@ export const allProducts: Product[] = [
     price_gross: 44252,
     price_gross_b: 47499,
     eps_capable: true,
-    image: '/products/sigenergy.png',
+    image: '/products/sigenergy-tp2-inv.png',
   },
   // Lp21: Sigen Hybrid TP2 12kW + 24 kWh (BAT 6 + 2× BAT 10.0)
   {
@@ -373,7 +373,7 @@ export const allProducts: Product[] = [
     price_gross: 60809,
     price_gross_b: 64056,
     eps_capable: true,
-    image: '/products/sigenergy.png',
+    image: '/products/sigenergy-tp2-inv.png',
   },
   // Lp22: Sigen Hybrid TP2 12kW + 27 kWh (3× BAT 10.0)
   {
@@ -391,7 +391,7 @@ export const allProducts: Product[] = [
     price_gross: 64443,
     price_gross_b: 67690,
     eps_capable: true,
-    image: '/products/sigenergy.png',
+    image: '/products/sigenergy-tp2-inv.png',
   },
 
   // ──────────────────────────────────────────────────────

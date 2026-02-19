@@ -6,6 +6,8 @@ export type BillingSystem = 'net-billing' | 'net-metering' | 'unknown';
 
 export type BackupPreference = 'yes' | 'no' | 'unknown';
 
+export type BackupVariant = 'A' | 'B';
+
 export type Tariff = 'G11' | 'G12' | 'G12w' | 'G13' | 'dynamic' | 'unknown';
 
 export type Priority =
@@ -109,6 +111,7 @@ export interface ConfiguratorState {
   hasHeatPump: boolean;
   hasEV: boolean;
   backupPreference: BackupPreference;
+  backupVariant: BackupVariant;
   priorities: Priority[];
   selectedProductId: string | null;
   selectedInverterId: string | null;
