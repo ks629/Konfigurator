@@ -146,6 +146,33 @@ export async function POST(req: NextRequest) {
       console.warn('RESEND_API_KEY not configured — lead email notification not sent');
     }
 
+    // === WEBHOOK → CRM NEXBE (fire-and-forget, nie blokuje zapisu leada) ===
+    const crmPayload = {
+      name: body.name || '',
+      email: body.email || '',
+      phone: body.phone || '',
+      postalCode: body.postalCode || '',
+      source: 'KONFIGURATOR',
+      installationType: body.installationType || body.type || '',
+      capacity: body.capacity || '',
+      hasPV: body.hasPV || '',
+      pvPowerKwp: body.pvPowerKwp || null,
+      hasHeatPump: body.hasHeatPump || false,
+      hasEV: body.hasEV || false,
+      selectedProductName: body.selectedProductName || body.productName || '',
+      notes: `Konfigurator AI | Typ: ${body.installationType || body.type || 'N/A'} | Pojemność: ${body.capacity || 'N/A'}`,
+    };
+    const crmUrl = process.env.CRM_WEBHOOK_URL || 'https://nexbe-crm.vercel.app/api/leads/webhook';
+    const crmSecret = process.env.CRM_WEBHOOK_SECRET || '';
+    const abortCtrl = new AbortController();
+    const crmTimeout = setTimeout(() => abortCtrl.abort(), 5000);
+    fetch(crmUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Webhook-Secret': crmSecret },
+      body: JSON.stringify(crmPayload),
+      signal: abortCtrl.signal,
+    }).catch(() => {}).finally(() => clearTimeout(crmTimeout));
+
     return NextResponse.json({
       success: true,
       leadId,
