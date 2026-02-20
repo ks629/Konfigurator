@@ -6,7 +6,17 @@ import { X, Send, Phone, ChevronDown, ExternalLink } from 'lucide-react';
 import NexbiCharacter from './NexbiCharacter';
 import { useNexbi } from './NexbiProvider';
 import { processMessage } from '../engine/message-processor';
-import type { ChatMessage, KnowledgeEntry, QuickSuggestion } from '../engine/types';
+import type { ChatMessage, KnowledgeEntry, QuickSuggestion, NexbiCostume } from '../engine/types';
+
+const COSTUME_SUBTITLES: Record<NexbiCostume, string> = {
+  none: 'Asystent Energetyczny',
+  doradca: 'Doradca Energetyczny',
+  naukowiec: 'Ekspert Techniczny',
+  inzynier: 'Specjalista Montażu',
+  superhero: 'Strażnik Oszczędności',
+  ekolog: 'Eko Doradca',
+  nauczyciel: 'Przewodnik Wiedzy',
+};
 
 interface Props {
   knowledge: KnowledgeEntry[];
@@ -14,7 +24,7 @@ interface Props {
 
 export default function NexbiWidget({ knowledge }: Props) {
   const nexbi = useNexbi();
-  const { config, isOpen, messages, addMessage, currentEmotion, setEmotion, isTyping, setIsTyping, hasInteracted, setHasInteracted, showLeadForm, setShowLeadForm, leadSubmitted, setLeadSubmitted, aiCallCount, incrementAiCalls } = nexbi;
+  const { config, isOpen, messages, addMessage, currentEmotion, setEmotion, currentCostume, setCostume, isTyping, setIsTyping, hasInteracted, setHasInteracted, showLeadForm, setShowLeadForm, leadSubmitted, setLeadSubmitted, aiCallCount, incrementAiCalls } = nexbi;
 
   const [inputValue, setInputValue] = useState('');
   const [showBubble, setShowBubble] = useState(false);
@@ -43,6 +53,18 @@ export default function NexbiWidget({ knowledge }: Props) {
       return () => clearTimeout(timer);
     }
   }, [showBubble, isOpen]);
+
+  // Idle timer: return to default costume + happy after 8s
+  useEffect(() => {
+    if (!isOpen || messages.length === 0) return;
+    const timer = setTimeout(() => {
+      setEmotion('happy');
+      if (config.dynamicCostumes) {
+        setCostume(config.defaultCostume ?? 'none');
+      }
+    }, 8000);
+    return () => clearTimeout(timer);
+  }, [messages, isOpen, setEmotion, setCostume, config.dynamicCostumes, config.defaultCostume]);
 
   const handleOpen = useCallback(() => {
     nexbi.open();
@@ -81,7 +103,7 @@ export default function NexbiWidget({ knowledge }: Props) {
     addMessage(userMsg);
     setInputValue('');
     setIsTyping(true);
-    setEmotion('curious');
+    setEmotion('thinking');
 
     const maxAiCalls = config.maxAiCallsPerSession ?? 10;
     const canUseAi = (config.enableAiFallback ?? false) && aiCallCount < maxAiCalls;
@@ -102,6 +124,12 @@ export default function NexbiWidget({ knowledge }: Props) {
 
     setTimeout(() => {
       setIsTyping(false);
+      setEmotion(result.emotion);
+
+      // Update costume (only if dynamic costumes enabled)
+      if (config.dynamicCostumes && result.costume) {
+        setCostume(result.costume);
+      }
 
       let fullAnswer = result.answer;
       if (result.followUp) fullAnswer += '\n\n' + result.followUp;
@@ -111,6 +139,7 @@ export default function NexbiWidget({ knowledge }: Props) {
         text: fullAnswer,
         sender: 'nexbi',
         emotion: result.emotion,
+        costume: result.costume,
         scrollTarget: result.scrollTarget,
         suggestions: result.source === 'fallback' ? config.suggestions.slice(0, 4) : undefined,
         suggestConfigurator: result.suggestConfigurator,
@@ -186,7 +215,7 @@ export default function NexbiWidget({ knowledge }: Props) {
   const positionClass = position === 'bottom-left' ? 'left-6' : 'right-6';
 
   return (
-    <div className={`fixed bottom-6 ${positionClass} z-50 flex flex-col items-end gap-3 nexbi-widget`}>
+    <div className={`fixed bottom-4 sm:bottom-6 ${positionClass} z-50 flex flex-col items-end gap-3 nexbi-widget`}>
       {/* Chat panel */}
       <AnimatePresence>
         {isOpen && (
@@ -204,12 +233,16 @@ export default function NexbiWidget({ knowledge }: Props) {
             {/* Header */}
             <div className="relative px-5 py-4 bg-gradient-to-r from-[#B5005D] to-[#FF004E] flex-shrink-0">
               <div className="flex items-center gap-3">
-                <div className="w-14 h-14 rounded-2xl bg-white/15 flex items-center justify-center backdrop-blur-sm overflow-hidden border border-white/10">
-                  <NexbiCharacter size={52} emotion={currentEmotion} />
+                <div className="w-[72px] h-[72px] rounded-2xl bg-white/15 flex items-center justify-center backdrop-blur-sm overflow-hidden border border-white/10">
+                  <NexbiCharacter size={68} emotion={currentEmotion} costume={currentCostume} enableEyeTracking />
                 </div>
                 <div>
                   <p className="font-bold text-sm text-white tracking-wide">NEXBI</p>
-                  <p className="text-[10px] text-white/70 uppercase tracking-wider">{config.subtitle ?? 'Asystent Energetyczny'}</p>
+                  <p className="text-[10px] text-white/70 uppercase tracking-wider">
+                    {config.dynamicCostumes
+                      ? COSTUME_SUBTITLES[currentCostume] || config.subtitle || 'Asystent Energetyczny'
+                      : config.subtitle ?? 'Asystent Energetyczny'}
+                  </p>
                   <div className="flex items-center gap-1.5 mt-1">
                     <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
                     <span className="text-[9px] text-white/50">Online</span>
@@ -228,7 +261,7 @@ export default function NexbiWidget({ knowledge }: Props) {
                   {msg.sender === 'nexbi' ? (
                     <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }} className="flex gap-2">
                       <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#B5005D] to-[#FF004E] flex items-center justify-center flex-shrink-0 mt-0.5 overflow-hidden">
-                        <NexbiCharacter size={24} emotion={msg.emotion || 'happy'} />
+                        <NexbiCharacter size={24} emotion={msg.emotion || 'happy'} costume={msg.costume} />
                       </div>
                       <div className="flex-1 space-y-2">
                         <div className="bg-white/[0.08] rounded-2xl rounded-tl-md px-4 py-3 text-[13px] text-white/90 leading-relaxed whitespace-pre-line">
@@ -276,7 +309,7 @@ export default function NexbiWidget({ knowledge }: Props) {
               {isTyping && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex gap-2">
                   <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#B5005D] to-[#FF004E] flex items-center justify-center flex-shrink-0 mt-0.5 overflow-hidden">
-                    <NexbiCharacter size={24} emotion={currentEmotion} />
+                    <NexbiCharacter size={24} emotion="thinking" costume={currentCostume} />
                   </div>
                   <div className="bg-white/[0.08] rounded-2xl rounded-tl-md px-4 py-3 flex items-center gap-1.5">
                     <motion.span className="w-1.5 h-1.5 rounded-full bg-white/50" animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 1, repeat: Infinity, delay: 0 }} />
@@ -346,26 +379,28 @@ export default function NexbiWidget({ knowledge }: Props) {
       {/* FAB */}
       <motion.button
         onClick={isOpen ? handleClose : handleOpen}
-        className="relative w-[72px] h-[72px] rounded-2xl bg-gradient-to-br from-[#B5005D] to-[#FF004E] shadow-lg shadow-[#B5005D]/40 flex items-center justify-center hover:shadow-xl hover:shadow-[#B5005D]/50 transition-shadow overflow-hidden border border-white/10 ring-2 ring-[#B5005D]/25 ring-offset-2 ring-offset-transparent"
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
+        className="relative w-[88px] h-[88px] md:w-[176px] md:h-[176px] rounded-full bg-gradient-to-br from-[#FF004E]/15 to-[#B5005D]/10 flex items-center justify-center transition-all cursor-pointer"
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.92 }}
         aria-label={isOpen ? 'Zamknij NEXBI' : 'Otwórz NEXBI'}
+        style={{ filter: 'drop-shadow(0 4px 20px rgba(255, 0, 78, 0.4)) drop-shadow(0 0 40px rgba(181, 0, 93, 0.25))', boxShadow: '0 0 30px rgba(255, 0, 78, 0.2), inset 0 0 20px rgba(255, 0, 78, 0.05)' }}
       >
         <AnimatePresence mode="wait">
           {isOpen ? (
-            <motion.div key="close" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.2 }}>
-              <X className="w-6 h-6 text-white" />
+            <motion.div key="close" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.2 }} className="w-12 h-12 md:w-24 md:h-24 rounded-full bg-gradient-to-br from-[#B5005D] to-[#FF004E] flex items-center justify-center shadow-lg shadow-[#B5005D]/40">
+              <X className="w-5 h-5 md:w-10 md:h-10 text-white" />
             </motion.div>
           ) : (
-            <motion.div key="open" initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.5, opacity: 0 }} transition={{ duration: 0.2 }}>
-              <NexbiCharacter size={54} emotion="happy" />
+            <motion.div key="open" initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.5, opacity: 0 }} transition={{ duration: 0.2 }} className="md:scale-[2]">
+              <NexbiCharacter size={80} emotion="happy" costume={currentCostume} enableEyeTracking />
             </motion.div>
           )}
         </AnimatePresence>
-        {!hasInteracted && !isOpen && <span className="absolute inset-0 rounded-2xl animate-ping bg-[#B5005D]/30 pointer-events-none" />}
+        {!hasInteracted && !isOpen && <span className="absolute inset-0 rounded-full animate-ping bg-[#FF004E]/30 pointer-events-none" />}
+        {!hasInteracted && !isOpen && <span className="absolute inset-2 md:inset-4 rounded-full animate-pulse bg-[#B5005D]/15 pointer-events-none" />}
         {!hasInteracted && !isOpen && (
-          <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#FF004E] border-2 border-[#0D0019] flex items-center justify-center">
-            <span className="w-1.5 h-1.5 rounded-full bg-white" />
+          <span className="absolute top-0 right-0 w-5 h-5 md:w-8 md:h-8 rounded-full bg-[#FF004E] border-2 md:border-[3px] border-white flex items-center justify-center shadow-[0_0_8px_rgba(255,0,78,0.6)]">
+            <span className="w-1.5 h-1.5 md:w-3 md:h-3 rounded-full bg-white" />
           </span>
         )}
       </motion.button>
