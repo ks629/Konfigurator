@@ -376,7 +376,7 @@ export async function POST(req: NextRequest) {
     // =====================================================
     // 3. SEND TO CRM — fire-and-forget (nie blokuje response)
     // =====================================================
-    sendToCrmWebhook({
+    await sendToCrmWebhook({
       leadId,
       name: name || '',
       email,
@@ -387,7 +387,7 @@ export async function POST(req: NextRequest) {
       calculation,
       config,
       source: 'konfigurator',
-    }).catch(() => {}); // fire-and-forget — errors already logged inside
+    }).catch(() => {}); // errors already logged inside
 
     console.log('Offer processed:', {
       leadId,
