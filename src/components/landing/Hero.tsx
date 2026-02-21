@@ -3,7 +3,8 @@
 import { Suspense, lazy } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { ArrowRight, ChevronDown, Zap } from 'lucide-react';
+import { NexbeIcon } from '@nexbe/icons';
+import { ArrowRight, ChevronDown } from 'lucide-react';
 import { fadeUp, staggerContainer, ease } from '@/lib/animations';
 
 const EnergyOrb = lazy(() => import('./EnergyOrb'));
@@ -63,7 +64,7 @@ export default function Hero() {
             {/* Badge */}
             <motion.div variants={fadeUp}>
               <span className="section-label">
-                <Zap className="w-3 h-3 text-nexbe-flame" />
+                <NexbeIcon name="smart-ems" size={12} variant="inherit" className="text-nexbe-flame" />
                 Partner Keno Energy — #1 dystrybutor OZE w Polsce
               </span>
             </motion.div>

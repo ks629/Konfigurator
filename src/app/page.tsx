@@ -8,21 +8,12 @@ import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
 import { HouseCrossSectionSVG } from '@/components/home/HouseCrossSectionSVG';
 import ContactForm from '@/components/landing/ContactForm';
+import { NexbeIcon } from '@nexbe/icons';
 import {
   ArrowRight,
-  Zap,
-  Shield,
-  TrendingUp,
-  Calculator,
   BadgePercent,
   BatteryCharging,
-  Home as HomeIcon,
-  Star,
   Clock,
-  Award,
-  Banknote,
-  ShieldCheck,
-  Battery,
   Gauge,
   ShieldAlert,
   CheckCircle2,
@@ -30,24 +21,16 @@ import {
   Repeat2,
   Timer,
   ChevronRight,
-  Trophy,
-  Sparkles,
   Phone,
   TrendingDown,
   Crown,
-  Cpu,
   Wifi,
-  BarChart3,
-  Sun,
-  Plug,
   MonitorSmartphone,
   PackageCheck,
   Truck,
   MapPin,
   Users,
   Building2,
-  Brain,
-  Globe,
   Activity,
   Layers,
   Settings,
@@ -210,35 +193,35 @@ const configuratorSteps = [
     num: '01',
     title: 'Typ instalacji',
     desc: 'Okre\u015bl czy masz ju\u017c fotowoltaik\u0119 (retrofit AC) czy planujesz now\u0105 instalacj\u0119 (DC hybrydowa).',
-    icon: Plug,
+    renderIcon: (cls: string) => <NexbeIcon name="ladowarka-ev" size={28} variant="inherit" className={cls} />,
     color: '#B5005D',
   },
   {
     num: '02',
     title: 'Dane fotowoltaiki',
     desc: 'Podaj moc instalacji PV, orientacj\u0119 paneli i roczn\u0105 produkcj\u0119 energii.',
-    icon: Sun,
+    renderIcon: (cls: string) => <NexbeIcon name="fotowoltaika" size={28} variant="inherit" className={cls} />,
     color: '#FF004E',
   },
   {
     num: '03',
     title: 'Zu\u017cycie energii',
     desc: 'Wpisz miesi\u0119czne zu\u017cycie pr\u0105du, wybierz profil u\u017cytkownika i operatora energii.',
-    icon: BarChart3,
+    renderIcon: (cls: string) => <NexbeIcon name="monitoring-247" size={28} variant="inherit" className={cls} />,
     color: '#B5005D',
   },
   {
     num: '04',
     title: 'Potrzeby dodatkowe',
     desc: 'Zaznacz czy potrzebujesz backup EPS, \u0142adowark\u0119 EV, inteligentne zarz\u0105dzanie energi\u0105.',
-    icon: Settings,
+    renderIcon: (cls: string) => <Settings className={cls} />,
     color: '#FF004E',
   },
   {
     num: '05',
     title: 'Rekomendacja AI',
     desc: 'Otrzymujesz spersonalizowan\u0105 rekomendacj\u0119 z kalkulacj\u0105 oszcz\u0119dno\u015bci i opcj\u0105 dofinansowania.',
-    icon: Brain,
+    renderIcon: (cls: string) => <NexbeIcon name="smart-ems" size={28} variant="inherit" className={cls} />,
     color: '#B5005D',
   },
 ];
@@ -246,32 +229,32 @@ const configuratorSteps = [
 /* ---- KENO EMS features ---- */
 const kenoFeatures = [
   {
-    icon: Activity,
+    renderIcon: (cls: string) => <Activity className={cls} />,
     title: 'Monitoring 24/7',
     desc: 'Produkcja PV, zu\u017cycie domu i stan baterii w czasie rzeczywistym na dowolnym urz\u0105dzeniu.',
   },
   {
-    icon: Brain,
+    renderIcon: (cls: string) => <NexbeIcon name="smart-ems" size={16} variant="inherit" className={cls} />,
     title: 'Inteligentne \u0142adowanie',
     desc: 'AI automatycznie decyduje kiedy \u0142adowa\u0107 i roz\u0142adowywa\u0107 magazyn dla maksymalnych oszcz\u0119dno\u015bci.',
   },
   {
-    icon: LineChart,
+    renderIcon: (cls: string) => <LineChart className={cls} />,
     title: 'Arbitra\u017c cenowy',
     desc: 'System kupuje tani pr\u0105d w nocy i zu\u017cywa go w szczycie cenowym \u2014 optymalizacja net-billingu.',
   },
   {
-    icon: Power,
+    renderIcon: (cls: string) => <Power className={cls} />,
     title: 'Backup awaryjny',
     desc: 'Automatyczne przej\u015bcie na zasilanie bateryjne podczas awarii sieci \u2014 prze\u0142\u0105czenie w <20ms.',
   },
   {
-    icon: MonitorSmartphone,
+    renderIcon: (cls: string) => <MonitorSmartphone className={cls} />,
     title: 'Aplikacja mobilna',
     desc: 'Pe\u0142na kontrola z telefonu: sterowanie priorytetami, harmonogramy \u0142adowania EV, powiadomienia push.',
   },
   {
-    icon: Layers,
+    renderIcon: (cls: string) => <Layers className={cls} />,
     title: 'Integracja EV',
     desc: 'Zarz\u0105dzanie \u0142adowark\u0105 samochodu elektrycznego \u2014 \u0142adowanie z nadwy\u017cek PV lub w taniej taryfie.',
   },
@@ -281,7 +264,7 @@ const kenoFeatures = [
 /* Educational content — replaces "Dlaczego Nexbe" */
 const educationalSections = [
   {
-    icon: BatteryCharging,
+    renderIcon: (cls: string) => <BatteryCharging className={cls} />,
     title: 'Dlaczego warto mieć magazyn energii?',
     items: [
       'Wykorzystujesz 80-90% produkowanej energii zamiast 25-30% bez magazynu',
@@ -292,7 +275,7 @@ const educationalSections = [
     ],
   },
   {
-    icon: Repeat2,
+    renderIcon: (cls: string) => <Repeat2 className={cls} />,
     title: 'Systemy rozliczeń — co musisz wiedzieć?',
     items: [
       'Net-billing (od 04.2022) — sprzedajesz nadwyżki po cenie RCE (~0.28 zł/kWh), kupujesz po ~1.12 zł/kWh. Magazyn pozwala zużyć energię samemu zamiast sprzedawać ze stratą.',
@@ -301,7 +284,7 @@ const educationalSections = [
     ],
   },
   {
-    icon: ShieldAlert,
+    renderIcon: (cls: string) => <ShieldAlert className={cls} />,
     title: 'Co to jest zasilanie awaryjne (EPS)?',
     items: [
       'EPS (Emergency Power Supply) to automatyczne przełączenie na zasilanie bateryjne w momencie awarii sieci',
@@ -343,9 +326,9 @@ function ProductCard({ product, index }: { product: ProductCardData; index: numb
                 ? 'bg-gradient-to-r from-[#B5005D] to-[#8B0048]'
                 : 'bg-gradient-to-r from-[#FF004E] to-[#CC003E]'
           }`} style={{ clipPath: 'polygon(0 0, 100% 0, 95% 100%, 0 100%)' }}>
-            {product.popularLabel === '#1 w Polsce' && <Trophy className="h-3 w-3 inline mr-1 -mt-0.5" />}
-            {product.popularLabel === 'Bestseller' && <Star className="h-3 w-3 inline mr-1 -mt-0.5" />}
-            {product.popularLabel === 'Nowo\u015b\u0107 2025' && <Sparkles className="h-3 w-3 inline mr-1 -mt-0.5" />}
+            {product.popularLabel === '#1 w Polsce' && <NexbeIcon name="certyfikat" size={12} variant="inherit" className="inline mr-1 -mt-0.5" />}
+            {product.popularLabel === 'Bestseller' && <NexbeIcon name="gwiazdki-opinie" size={12} variant="inherit" className="inline mr-1 -mt-0.5" />}
+            {product.popularLabel === 'Nowo\u015b\u0107 2025' && <NexbeIcon name="smart-ems" size={12} variant="inherit" className="inline mr-1 -mt-0.5" />}
             {product.popularLabel}
           </div>
         )}
@@ -387,7 +370,7 @@ function ProductCard({ product, index }: { product: ProductCardData; index: numb
             <div className="text-right">
               <div className="flex items-center gap-0.5">
                 {[1,2,3,4,5].map(s => (
-                  <Star key={s} className={`h-3 w-3 ${s <= Math.floor(product.rating) ? 'fill-amber-400 text-amber-400' : 'text-gray-600'}`} />
+                  <NexbeIcon key={s} name="gwiazdki-opinie" size={12} variant="inherit" className={s <= Math.floor(product.rating) ? 'text-amber-400' : 'text-gray-600'} />
                 ))}
               </div>
               <p className="text-[10px] text-gray-500 mt-0.5">{product.rating} ({product.reviewCount})</p>
@@ -398,7 +381,7 @@ function ProductCard({ product, index }: { product: ProductCardData; index: numb
           <div className="grid grid-cols-2 gap-2">
             <div className="rounded-xl p-2.5 bg-white/5 border border-white/5">
               <div className="flex items-center gap-1.5 mb-1">
-                <Battery className={`h-3.5 w-3.5 ${isPremium ? 'text-amber-400' : 'text-[#B5005D]'}`} />
+                <NexbeIcon name="magazyn-energii" size={14} variant="inherit" className={isPremium ? 'text-amber-400' : 'text-[#B5005D]'} />
                 <span className="text-[10px] text-gray-400">Pojemność</span>
               </div>
               <p className="font-heading text-sm text-white">{product.capacityRange} <span className="text-[10px] font-normal text-gray-400">kWh</span></p>
@@ -434,7 +417,7 @@ function ProductCard({ product, index }: { product: ProductCardData; index: numb
               </span>
             )}
             <span className="inline-flex items-center gap-1 text-[10px] bg-[#B5005D]/10 text-[#B5005D] px-2 py-1 rounded-lg font-medium border border-[#B5005D]/20">
-              <Award className="h-3 w-3" />{product.warranty} lat gwarancji
+              <NexbeIcon name="certyfikat" size={12} variant="inherit" />{product.warranty} lat gwarancji
             </span>
             <span className="inline-flex items-center gap-1 text-[10px] bg-purple-500/10 text-purple-300 px-2 py-1 rounded-lg font-medium border border-purple-500/20">
               <Smartphone className="h-3 w-3" />{product.appName}
@@ -539,7 +522,7 @@ export default function Home() {
           <div className="max-w-4xl mx-auto text-center space-y-6">
             <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
               <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#B5005D]/10 text-[#B5005D] text-sm font-medium mb-6 backdrop-blur-sm border border-[#B5005D]/20">
-                <Cpu className="h-4 w-4" />
+                <NexbeIcon name="falownik" size={16} variant="inherit" />
                 Konfigurator AI magazynu energii
               </span>
 
@@ -558,7 +541,7 @@ export default function Home() {
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2 }} className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-6">
               <Button asChild size="lg" className="text-lg px-8 h-14 w-full sm:w-auto bg-gradient-to-r from-[#B5005D] to-[#8B0048] hover:from-[#D4006E] hover:to-[#9A0050] text-white transition-all shadow-lg shadow-[#B5005D]/25 hover:shadow-xl hover:shadow-[#B5005D]/30">
                 <Link href="/konfigurator">
-                  <Zap className="h-5 w-5 mr-2" />
+                  <NexbeIcon name="smart-ems" size={20} variant="inherit" className="mr-2" />
                   Konfigurator Magazynu z AI
                   <ArrowRight className="h-5 w-5 ml-2" />
                 </Link>
@@ -628,7 +611,7 @@ export default function Home() {
         <div className="container mx-auto px-4 relative z-10">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-16">
             <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#B5005D]/10 text-[#B5005D] text-sm font-medium mb-5 border border-[#B5005D]/20">
-              <Calculator className="h-4 w-4" />
+              <NexbeIcon name="kalkulator" size={16} variant="inherit" />
               Jak to dzia&#322;a
             </span>
             <h2 className="font-heading text-2xl md:text-4xl text-white mb-4">
@@ -665,8 +648,9 @@ export default function Home() {
                     <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-3 transition-all group-hover:scale-110`} style={{
                       background: `linear-gradient(135deg, ${step.color}15, ${step.color}08)`,
                       border: `1px solid ${step.color}30`,
+                      color: step.color,
                     }}>
-                      <step.icon className="h-7 w-7" style={{ color: step.color }} />
+                      {step.renderIcon('h-7 w-7')}
                     </div>
 
                     <h3 className="font-heading text-sm text-white mb-1.5">{step.title}</h3>
@@ -700,7 +684,7 @@ export default function Home() {
           {/* Section header */}
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-12">
             <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-gradient-to-r from-[#B5005D]/10 to-[#FF004E]/10 text-[#B5005D] text-sm font-medium mb-5 border border-[#B5005D]/20">
-              <Trophy className="h-4 w-4 text-amber-400" />
+              <NexbeIcon name="certyfikat" size={16} variant="inherit" className="text-amber-400" />
               Ranking Magazyn&oacute;w Energii 2025
             </div>
             <h2 className="font-heading text-2xl md:text-4xl text-white mb-3">
@@ -781,13 +765,13 @@ export default function Home() {
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="max-w-4xl mx-auto mt-14">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 text-center">
               {[
-                { icon: Smartphone, title: 'Podgl\u0105d w aplikacji', desc: 'Monitoruj produkcj\u0119, zu\u017cycie i stan baterii 24/7', color: '#B5005D' },
-                { icon: Shield, title: 'Bezpieczna technologia LFP', desc: 'LiFePO4 nie ulega samozap\u0142onowi \u2014 bezpieczna w domu', color: '#FF004E' },
-                { icon: BadgePercent, title: 'Kwalifikacja do dotacji', desc: 'Wszystkie produkty spe\u0142niaj\u0105 wymagania M\u00f3j Pr\u0105d 6.0', color: 'rgb(251, 191, 36)' },
+                { renderIcon: (cls: string) => <Smartphone className={cls} />, title: 'Podgl\u0105d w aplikacji', desc: 'Monitoruj produkcj\u0119, zu\u017cycie i stan baterii 24/7', color: '#B5005D' },
+                { renderIcon: (cls: string) => <NexbeIcon name="blackout-ochrona" size={24} variant="inherit" className={cls} />, title: 'Bezpieczna technologia LFP', desc: 'LiFePO4 nie ulega samozap\u0142onowi \u2014 bezpieczna w domu', color: '#FF004E' },
+                { renderIcon: (cls: string) => <BadgePercent className={cls} />, title: 'Kwalifikacja do dotacji', desc: 'Wszystkie produkty spe\u0142niaj\u0105 wymagania M\u00f3j Pr\u0105d 6.0', color: 'rgb(251, 191, 36)' },
               ].map((item) => (
                 <div key={item.title} className="p-5 rounded-2xl bg-white/[0.02] border border-white/5 hover:border-white/10 transition-all">
-                  <div className="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3" style={{ background: `${item.color}10`, border: `1px solid ${item.color}20` }}>
-                    <item.icon className="h-6 w-6" style={{ color: item.color }} />
+                  <div className="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3" style={{ background: `${item.color}10`, border: `1px solid ${item.color}20`, color: item.color }}>
+                    {item.renderIcon('h-6 w-6')}
                   </div>
                   <p className="text-sm font-heading text-white">{item.title}</p>
                   <p className="text-xs text-gray-500 mt-1">{item.desc}</p>
@@ -832,7 +816,7 @@ export default function Home() {
                 <div className="absolute top-4 right-4 text-[10px] font-bold text-[#B5005D] bg-[#B5005D]/10 px-3 py-1 rounded-full border border-[#B5005D]/20">
                   NFO&#346;IGW
                 </div>
-                <Banknote className="h-10 w-10 text-[#B5005D] mb-4" />
+                <NexbeIcon name="dotacja" size={40} variant="inherit" className="text-[#B5005D] mb-4" />
                 <h3 className="font-heading text-xl text-white mb-1">M&oacute;j Pr&#261;d 6.0</h3>
                 <p className="text-3xl font-heading text-[#B5005D] mb-4">do 16 000 z&#322;</p>
                 <ul className="space-y-2 text-sm text-gray-400">
@@ -856,7 +840,7 @@ export default function Home() {
                 <div className="absolute top-4 right-4 text-[10px] font-bold text-[#FF004E] bg-[#FF004E]/10 px-3 py-1 rounded-full border border-[#FF004E]/20">
                   PIT
                 </div>
-                <HomeIcon className="h-10 w-10 text-[#FF004E] mb-4" />
+                <NexbeIcon name="dom-energia" size={40} variant="inherit" className="text-[#FF004E] mb-4" />
                 <h3 className="font-heading text-xl text-white mb-1">Ulga termomodernizacyjna</h3>
                 <p className="text-3xl font-heading text-[#FF004E] mb-4">nawet 32% odliczenia</p>
                 <ul className="space-y-2 text-sm text-gray-400">
@@ -914,7 +898,7 @@ export default function Home() {
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                 <Button asChild size="lg" className="bg-[#FF004E]/10 border-2 border-[#FF004E]/50 text-[#FF004E] hover:bg-[#FF004E]/20 shadow-lg shadow-[#FF004E]/10 animate-pulse hover:animate-none">
                   <Link href="/konfigurator">
-                    <Calculator className="h-5 w-5 mr-2" />
+                    <NexbeIcon name="kalkulator" size={20} variant="inherit" className="mr-2" />
                     Oblicz swoją dotację w konfiguratorze
                     <ArrowRight className="h-5 w-5 ml-2" />
                   </Link>
@@ -939,7 +923,7 @@ export default function Home() {
               {/* Left — text */}
               <motion.div initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
                 <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#B5005D]/10 text-[#B5005D] text-sm font-medium mb-5 border border-[#B5005D]/20">
-                  <Cpu className="h-4 w-4" />
+                  <NexbeIcon name="falownik" size={16} variant="inherit" />
                   W ka&#380;dej instalacji NEXBE
                 </span>
                 <h2 className="font-heading text-2xl md:text-4xl text-white mb-4">
@@ -962,7 +946,7 @@ export default function Home() {
                       className="flex items-start gap-3 p-3 rounded-xl bg-white/[0.02] border border-white/5 hover:border-[#B5005D]/20 transition-all"
                     >
                       <div className="shrink-0 w-9 h-9 rounded-lg bg-[#B5005D]/10 border border-[#B5005D]/20 flex items-center justify-center">
-                        <f.icon className="h-4 w-4 text-[#B5005D]" />
+                        {f.renderIcon('h-4 w-4 text-[#B5005D]')}
                       </div>
                       <div>
                         <h4 className="font-heading text-xs text-white mb-0.5">{f.title}</h4>
@@ -1068,7 +1052,7 @@ export default function Home() {
         <div className="container mx-auto px-4 relative z-10">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-14">
             <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 text-gray-300 text-sm font-medium mb-5 border border-white/10">
-              <Brain className="h-4 w-4 text-[#B5005D]" />
+              <NexbeIcon name="smart-ems" size={16} variant="inherit" className="text-[#B5005D]" />
               Baza wiedzy
             </span>
             <h2 className="font-heading text-2xl md:text-4xl text-white mb-4">
@@ -1091,7 +1075,7 @@ export default function Home() {
                 className="group relative p-6 rounded-2xl bg-white/[0.02] border border-white/5 hover:border-[#B5005D]/20 transition-all"
               >
                 <div className="w-12 h-12 rounded-xl bg-[#B5005D]/10 border border-[#B5005D]/20 flex items-center justify-center mb-5">
-                  <section.icon className="h-6 w-6 text-[#B5005D]" />
+                  {section.renderIcon('h-6 w-6 text-[#B5005D]')}
                 </div>
                 <h3 className="font-heading text-lg text-white mb-4">{section.title}</h3>
                 <ul className="space-y-3">
@@ -1146,7 +1130,7 @@ export default function Home() {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Button asChild size="lg" className="text-lg px-8 h-14 bg-gradient-to-r from-[#B5005D] to-[#8B0048] hover:from-[#D4006E] hover:to-[#9A0050] text-white shadow-lg shadow-[#B5005D]/25">
                 <Link href="/konfigurator">
-                  <Zap className="h-5 w-5 mr-2" />
+                  <NexbeIcon name="smart-ems" size={20} variant="inherit" className="mr-2" />
                   Konfigurator AI
                   <ArrowRight className="h-5 w-5 ml-2" />
                 </Link>

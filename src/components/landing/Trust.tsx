@@ -1,7 +1,8 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Award, Building2, Users, Globe, Warehouse, MapPin } from 'lucide-react';
+import { NexbeIcon } from '@nexbe/icons';
+import { Building2, Users, Warehouse, MapPin } from 'lucide-react';
 import { teamMembers, kenoStats } from '@/lib/data';
 import { fadeUp, slideFromLeft, slideFromRight, staggerContainer } from '@/lib/animations';
 
@@ -66,7 +67,7 @@ export default function Trust() {
                       variants={fadeUp}
                       className="flex items-start gap-3 text-sm text-nexbe-text-muted leading-relaxed"
                     >
-                      <Award className="w-4 h-4 text-nexbe-raspberry flex-shrink-0 mt-0.5" />
+                      <NexbeIcon name="certyfikat" size={16} variant="inherit" className="text-nexbe-raspberry flex-shrink-0 mt-0.5" />
                       {highlight}
                     </motion.li>
                   ))}
@@ -113,7 +114,7 @@ export default function Trust() {
                 <p>Centrum logistyczne 7 000 m² w Gliwicach — wysyłka w 48h.</p>
               </div>
               <div className="flex items-start gap-3">
-                <Globe className="w-4 h-4 text-nexbe-raspberry flex-shrink-0 mt-0.5" />
+                <NexbeIcon name="siec-energetyczna" size={16} variant="inherit" className="text-nexbe-raspberry flex-shrink-0 mt-0.5" />
                 <p>Obecność w 6 krajach Europy. 500+ certyfikowanych instalatorów.</p>
               </div>
               <div className="flex items-start gap-3">

@@ -6,7 +6,8 @@ import { useConfigurator } from '@/hooks/useConfigurator';
 import { getRecommendedProducts, getBrandProducts } from '@/lib/compatibility';
 import { inverters } from '@/data/products';
 import { ProductCard } from './ProductCard';
-import { Sparkles, Info, ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react';
+import { NexbeIcon } from '@nexbe/icons';
+import { Info, ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react';
 
 const CARDS_PER_PAGE = 3;
 
@@ -178,7 +179,7 @@ export function StepRecommendation() {
     >
       <div className="text-center space-y-2">
         <div className="flex items-center justify-center gap-2 text-primary">
-          <Sparkles className="h-6 w-6" />
+          <NexbeIcon name="smart-ems" size={24} variant="inherit" />
           <h2 className="font-heading text-2xl md:text-3xl text-white">
             Mamy dla Ciebie idealne rozwiązanie!
           </h2>

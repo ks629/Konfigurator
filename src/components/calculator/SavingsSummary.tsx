@@ -2,7 +2,8 @@
 
 import { CalculationResult, Product, Inverter, BackupVariant } from '@/lib/types';
 import { formatCurrency, formatNumber } from '@/lib/calculations';
-import { Wallet, TrendingUp, Target, Banknote, Percent, ArrowDown, Battery, Cpu, ShieldCheck, Settings } from 'lucide-react';
+import { NexbeIcon } from '@nexbe/icons';
+import { Wallet, Target, Percent, ArrowDown, Settings } from 'lucide-react';
 
 interface SavingsSummaryProps {
   result: CalculationResult;
@@ -34,7 +35,7 @@ export function SavingsSummary({ result, product, inverter, backupVariant = 'A' 
             <p className="text-xs text-muted-foreground uppercase tracking-wide">W zestawie</p>
             <div className="space-y-2.5 text-sm">
               <div className="flex items-start gap-2.5">
-                <Battery className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                <NexbeIcon name="magazyn-energii" size={16} variant="inherit" className="text-primary mt-0.5 shrink-0" />
                 <div>
                   <p className="font-medium text-white">Magazyn energii {product.brand.split('/')[0]}</p>
                   <p className="text-xs text-muted-foreground">{product.name} · {product.capacity_kwh} kWh</p>
@@ -42,7 +43,7 @@ export function SavingsSummary({ result, product, inverter, backupVariant = 'A' 
               </div>
               {inverter && (
                 <div className="flex items-start gap-2.5">
-                  <Cpu className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                  <NexbeIcon name="falownik" size={16} variant="inherit" className="text-primary mt-0.5 shrink-0" />
                   <div>
                     <p className="font-medium text-white">Falownik hybrydowy {inverter.brand}</p>
                     <p className="text-xs text-muted-foreground">{inverter.name} · {inverter.power_kw} kW</p>
@@ -50,7 +51,7 @@ export function SavingsSummary({ result, product, inverter, backupVariant = 'A' 
                 </div>
               )}
               <div className="flex items-start gap-2.5">
-                <ShieldCheck className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                <NexbeIcon name="blackout-ochrona" size={16} variant="inherit" className="text-primary mt-0.5 shrink-0" />
                 <div>
                   <p className="font-medium text-white">
                     {backupVariant === 'B'
@@ -92,7 +93,7 @@ export function SavingsSummary({ result, product, inverter, backupVariant = 'A' 
         {/* Dotacje */}
         <div className="bg-muted/50 rounded-lg p-4 space-y-2">
           <div className="flex items-center gap-2 text-sm font-medium">
-            <Banknote className="h-4 w-4 text-primary" />
+            <NexbeIcon name="dotacja" size={16} variant="inherit" className="text-primary" />
             Dotacje i ulgi
           </div>
           <div className="space-y-1.5 text-sm">
@@ -136,7 +137,7 @@ export function SavingsSummary({ result, product, inverter, backupVariant = 'A' 
       {/* Oszczednosci */}
       <div className="rounded-xl border bg-card p-6 space-y-4">
         <div className="flex items-center gap-2">
-          <TrendingUp className="h-5 w-5 text-primary" />
+          <NexbeIcon name="roi" size={20} variant="inherit" className="text-primary" />
           <h3 className="font-heading text-lg text-white">Twoje oszczędności</h3>
         </div>
 

@@ -15,7 +15,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { Settings2, Battery, Cpu, Check, ChevronDown } from 'lucide-react';
+import { NexbeIcon } from '@nexbe/icons';
+import { Settings2, Check, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 /** Simple monthly installment calculator (Inbank: 8.99% nominal, 10 zl/month fee, 120 months) */
@@ -167,7 +168,7 @@ export function CustomConfigSection() {
                   {/* Select 1: Magazyn */}
                   <div className="space-y-2">
                     <label className="flex items-center gap-2 text-sm font-medium">
-                      <Battery className="h-4 w-4 text-primary" />
+                      <NexbeIcon name="magazyn-energii" size={16} variant="inherit" className="text-primary" />
                       Magazyn energii
                     </label>
                     <Select
@@ -195,7 +196,7 @@ export function CustomConfigSection() {
                   {/* Select 2: Falownik */}
                   <div className="space-y-2">
                     <label className="flex items-center gap-2 text-sm font-medium">
-                      <Cpu className="h-4 w-4 text-primary" />
+                      <NexbeIcon name="falownik" size={16} variant="inherit" className="text-primary" />
                       Falownik
                     </label>
                     <Select
@@ -234,7 +235,7 @@ export function CustomConfigSection() {
                   >
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/40 border border-border/30">
-                        <Battery className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                        <NexbeIcon name="magazyn-energii" size={16} variant="inherit" className="text-primary mt-0.5 shrink-0" />
                         <div>
                           <p className="font-medium text-sm">{customProduct.name}</p>
                           <p className="text-xs text-muted-foreground">
@@ -243,7 +244,7 @@ export function CustomConfigSection() {
                         </div>
                       </div>
                       <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/40 border border-border/30">
-                        <Cpu className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                        <NexbeIcon name="falownik" size={16} variant="inherit" className="text-primary mt-0.5 shrink-0" />
                         <div>
                           <p className="font-medium text-sm">{customInverter.name}</p>
                           <p className="text-xs text-muted-foreground">

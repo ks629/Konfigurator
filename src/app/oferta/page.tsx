@@ -20,22 +20,17 @@ import { getBackupEstimate, getRecommendations } from '@/lib/compatibility';
 import { ContactFormData } from '@/lib/validations';
 import type { PdfOfferData } from '@/lib/pdf-generator';
 import type { RecommendationSet } from '@/lib/compatibility';
+import { NexbeIcon } from '@nexbe/icons';
 import {
   CalendarCheck,
-  Battery,
-  Zap,
-  Shield,
   Calendar,
   Check,
   ArrowLeft,
   Info,
-  Star,
   TrendingDown,
-  TrendingUp,
   FileText,
   Wrench,
   Settings,
-  Award,
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -224,7 +219,7 @@ export default function OfertaPage() {
       label: 'Rekomendowany',
       badge: 'Najlepszy wybór',
       badgeColor: 'bg-[#B5005D] text-white',
-      icon: <Star className="h-5 w-5" />,
+      icon: <NexbeIcon name="gwiazdki-opinie" size={20} variant="inherit" />,
       product: recommendations.recommended.product,
       description: 'Optymalnie dobrany do Twojej instalacji PV i zużycia energii.',
     });
@@ -236,7 +231,7 @@ export default function OfertaPage() {
       label: 'Premium',
       badge: 'Większa pojemność',
       badgeColor: 'bg-[#350066] text-white',
-      icon: <TrendingUp className="h-5 w-5" />,
+      icon: <NexbeIcon name="roi" size={20} variant="inherit" />,
       product: recommendations.premium.product,
       description: 'Większa pojemność na przyszłość — więcej niezależności energetycznej.',
     });
@@ -264,7 +259,7 @@ export default function OfertaPage() {
       desc: 'Konfiguracja i podłączenie',
     },
     {
-      icon: <Award className="h-5 w-5" />,
+      icon: <NexbeIcon name="certyfikat" size={20} variant="inherit" />,
       title: 'Dotacja Mój Prąd 7.0',
       desc: 'Pomoc w złożeniu wniosku',
     },
@@ -382,7 +377,7 @@ export default function OfertaPage() {
                               />
                             ) : (
                               <div className="w-full h-full flex items-center justify-center">
-                                <Battery className="h-8 w-8 text-muted-foreground/30" />
+                                <NexbeIcon name="magazyn-energii" size={32} variant="inherit" className="text-muted-foreground/30" />
                               </div>
                             )}
                           </div>
@@ -398,11 +393,11 @@ export default function OfertaPage() {
 
                         <div className="grid grid-cols-2 gap-2 text-sm">
                           <div className="flex items-center gap-1.5 bg-muted/50 rounded-lg px-3 py-1.5">
-                            <Battery className="h-3.5 w-3.5 text-primary" />
+                            <NexbeIcon name="magazyn-energii" size={14} variant="inherit" className="text-primary" />
                             <span className="font-medium">{prod.capacity_kwh} kWh</span>
                           </div>
                           <div className="flex items-center gap-1.5 bg-muted/50 rounded-lg px-3 py-1.5">
-                            <Zap className="h-3.5 w-3.5 text-primary" />
+                            <NexbeIcon name="smart-ems" size={14} variant="inherit" className="text-primary" />
                             <span className="font-medium">{prod.power_continuous_kw} kW</span>
                           </div>
                         </div>
@@ -448,9 +443,9 @@ export default function OfertaPage() {
                     </div>
                     <div className="space-y-3">
                       {[
-                        { icon: <Zap className="h-4 w-4" />, text: 'Falownik hybrydowy 10 kW' },
-                        { icon: <Battery className="h-4 w-4" />, text: 'System EMS (zarządzanie energią)' },
-                        { icon: <Shield className="h-4 w-4" />, text: 'Backup / SZR (zasilanie awaryjne)' },
+                        { icon: <NexbeIcon name="falownik" size={16} variant="inherit" />, text: 'Falownik hybrydowy 10 kW' },
+                        { icon: <NexbeIcon name="smart-ems" size={16} variant="inherit" />, text: 'System EMS (zarządzanie energią)' },
+                        { icon: <NexbeIcon name="blackout-ochrona" size={16} variant="inherit" />, text: 'Backup / SZR (zasilanie awaryjne)' },
                         { icon: <Calendar className="h-4 w-4" />, text: 'Montaż i uruchomienie' },
                       ].map((item) => (
                         <div key={item.text} className="flex items-center gap-3 text-sm">
@@ -470,7 +465,7 @@ export default function OfertaPage() {
                   <div className="p-6 space-y-4">
                     <div className="flex items-center gap-2">
                       <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
-                        <Shield className="h-4 w-4 text-blue-700" />
+                        <NexbeIcon name="blackout-ochrona" size={16} variant="inherit" className="text-blue-700" />
                       </div>
                       <h3 className="font-heading text-base text-blue-800">Zasilanie awaryjne</h3>
                     </div>
@@ -482,7 +477,7 @@ export default function OfertaPage() {
                             {backupEstimate.hours_min}–{backupEstimate.hours_max} <span className="text-base font-normal">godz.</span>
                           </p>
                         </div>
-                        <Shield className="h-10 w-10 text-blue-200" />
+                        <NexbeIcon name="blackout-ochrona" size={40} variant="inherit" className="text-blue-200" />
                       </div>
                       <p className="text-xs text-blue-600">
                         Podstawowe urządzenia domowe. Automatyczne przełączanie SZR w mniej niż 20 ms.

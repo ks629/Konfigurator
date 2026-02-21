@@ -17,7 +17,8 @@ import { FinancingSimulator } from '@/components/calculator/FinancingSimulator';
 import { ContactForm } from '@/components/forms/ContactForm';
 import { Button } from '@/components/ui/button';
 import { ResumeProgressBanner } from '@/components/ui/ResumeProgressBanner';
-import { ArrowLeft, ArrowRight, FileText, CalendarCheck, Zap } from 'lucide-react';
+import { NexbeIcon } from '@nexbe/icons';
+import { ArrowLeft, ArrowRight, FileText, CalendarCheck } from 'lucide-react';
 import { calculateROI, calculateMonthlyFromBill } from '@/lib/calculations';
 import { allProducts } from '@/data/products';
 import { inverters } from '@/data/products';
@@ -291,7 +292,7 @@ export default function KonfiguratorPage() {
                 <div className="rounded-xl border-2 border-amber-400/30 bg-gradient-to-r from-amber-400/5 via-card to-amber-400/5 p-6 space-y-4">
                   <div className="flex items-center gap-3">
                     <div className="p-2 rounded-lg bg-amber-400/10">
-                      <Zap className="h-6 w-6 text-amber-400" />
+                      <NexbeIcon name="smart-ems" size={24} variant="inherit" className="text-amber-400" />
                     </div>
                     <div>
                       <h3 className="font-heading text-lg text-white">
@@ -337,7 +338,7 @@ export default function KonfiguratorPage() {
                     onClick={() => store.setTariff('dynamic')}
                     className="bg-gradient-to-r from-amber-400 to-amber-500 text-black hover:from-amber-500 hover:to-amber-600 font-bold"
                   >
-                    <Zap className="h-4 w-4 mr-2" />
+                    <NexbeIcon name="smart-ems" size={16} variant="inherit" className="mr-2" />
                     Przelicz z taryfą dynamiczną
                   </Button>
                 </div>

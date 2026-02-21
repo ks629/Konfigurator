@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Menu, X, ArrowRight, Zap } from 'lucide-react';
+import { NexbeIcon } from '@nexbe/icons';
+import { Menu, X, ArrowRight } from 'lucide-react';
 
 const navLinks = [
   { label: 'Jak to działa', href: '#jak-to-dziala' },
@@ -56,7 +57,7 @@ export default function Navbar() {
               priority
             />
             <span className="hidden sm:inline-flex section-label !py-1 !px-2.5 !text-[9px] !tracking-[2px]">
-              <Zap className="w-3 h-3 text-nexbe-flame" />
+              <NexbeIcon name="smart-ems" size={12} variant="inherit" className="text-nexbe-flame" />
               ENERGIA
             </span>
           </Link>
