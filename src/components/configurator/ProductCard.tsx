@@ -5,7 +5,8 @@ import { Product, Inverter } from '@/lib/types';
 import { allProducts } from '@/data/products';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Battery, Zap, Shield, Calendar, Check, CreditCard, Crown, ArrowUpCircle } from 'lucide-react';
+import { NexbeIcon } from '@nexbe/icons';
+import { Calendar, Check, Crown, ArrowUpCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatCurrency } from '@/lib/calculations';
 
@@ -102,7 +103,7 @@ export function ProductCard({
             sizes="(max-width: 768px) 100vw, 33vw"
           />
         ) : (
-          <Battery className="h-20 w-20 text-muted-foreground/30" />
+          <NexbeIcon name="magazyn-energii" size={80} variant="inherit" className="text-muted-foreground/30" />
         )}
         <div className="absolute bottom-2 left-2 z-10">
           {onBrandClick ? (
@@ -134,14 +135,14 @@ export function ProductCard({
         {/* Specs */}
         <div className="grid grid-cols-2 gap-3 text-sm">
           <div className="flex items-center gap-2">
-            <Battery className="h-4 w-4 text-primary" />
+            <NexbeIcon name="magazyn-energii" size={16} variant="inherit" className="text-primary" />
             <div>
               <p className="font-medium">{product.capacity_kwh} kWh</p>
               <p className="text-xs text-muted-foreground">Pojemność</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Zap className="h-4 w-4 text-primary" />
+            <NexbeIcon name="smart-ems" size={16} variant="inherit" className="text-primary" />
             <div>
               <p className="font-medium">
                 {product.power_continuous_kw} / {product.power_peak_kw} kW
@@ -150,7 +151,7 @@ export function ProductCard({
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Shield className="h-4 w-4 text-primary" />
+            <NexbeIcon name="falownik" size={16} variant="inherit" className="text-primary" />
             <div>
               <p className="font-medium">{product.inverter_power_kw} kW</p>
               <p className="text-xs text-muted-foreground">Falownik</p>
@@ -186,7 +187,7 @@ export function ProductCard({
           </div>
           {monthlyRate && monthlyRate > 0 && (
             <div className="flex items-center gap-1.5 text-sm">
-              <CreditCard className="h-3.5 w-3.5 text-muted-foreground" />
+              <NexbeIcon name="raty" size={14} variant="inherit" className="text-muted-foreground" />
               <span className="text-muted-foreground">Rata już od</span>
               <span className="font-heading text-primary">{monthlyRate} zł/mies.</span>
             </div>

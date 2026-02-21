@@ -2,7 +2,7 @@
 
 import { useConfigurator } from '@/hooks/useConfigurator';
 import { Product, BackupVariant } from '@/lib/types';
-import { Shield, ShieldCheck } from 'lucide-react';
+import { NexbeIcon } from '@nexbe/icons';
 import { cn } from '@/lib/utils';
 
 interface BackupVariantToggleProps {
@@ -23,14 +23,14 @@ export function BackupVariantToggle({ product }: BackupVariantToggleProps) {
           <VariantButton
             variant="A"
             label={labelA}
-            icon={<Shield className="h-4 w-4" />}
+            icon={<NexbeIcon name="blackout-ochrona" size={16} variant="inherit" />}
             isActive={backupVariant === 'A'}
             onClick={() => setBackupVariant('A')}
           />
           <VariantButton
             variant="B"
             label={labelB}
-            icon={<ShieldCheck className="h-4 w-4" />}
+            icon={<NexbeIcon name="blackout-ochrona" size={16} variant="inherit" />}
             isActive={backupVariant === 'B'}
             onClick={() => setBackupVariant('B')}
           />

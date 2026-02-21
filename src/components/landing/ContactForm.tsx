@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Send, Check, Shield, Clock, Users, Zap, ArrowRight, Loader2 } from 'lucide-react';
+import { NexbeIcon } from '@nexbe/icons';
+import { Send, Check, Clock, Users, ArrowRight, Loader2 } from 'lucide-react';
 import { contactBenefits } from '@/lib/data';
 import { fadeUp, slideFromLeft, slideFromRight } from '@/lib/animations';
 
@@ -22,7 +23,13 @@ const pvOptions = [
   { value: 'nie', label: 'Nie' },
 ];
 
-const benefitIcons = [Clock, Zap, Shield, Users, ArrowRight];
+const benefitIcons: ((cls: string) => React.ReactNode)[] = [
+  (cls) => <Clock className={cls} />,
+  (cls) => <NexbeIcon name="smart-ems" size={14} variant="inherit" className={cls} />,
+  (cls) => <NexbeIcon name="blackout-ochrona" size={14} variant="inherit" className={cls} />,
+  (cls) => <Users className={cls} />,
+  (cls) => <ArrowRight className={cls} />,
+];
 
 export default function ContactForm() {
   const [submitted, setSubmitted] = useState(false);
@@ -110,11 +117,11 @@ export default function ContactForm() {
 
               <ul className="mt-8 space-y-4">
                 {contactBenefits.map((benefit, i) => {
-                  const Icon = benefitIcons[i] || Check;
+                  const renderIcon = benefitIcons[i] || ((cls: string) => <Check className={cls} />);
                   return (
                     <li key={benefit} className="flex items-center gap-3 text-sm text-nexbe-text-muted">
                       <span className="w-7 h-7 rounded-full bg-nexbe-raspberry/10 flex items-center justify-center flex-shrink-0">
-                        <Icon className="w-3.5 h-3.5 text-nexbe-raspberry" />
+                        {renderIcon('w-3.5 h-3.5 text-nexbe-raspberry')}
                       </span>
                       {benefit}
                     </li>

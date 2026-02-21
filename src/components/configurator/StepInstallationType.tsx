@@ -3,32 +3,33 @@
 import { motion } from 'framer-motion';
 import { useConfigurator } from '@/hooks/useConfigurator';
 import { InstallationType } from '@/lib/types';
-import { Battery, Sun, RefreshCw } from 'lucide-react';
+import { NexbeIcon } from '@nexbe/icons';
+import { RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const options: {
   type: InstallationType;
   title: string;
   description: string;
-  icon: React.ElementType;
+  renderIcon: (cls: string) => React.ReactNode;
 }[] = [
   {
     type: 'retrofit',
     title: 'Mam już instalację PV i chcę dodać magazyn',
     description: 'Twój obecny falownik zostaje, dodajemy magazyn AC',
-    icon: Battery,
+    renderIcon: (cls) => <NexbeIcon name="magazyn-energii" size={32} variant="inherit" className={cls} />,
   },
   {
     type: 'hybrid',
     title: 'Planuję nową instalację PV z magazynem',
     description: 'Kompletny system: panele + falownik hybrydowy + magazyn DC',
-    icon: Sun,
+    renderIcon: (cls) => <NexbeIcon name="fotowoltaika" size={32} variant="inherit" className={cls} />,
   },
   {
     type: 'upgrade',
     title: 'Chcę wymienić falownik na hybrydowy i dodać magazyn',
     description: 'Modernizacja istniejącej instalacji do systemu hybrydowego',
-    icon: RefreshCw,
+    renderIcon: (cls) => <RefreshCw className={cls} />,
   },
 ];
 
@@ -57,7 +58,7 @@ export function StepInstallationType() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-3 max-w-4xl mx-auto">
-        {options.map(({ type, title, description, icon: Icon }) => (
+        {options.map(({ type, title, description, renderIcon }) => (
           <button
             key={type}
             onClick={() => handleSelect(type)}
@@ -76,7 +77,7 @@ export function StepInstallationType() {
                   : 'bg-muted text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary'
               )}
             >
-              <Icon className="h-8 w-8" />
+              {renderIcon('h-8 w-8')}
             </div>
             <h3 className="font-heading text-sm md:text-base mb-2 text-white">{title}</h3>
             <p className="text-xs md:text-sm text-muted-foreground">

@@ -6,10 +6,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { defaultCalcParams } from '@/data/params';
+import { NexbeIcon } from '@nexbe/icons';
 import {
-  Battery,
   LayoutDashboard,
-  Package,
   Users,
   Settings,
   Save,
@@ -20,10 +19,10 @@ export default function UstawieniaPage() {
   const [params, setParams] = useState(defaultCalcParams);
 
   const menuItems = [
-    { label: 'Dashboard', href: '/admin', icon: LayoutDashboard },
-    { label: 'Cennik produktów', href: '/admin/cennik', icon: Package },
-    { label: 'Lista leadów', href: '/admin/leady', icon: Users },
-    { label: 'Ustawienia', href: '/admin/ustawienia', icon: Settings, active: true },
+    { label: 'Dashboard', href: '/admin', renderIcon: (cls: string) => <LayoutDashboard className={cls} /> },
+    { label: 'Cennik produktów', href: '/admin/cennik', renderIcon: (cls: string) => <NexbeIcon name="system-hybrydowy" size={16} variant="inherit" className={cls} /> },
+    { label: 'Lista leadów', href: '/admin/leady', renderIcon: (cls: string) => <Users className={cls} /> },
+    { label: 'Ustawienia', href: '/admin/ustawienia', renderIcon: (cls: string) => <Settings className={cls} />, active: true },
   ];
 
   const handleSave = () => {
@@ -93,7 +92,7 @@ export default function UstawieniaPage() {
       <header className="bg-secondary text-secondary-foreground border-b">
         <div className="container mx-auto px-4 flex items-center justify-between h-14">
           <div className="flex items-center gap-2">
-            <Battery className="h-6 w-6 text-primary" />
+            <NexbeIcon name="magazyn-energii" size={24} variant="inherit" className="text-primary" />
             <span className="font-heading text-lg text-primary">NEXBE</span>
             <span className="text-xs text-gray-400 ml-2">Admin</span>
           </div>
@@ -105,7 +104,7 @@ export default function UstawieniaPage() {
           {menuItems.map((item) => (
             <Link key={item.href} href={item.href}>
               <Button variant={item.active ? 'default' : 'outline'} size="sm" className="gap-2">
-                <item.icon className="h-4 w-4" />
+                {item.renderIcon('h-4 w-4')}
                 {item.label}
               </Button>
             </Link>

@@ -17,13 +17,14 @@ import { Tariff, BillingSystem, UserProfile, EnergyOperator } from '@/lib/types'
 import { calculateMonthlyFromBill } from '@/lib/calculations';
 import { operatorPricing } from '@/data/energy-prices';
 import { cn } from '@/lib/utils';
-import { Home, Thermometer, Laptop, Car } from 'lucide-react';
+import { NexbeIcon } from '@nexbe/icons';
+import { Laptop } from 'lucide-react';
 
-const userProfileOptions: { value: UserProfile; label: string; icon: React.ElementType }[] = [
-  { value: 'standard', label: 'Standardowe gospodarstwo', icon: Home },
-  { value: 'heat_pump', label: 'Z pompą ciepła', icon: Thermometer },
-  { value: 'work_from_home', label: 'Praca zdalna z domu', icon: Laptop },
-  { value: 'heat_pump_ev', label: 'Pompa ciepła + EV', icon: Car },
+const userProfileOptions: { value: UserProfile; label: string; renderIcon: (cls: string) => React.ReactNode }[] = [
+  { value: 'standard', label: 'Standardowe gospodarstwo', renderIcon: (cls) => <NexbeIcon name="dom-energia" size={16} variant="inherit" className={cls} /> },
+  { value: 'heat_pump', label: 'Z pompą ciepła', renderIcon: (cls) => <NexbeIcon name="pompa-ciepla" size={16} variant="inherit" className={cls} /> },
+  { value: 'work_from_home', label: 'Praca zdalna z domu', renderIcon: (cls) => <Laptop className={cls} /> },
+  { value: 'heat_pump_ev', label: 'Pompa ciepła + EV', renderIcon: (cls) => <NexbeIcon name="auto-elektryczne" size={16} variant="inherit" className={cls} /> },
 ];
 
 const tariffOptions: { value: Tariff; label: string; desc: string }[] = [
@@ -180,7 +181,7 @@ export function StepConsumption() {
           onValueChange={(val) => setUserProfile(val as UserProfile)}
           className="grid grid-cols-2 gap-2"
         >
-          {userProfileOptions.map(({ value, label, icon: Icon }) => (
+          {userProfileOptions.map(({ value, label, renderIcon }) => (
             <label
               key={value}
               className={cn(
@@ -191,10 +192,10 @@ export function StepConsumption() {
               )}
             >
               <RadioGroupItem value={value} />
-              <Icon className={cn(
+              {renderIcon(cn(
                 'h-4 w-4',
                 userProfile === value ? 'text-primary' : 'text-muted-foreground'
-              )} />
+              ))}
               <span className="text-sm font-medium">{label}</span>
             </label>
           ))}

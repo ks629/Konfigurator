@@ -5,14 +5,11 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { NexbeIcon } from '@nexbe/icons';
 import {
-  Battery,
   LayoutDashboard,
-  Package,
   Users,
   Settings,
-  BarChart3,
-  TrendingUp,
   FileText,
   CalendarCheck,
 } from 'lucide-react';
@@ -34,7 +31,7 @@ export default function AdminPage() {
       <div className="min-h-screen flex items-center justify-center bg-muted/20">
         <div className="w-full max-w-sm p-8 bg-card rounded-xl border shadow-lg">
           <div className="flex items-center gap-2 mb-6 justify-center">
-            <Battery className="h-8 w-8 text-primary" />
+            <NexbeIcon name="magazyn-energii" size={32} variant="inherit" className="text-primary" />
             <span className="font-heading text-2xl text-primary">NEXBE</span>
           </div>
           <h1 className="font-heading text-lg text-center mb-6">Panel administracyjny</h1>
@@ -60,17 +57,17 @@ export default function AdminPage() {
   }
 
   const stats = [
-    { label: 'Leady dziś', value: '12', icon: Users, color: 'text-blue-600 bg-blue-50' },
-    { label: 'Leady w tygodniu', value: '47', icon: TrendingUp, color: 'text-green-600 bg-green-50' },
-    { label: 'Pobrane PDF', value: '31', icon: FileText, color: 'text-purple-600 bg-purple-50' },
-    { label: 'Umówione audyty', value: '8', icon: CalendarCheck, color: 'text-orange-600 bg-orange-50' },
+    { label: 'Leady dziś', value: '12', renderIcon: (cls: string) => <Users className={cls} />, color: 'text-blue-600 bg-blue-50' },
+    { label: 'Leady w tygodniu', value: '47', renderIcon: (cls: string) => <NexbeIcon name="roi" size={20} variant="inherit" className={cls} />, color: 'text-green-600 bg-green-50' },
+    { label: 'Pobrane PDF', value: '31', renderIcon: (cls: string) => <FileText className={cls} />, color: 'text-purple-600 bg-purple-50' },
+    { label: 'Umówione audyty', value: '8', renderIcon: (cls: string) => <CalendarCheck className={cls} />, color: 'text-orange-600 bg-orange-50' },
   ];
 
   const menuItems = [
-    { label: 'Dashboard', href: '/admin', icon: LayoutDashboard, active: true },
-    { label: 'Cennik produktów', href: '/admin/cennik', icon: Package },
-    { label: 'Lista leadów', href: '/admin/leady', icon: Users },
-    { label: 'Ustawienia', href: '/admin/ustawienia', icon: Settings },
+    { label: 'Dashboard', href: '/admin', renderIcon: (cls: string) => <LayoutDashboard className={cls} />, active: true },
+    { label: 'Cennik produktów', href: '/admin/cennik', renderIcon: (cls: string) => <NexbeIcon name="system-hybrydowy" size={16} variant="inherit" className={cls} /> },
+    { label: 'Lista leadów', href: '/admin/leady', renderIcon: (cls: string) => <Users className={cls} /> },
+    { label: 'Ustawienia', href: '/admin/ustawienia', renderIcon: (cls: string) => <Settings className={cls} /> },
   ];
 
   return (
@@ -79,7 +76,7 @@ export default function AdminPage() {
       <header className="bg-secondary text-secondary-foreground border-b">
         <div className="container mx-auto px-4 flex items-center justify-between h-14">
           <div className="flex items-center gap-2">
-            <Battery className="h-6 w-6 text-primary" />
+            <NexbeIcon name="magazyn-energii" size={24} variant="inherit" className="text-primary" />
             <span className="font-heading text-lg text-primary">NEXBE</span>
             <span className="text-xs text-gray-400 ml-2">Admin</span>
           </div>
@@ -104,7 +101,7 @@ export default function AdminPage() {
                 size="sm"
                 className="gap-2"
               >
-                <item.icon className="h-4 w-4" />
+                {item.renderIcon('h-4 w-4')}
                 {item.label}
               </Button>
             </Link>
@@ -117,7 +114,7 @@ export default function AdminPage() {
             <div key={stat.label} className="bg-card rounded-xl border p-5">
               <div className="flex items-center gap-3">
                 <div className={`p-2.5 rounded-lg ${stat.color}`}>
-                  <stat.icon className="h-5 w-5" />
+                  {stat.renderIcon('h-5 w-5')}
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">{stat.label}</p>
@@ -131,7 +128,7 @@ export default function AdminPage() {
         {/* Conversion funnel */}
         <div className="bg-card rounded-xl border p-6">
           <div className="flex items-center gap-2 mb-6">
-            <BarChart3 className="h-5 w-5 text-primary" />
+            <NexbeIcon name="monitoring-247" size={20} variant="inherit" className="text-primary" />
             <h2 className="font-heading text-lg">Lejek konwersji (ostatnie 30 dni)</h2>
           </div>
 

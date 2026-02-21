@@ -3,15 +3,16 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
-import { ArrowRight, Sun, Battery, RefreshCw, Zap, TrendingUp } from 'lucide-react';
+import { NexbeIcon } from '@nexbe/icons';
+import { ArrowRight, RefreshCw } from 'lucide-react';
 import { fadeUp, ease } from '@/lib/animations';
 
 type Situation = 'have-pv' | 'plan-pv' | 'upgrade' | null;
 
 const situations = [
-  { id: 'have-pv' as const, icon: Sun, label: 'Mam fotowoltaikę', desc: 'Chcę dodać magazyn do istniejącej instalacji' },
-  { id: 'plan-pv' as const, icon: Battery, label: 'Planuję fotowoltaikę', desc: 'Chcę system PV + magazyn od razu' },
-  { id: 'upgrade' as const, icon: RefreshCw, label: 'Wymiana falownika', desc: 'Chcę wymienić falownik na hybrydowy' },
+  { id: 'have-pv' as const, renderIcon: (cls: string) => <NexbeIcon name="fotowoltaika" size={20} variant="inherit" className={cls} />, label: 'Mam fotowoltaikę', desc: 'Chcę dodać magazyn do istniejącej instalacji' },
+  { id: 'plan-pv' as const, renderIcon: (cls: string) => <NexbeIcon name="magazyn-energii" size={20} variant="inherit" className={cls} />, label: 'Planuję fotowoltaikę', desc: 'Chcę system PV + magazyn od razu' },
+  { id: 'upgrade' as const, renderIcon: (cls: string) => <RefreshCw className={cls} />, label: 'Wymiana falownika', desc: 'Chcę wymienić falownik na hybrydowy' },
 ];
 
 const consumptionOptions = [
@@ -71,7 +72,7 @@ export default function MiniConfigurator() {
           viewport={{ once: true }}
         >
           <span className="section-label mb-6 inline-block">
-            <Zap className="w-3 h-3 text-nexbe-flame" />
+            <NexbeIcon name="smart-ems" size={12} variant="inherit" className="text-nexbe-flame" />
             SZYBKI KALKULATOR
           </span>
           <h2 className="font-display font-bold text-[clamp(1.8rem,3.5vw,2.5rem)] tracking-[-0.02em] mt-4">
@@ -122,7 +123,7 @@ export default function MiniConfigurator() {
                       className="w-full text-left p-4 rounded-xl border border-nexbe-border bg-nexbe-bg/50 hover:border-nexbe-raspberry/40 hover:bg-nexbe-surface/60 transition-all duration-300 group flex items-center gap-4"
                     >
                       <span className="flex-shrink-0 w-10 h-10 rounded-xl bg-nexbe-raspberry/10 flex items-center justify-center group-hover:bg-nexbe-raspberry/20 transition-colors">
-                        <s.icon className="w-5 h-5 text-nexbe-raspberry" />
+                        {s.renderIcon('w-5 h-5 text-nexbe-raspberry')}
                       </span>
                       <div>
                         <p className="font-semibold text-nexbe-text text-sm">{s.label}</p>
@@ -176,7 +177,7 @@ export default function MiniConfigurator() {
                 className="text-center"
               >
                 <div className="w-16 h-16 rounded-2xl bg-nexbe-raspberry/10 flex items-center justify-center mx-auto mb-6">
-                  <TrendingUp className="w-8 h-8 text-nexbe-flame" />
+                  <NexbeIcon name="roi" size={32} variant="inherit" className="text-nexbe-flame" />
                 </div>
 
                 <p className="text-nexbe-text-muted text-sm mb-2">Szacowane roczne oszczędności</p>

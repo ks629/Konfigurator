@@ -13,16 +13,17 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { inverterBrands } from '@/data/products';
-import { Info, Sun, ArrowLeftRight, Sunrise, Sunset } from 'lucide-react';
+import { NexbeIcon } from '@nexbe/icons';
+import { Info, ArrowLeftRight, Sunrise, Sunset } from 'lucide-react';
 import { PVOrientation } from '@/lib/types';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { cn } from '@/lib/utils';
 
-const pvOrientationOptions: { value: PVOrientation; label: string; icon: React.ElementType }[] = [
-  { value: 'south', label: 'Południe', icon: Sun },
-  { value: 'east_west', label: 'Wschód + Zachód', icon: ArrowLeftRight },
-  { value: 'east', label: 'Wschód', icon: Sunrise },
-  { value: 'west', label: 'Zachód', icon: Sunset },
+const pvOrientationOptions: { value: PVOrientation; label: string; renderIcon: (cls: string) => React.ReactNode }[] = [
+  { value: 'south', label: 'Południe', renderIcon: (cls) => <NexbeIcon name="fotowoltaika" size={16} variant="inherit" className={cls} /> },
+  { value: 'east_west', label: 'Wschód + Zachód', renderIcon: (cls) => <ArrowLeftRight className={cls} /> },
+  { value: 'east', label: 'Wschód', renderIcon: (cls) => <Sunrise className={cls} /> },
+  { value: 'west', label: 'Zachód', renderIcon: (cls) => <Sunset className={cls} /> },
 ];
 
 export function StepPVData() {
@@ -98,7 +99,7 @@ export function StepPVData() {
           onValueChange={(val) => setPvOrientation(val as PVOrientation)}
           className="grid grid-cols-2 gap-2"
         >
-          {pvOrientationOptions.map(({ value, label, icon: Icon }) => (
+          {pvOrientationOptions.map(({ value, label, renderIcon }) => (
             <label
               key={value}
               className={cn(
@@ -109,10 +110,10 @@ export function StepPVData() {
               )}
             >
               <RadioGroupItem value={value} />
-              <Icon className={cn(
+              {renderIcon(cn(
                 'h-4 w-4',
                 pvOrientation === value ? 'text-primary' : 'text-muted-foreground'
-              )} />
+              ))}
               <span className="text-sm font-medium">{label}</span>
             </label>
           ))}

@@ -4,7 +4,8 @@ import { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight, Sparkles } from 'lucide-react';
+import { NexbeIcon } from '@nexbe/icons';
+import { ArrowRight } from 'lucide-react';
 import { featuredProducts } from '@/lib/data';
 import { fadeUp, staggerContainer } from '@/lib/animations';
 
@@ -18,7 +19,7 @@ function ProductCard({ product, index }: { product: typeof featuredProducts[0]; 
       <div className="flex items-center justify-between mb-5">
         <span className="text-xs text-nexbe-text-muted font-medium">{product.brand}</span>
         <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-semibold uppercase tracking-[2px] bg-nexbe-raspberry/10 text-nexbe-flame border border-nexbe-raspberry/20">
-          <Sparkles className="w-3 h-3" />
+          <NexbeIcon name="smart-ems" size={12} variant="inherit" />
           {product.badge}
         </span>
       </div>

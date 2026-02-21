@@ -8,24 +8,20 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { BackupPreference, Priority, TaxBracket } from '@/lib/types';
 import { Slider } from '@/components/ui/slider';
 import { cn } from '@/lib/utils';
+import { NexbeIcon } from '@nexbe/icons';
 import {
-  Thermometer,
-  Car,
-  Shield,
   Wallet,
-  Zap,
-  ShieldCheck,
   Leaf,
   Gift,
   Info,
 } from 'lucide-react';
 
-const priorityOptions: { value: Priority; label: string; icon: React.ElementType }[] = [
-  { value: 'savings', label: 'Maksymalne oszczędności na rachunkach', icon: Wallet },
-  { value: 'independence', label: 'Niezależność energetyczna', icon: Zap },
-  { value: 'blackout', label: 'Ochrona przed blackoutem', icon: ShieldCheck },
-  { value: 'ecology', label: 'Ekologia i slad weglowy', icon: Leaf },
-  { value: 'subsidy', label: 'Wykorzystanie dotacji', icon: Gift },
+const priorityOptions: { value: Priority; label: string; renderIcon: (cls: string) => React.ReactNode }[] = [
+  { value: 'savings', label: 'Maksymalne oszczędności na rachunkach', renderIcon: (cls) => <Wallet className={cls} /> },
+  { value: 'independence', label: 'Niezależność energetyczna', renderIcon: (cls) => <NexbeIcon name="smart-ems" size={16} variant="inherit" className={cls} /> },
+  { value: 'blackout', label: 'Ochrona przed blackoutem', renderIcon: (cls) => <NexbeIcon name="blackout-ochrona" size={16} variant="inherit" className={cls} /> },
+  { value: 'ecology', label: 'Ekologia i slad weglowy', renderIcon: (cls) => <Leaf className={cls} /> },
+  { value: 'subsidy', label: 'Wykorzystanie dotacji', renderIcon: (cls) => <Gift className={cls} /> },
 ];
 
 export function StepAdditionalNeeds() {
@@ -77,7 +73,7 @@ export function StepAdditionalNeeds() {
             'p-3 rounded-lg shrink-0',
             hasHeatPump ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
           )}>
-            <Thermometer className="h-6 w-6" />
+            <NexbeIcon name="pompa-ciepla" size={24} variant="inherit" />
           </div>
           <div className="flex-1">
             <div className="flex items-center gap-3">
@@ -106,7 +102,7 @@ export function StepAdditionalNeeds() {
             'p-3 rounded-lg shrink-0',
             hasEV ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
           )}>
-            <Car className="h-6 w-6" />
+            <NexbeIcon name="auto-elektryczne" size={24} variant="inherit" />
           </div>
           <div className="flex-1">
             <div className="flex items-center gap-3">
@@ -125,7 +121,7 @@ export function StepAdditionalNeeds() {
       {/* Backup */}
       <div className="space-y-3">
         <div className="flex items-center gap-2 mb-2">
-          <Shield className="h-5 w-5 text-primary" />
+          <NexbeIcon name="blackout-ochrona" size={20} variant="inherit" className="text-primary" />
           <Label className="text-base font-medium">
             Czy potrzebujesz zasilania awaryjnego (backup)?
           </Label>
@@ -169,7 +165,7 @@ export function StepAdditionalNeeds() {
           <span className="text-muted-foreground font-normal">(opcjonalnie)</span>
         </Label>
         <div className="grid gap-2">
-          {priorityOptions.map(({ value, label, icon: Icon }) => (
+          {priorityOptions.map(({ value, label, renderIcon }) => (
             <div
               key={value}
               className={cn(
@@ -184,10 +180,10 @@ export function StepAdditionalNeeds() {
                 checked={priorities.includes(value)}
                 onCheckedChange={() => togglePriority(value)}
               />
-              <Icon className={cn(
+              {renderIcon(cn(
                 'h-4 w-4',
                 priorities.includes(value) ? 'text-primary' : 'text-muted-foreground'
-              )} />
+              ))}
               <span className="text-sm font-medium">{label}</span>
             </div>
           ))}

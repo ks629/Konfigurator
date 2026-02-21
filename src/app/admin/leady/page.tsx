@@ -5,10 +5,9 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
+import { NexbeIcon } from '@nexbe/icons';
 import {
-  Battery,
   LayoutDashboard,
-  Package,
   Users,
   Settings,
   Search,
@@ -79,10 +78,10 @@ export default function LeadyPage() {
   const [selectedLead, setSelectedLead] = useState<(typeof sampleLeads)[0] | null>(null);
 
   const menuItems = [
-    { label: 'Dashboard', href: '/admin', icon: LayoutDashboard },
-    { label: 'Cennik produktow', href: '/admin/cennik', icon: Package },
-    { label: 'Lista leadow', href: '/admin/leady', icon: Users, active: true },
-    { label: 'Ustawienia', href: '/admin/ustawienia', icon: Settings },
+    { label: 'Dashboard', href: '/admin', renderIcon: (cls: string) => <LayoutDashboard className={cls} /> },
+    { label: 'Cennik produktow', href: '/admin/cennik', renderIcon: (cls: string) => <NexbeIcon name="system-hybrydowy" size={16} variant="inherit" className={cls} /> },
+    { label: 'Lista leadow', href: '/admin/leady', renderIcon: (cls: string) => <Users className={cls} />, active: true },
+    { label: 'Ustawienia', href: '/admin/ustawienia', renderIcon: (cls: string) => <Settings className={cls} /> },
   ];
 
   const filtered = sampleLeads.filter(
@@ -97,7 +96,7 @@ export default function LeadyPage() {
       <header className="bg-secondary text-secondary-foreground border-b">
         <div className="container mx-auto px-4 flex items-center justify-between h-14">
           <div className="flex items-center gap-2">
-            <Battery className="h-6 w-6 text-primary" />
+            <NexbeIcon name="magazyn-energii" size={24} variant="inherit" className="text-primary" />
             <span className="font-heading text-lg text-primary">NEXBE</span>
             <span className="text-xs text-gray-400 ml-2">Admin</span>
           </div>
@@ -109,7 +108,7 @@ export default function LeadyPage() {
           {menuItems.map((item) => (
             <Link key={item.href} href={item.href}>
               <Button variant={item.active ? 'default' : 'outline'} size="sm" className="gap-2">
-                <item.icon className="h-4 w-4" />
+                {item.renderIcon('h-4 w-4')}
                 {item.label}
               </Button>
             </Link>
