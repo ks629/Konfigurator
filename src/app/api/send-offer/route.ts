@@ -10,6 +10,10 @@ const resend = process.env.RESEND_API_KEY
 const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'Nexbe <onboarding@resend.dev>';
 const NEXBE_LEAD_EMAIL = process.env.NEXBE_LEAD_EMAIL || 'kontakt@nexbe.pl';
 
+// CRM Webhook
+const CRM_WEBHOOK_URL = process.env.CRM_WEBHOOK_URL;
+const CRM_WEBHOOK_SECRET = process.env.CRM_WEBHOOK_SECRET;
+
 function formatPLN(amount: number): string {
   return new Intl.NumberFormat('pl-PL', {
     minimumFractionDigits: 0,
@@ -210,6 +214,77 @@ function buildLeadNotificationHtml(
 </html>`;
 }
 
+// =============================================================
+// WEBHOOK DO CRM NEXBE — fire-and-forget, 5s timeout
+// =============================================================
+async function sendToCrmWebhook(data: {
+  leadId: string;
+  name: string;
+  email: string;
+  phone: string;
+  postalCode: string;
+  product: { name: string; brand: string; capacity_kwh: number };
+  inverter?: { name: string; brand: string } | null;
+  calculation?: Record<string, unknown> | null;
+  config?: Record<string, unknown> | null;
+  source: string;
+}) {
+  if (!CRM_WEBHOOK_URL) {
+    console.warn('[CRM Webhook] CRM_WEBHOOK_URL not configured — skipping');
+    return;
+  }
+
+  try {
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+
+    if (CRM_WEBHOOK_SECRET) {
+      headers['x-webhook-secret'] = CRM_WEBHOOK_SECRET;
+    }
+
+    const payload = {
+      source: data.source,
+      leadId: data.leadId,
+      name: data.name,
+      email: data.email,
+      phone: data.phone || '',
+      postalCode: data.postalCode || '',
+      product: data.product,
+      inverter: data.inverter || null,
+      calculation: data.calculation || null,
+      config: data.config || null,
+      timestamp: new Date().toISOString(),
+    };
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000); // 5s timeout
+
+    const response = await fetch(CRM_WEBHOOK_URL, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(payload),
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeout);
+
+    if (response.ok) {
+      console.log(`[CRM Webhook] ✅ Lead sent to CRM: ${data.leadId} → ${response.status}`);
+    } else {
+      const text = await response.text().catch(() => '');
+      console.error(`[CRM Webhook] ❌ CRM returned ${response.status}: ${text}`);
+    }
+  } catch (error: unknown) {
+    if (error instanceof Error && error.name === 'AbortError') {
+      console.error(`[CRM Webhook] ⏱️ Timeout (5s) sending lead ${data.leadId}`);
+    } else {
+      console.error(`[CRM Webhook] ❌ Failed to send lead ${data.leadId}:`, error);
+    }
+    // Fire-and-forget — don't throw, don't block the response
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -297,6 +372,22 @@ export async function POST(req: NextRequest) {
     } else {
       console.warn('RESEND_API_KEY not configured — emails not sent. Set RESEND_API_KEY env variable.');
     }
+
+    // =====================================================
+    // 3. SEND TO CRM — fire-and-forget (nie blokuje response)
+    // =====================================================
+    sendToCrmWebhook({
+      leadId,
+      name: name || '',
+      email,
+      phone: phone || '',
+      postalCode: postalCode || '',
+      product,
+      inverter,
+      calculation,
+      config,
+      source: 'konfigurator',
+    }).catch(() => {}); // fire-and-forget — errors already logged inside
 
     console.log('Offer processed:', {
       leadId,
