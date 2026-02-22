@@ -1,8 +1,10 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { AnimatePresence } from 'framer-motion';
 import { useConfigurator } from '@/hooks/useConfigurator';
+import { useOrder } from '@/hooks/useOrder';
 import { Header } from '@/components/layout/Header';
 import { ProgressBar } from '@/components/configurator/ProgressBar';
 import { StepInstallationType } from '@/components/configurator/StepInstallationType';
@@ -18,8 +20,8 @@ import { ContactForm } from '@/components/forms/ContactForm';
 import { Button } from '@/components/ui/button';
 import { ResumeProgressBanner } from '@/components/ui/ResumeProgressBanner';
 import { NexbeIcon } from '@nexbe/icons';
-import { ArrowLeft, ArrowRight, FileText, CalendarCheck } from 'lucide-react';
-import { calculateROI, calculateMonthlyFromBill } from '@/lib/calculations';
+import { ArrowLeft, ArrowRight, FileText, CalendarCheck, Zap, ShoppingCart } from 'lucide-react';
+import { calculateROI, calculateMonthlyFromBill, formatCurrency } from '@/lib/calculations';
 import { allProducts } from '@/data/products';
 import { inverters } from '@/data/products';
 import { ContactFormData } from '@/lib/validations';
@@ -28,7 +30,9 @@ import { generateOfferPdfBlob, type PdfOfferData } from '@/lib/pdf-generator';
 const TOTAL_STEPS = 5;
 
 export default function KonfiguratorPage() {
+  const router = useRouter();
   const store = useConfigurator();
+  const { createFromConfigurator } = useOrder();
   const { currentStep, nextStep, prevStep, setStep, selectedProductId, selectedInverterId } = store;
   const [contactFormOpen, setContactFormOpen] = useState(false);
   const [contactData, setContactData] = useState<ContactFormData | null>(null);
@@ -352,24 +356,50 @@ export default function KonfiguratorPage() {
               <ProjectionTable projection={calculation.projection} horizonYears={calculation.horizon_years} />
 
               {/* CTA */}
-              <div className="flex flex-col sm:flex-row gap-4 items-center justify-center pt-8 pb-4 no-print">
+              <div className="flex flex-col items-center gap-4 pt-8 pb-4 no-print">
+                {/* Primary CTA — KUP ONLINE */}
                 <Button
                   size="lg"
-                  className="text-lg px-8 h-14 bg-gradient-to-r from-[#B5005D] to-[#8B0048] hover:from-[#D4006E] hover:to-[#9A0050] text-white shadow-lg shadow-[#B5005D]/20"
-                  onClick={() => setContactFormOpen(true)}
+                  className="text-lg px-10 h-16 bg-gradient-to-r from-[#350066] via-[#B5005D] to-[#FF004E] hover:from-[#4a0080] hover:via-[#D4006E] hover:to-[#FF1A5E] text-white shadow-xl shadow-[#B5005D]/30 rounded-2xl w-full sm:w-auto"
+                  onClick={() => {
+                    if (!selectedProduct || !calculation) return;
+                    createFromConfigurator({
+                      config: store,
+                      product: selectedProduct,
+                      inverter: selectedInverter,
+                      calculation,
+                    });
+                    router.push('/zamowienie');
+                  }}
                 >
-                  <FileText className="h-5 w-5 mr-2" />
-                  Pobierz szczegółową ofertę
+                  <ShoppingCart className="h-5 w-5 mr-2" />
+                  KUP ONLINE — od {formatCurrency(Math.round((calculation?.investment.net_cost ?? 0) * 0.3))}
                 </Button>
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="text-lg px-8 h-14 border-white/20 text-white hover:bg-white/5"
-                  onClick={() => setContactFormOpen(true)}
-                >
-                  <CalendarCheck className="h-5 w-5 mr-2" />
-                  Umów bezpłatny audyt
-                </Button>
+                <p className="text-xs text-muted-foreground -mt-1">
+                  Zaliczka 30% online. Resztę płacisz przy montażu.
+                </p>
+
+                {/* Secondary CTAs */}
+                <div className="flex flex-col sm:flex-row gap-3 items-center">
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="text-sm px-6 h-12 border-white/20 text-white hover:bg-white/5"
+                    onClick={() => setContactFormOpen(true)}
+                  >
+                    <FileText className="h-4 w-4 mr-2" />
+                    Pobierz ofertę PDF
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="text-sm px-6 h-12 border-white/20 text-white hover:bg-white/5"
+                    onClick={() => setContactFormOpen(true)}
+                  >
+                    <CalendarCheck className="h-4 w-4 mr-2" />
+                    Umów bezpłatny audyt
+                  </Button>
+                </div>
               </div>
             </div>
           )}

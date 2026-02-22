@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { Menu, X } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -11,13 +12,14 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-[#0f0520]/90 backdrop-blur-md supports-[backdrop-filter]:bg-[#0f0520]/70">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
-        <Link href="https://magazyny.nexbe.pl" className="flex items-center gap-2">
-          <span className="font-heading text-2xl tracking-tight">
-            <span className="text-[#B5005D]">Nexbe</span>
-          </span>
-          <span className="hidden sm:inline text-xs text-gray-400 border-l border-white/20 pl-2 ml-1">
-            energia na życie
-          </span>
+        <Link href="https://magazyny.nexbe.pl" className="flex items-center gap-3">
+          <Image
+            src="/logo-white.svg"
+            alt="Nexbe"
+            width={110}
+            height={32}
+            priority
+          />
         </Link>
 
         <nav className="hidden md:flex items-center gap-6">
