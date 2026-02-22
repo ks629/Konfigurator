@@ -135,15 +135,15 @@ export interface Order {
 // ───────────────────────── Zod Schemas ─────────────────────────
 
 export const customerSchema = z.object({
-  imie: z.string().min(2, 'Imie jest wymagane'),
+  imie: z.string().min(2, 'Imię jest wymagane'),
   nazwisko: z.string().min(2, 'Nazwisko jest wymagane'),
-  email: z.string().email('Podaj prawidlowy e-mail'),
+  email: z.string().email('Podaj prawidłowy adres e-mail'),
   telefon: z.string().transform((v) => v.replace(/\s/g, '')).pipe(z.string().regex(/^\+?(?:48)?\d{9}$/, 'Podaj prawidłowy numer telefonu (9 cyfr)')),
-  ulica: z.string().min(3, 'Ulica jest wymagana'),
+  ulica: z.string().min(3, 'Podaj ulicę i numer'),
   kod: z.string().regex(/^\d{2}-\d{3}$/, 'Format: XX-XXX'),
-  miasto: z.string().min(2, 'Miasto jest wymagane'),
-  wojewodztwo: z.string().min(1, 'Wybierz wojewodztwo'),
-  nip: z.string().optional(),
+  miasto: z.string().min(2, 'Podaj miasto'),
+  wojewodztwo: z.string().min(1, 'Wybierz województwo'),
+  nip: z.string().regex(/^\d{10}$/, 'NIP musi zawierać 10 cyfr').optional().or(z.literal('')),
   zgoda_rodo: z.literal(true, { errorMap: () => ({ message: 'Zgoda RODO jest wymagana' }) }),
   zgoda_regulamin: z.literal(true, { errorMap: () => ({ message: 'Akceptacja regulaminu jest wymagana' }) }),
   zgoda_marketing: z.boolean().optional(),

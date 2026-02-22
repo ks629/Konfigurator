@@ -53,26 +53,44 @@ function formatPostalCode(value: string): string {
 
 export default function DaneKlientaPage() {
   const router = useRouter();
-  const { order, updateCustomer } = useOrder();
+  const { order, updateCustomer, formDraft, updateFormDraft } = useOrder();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<CustomerFormData>({
     resolver: zodResolver(customerSchema),
     defaultValues: {
-      imie: order?.klient?.imie ?? '',
-      nazwisko: order?.klient?.nazwisko ?? '',
-      email: order?.klient?.email ?? '',
-      telefon: order?.klient?.telefon ?? '',
-      ulica: order?.klient?.adres?.ulica ?? '',
-      kod: order?.klient?.adres?.kod ?? '',
-      miasto: order?.klient?.adres?.miasto ?? '',
-      wojewodztwo: order?.klient?.adres?.wojewodztwo ?? '',
-      nip: '',
+      imie: order?.klient?.imie ?? formDraft?.imie ?? '',
+      nazwisko: order?.klient?.nazwisko ?? formDraft?.nazwisko ?? '',
+      email: order?.klient?.email ?? formDraft?.email ?? '',
+      telefon: order?.klient?.telefon ?? formDraft?.telefon ?? '',
+      ulica: order?.klient?.adres?.ulica ?? formDraft?.ulica ?? '',
+      kod: order?.klient?.adres?.kod ?? formDraft?.kod ?? '',
+      miasto: order?.klient?.adres?.miasto ?? formDraft?.miasto ?? '',
+      wojewodztwo: order?.klient?.adres?.wojewodztwo ?? formDraft?.wojewodztwo ?? '',
+      nip: formDraft?.nip ?? '',
       zgoda_rodo: false as unknown as true,
       zgoda_regulamin: false as unknown as true,
       zgoda_marketing: false,
     },
   });
+
+  // Auto-save form on blur (debounced via field change)
+  useEffect(() => {
+    const subscription = form.watch((values) => {
+      updateFormDraft({
+        imie: values.imie || '',
+        nazwisko: values.nazwisko || '',
+        email: values.email || '',
+        telefon: values.telefon || '',
+        ulica: values.ulica || '',
+        kod: values.kod || '',
+        miasto: values.miasto || '',
+        wojewodztwo: values.wojewodztwo || '',
+        nip: values.nip || '',
+      });
+    });
+    return () => subscription.unsubscribe();
+  }, [form, updateFormDraft]);
 
   useEffect(() => {
     if (!order) {
