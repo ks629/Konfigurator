@@ -4,10 +4,11 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Header } from '@/components/layout/Header';
+import { OrderProgressBar } from '@/components/configurator/OrderProgressBar';
 import { useOrder } from '@/hooks/useOrder';
 import { formatCurrency } from '@/lib/calculations';
-import { Badge } from '@/components/ui/badge';
-import { Banknote, ArrowLeft, Clock, Check } from 'lucide-react';
+import { staggerContainer, fadeUp } from '@/lib/animations';
+import { Banknote, ArrowLeft, CheckCircle2, Check, Shield, Lock, Mail, Phone } from 'lucide-react';
 import Link from 'next/link';
 
 export default function RatyPage() {
@@ -55,49 +56,66 @@ export default function RatyPage() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center space-y-3 mb-10"
+            className="text-center space-y-3 mb-6"
           >
-            <Badge className="bg-white/10 text-white/90 border-white/20 backdrop-blur-sm">
-              <Banknote className="h-3.5 w-3.5 mr-1.5" />
-              Krok 8 z 10
-            </Badge>
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-500/20 text-green-400 border border-green-500/30 backdrop-blur-sm text-xs font-medium">
+              <CheckCircle2 className="h-3.5 w-3.5" />
+              Zamówienie złożone
+            </div>
             <h1 className="font-heading text-3xl md:text-4xl text-white">
-              WNIOSEK O RATY
+              WNIOSEK O RATY PRZYJĘTY
             </h1>
             <p className="text-muted-foreground max-w-lg mx-auto">
-              Złóż wniosek o finansowanie ratalne — decyzja w 24h
+              Wysłaliśmy potwierdzenie na {order.klient?.email}
             </p>
           </motion.div>
 
+          {/* Order Progress Bar */}
+          <OrderProgressBar currentStep={3} paymentLabel="Potwierdzenie" />
+
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
+            variants={staggerContainer}
+            initial="hidden"
+            animate="visible"
             className="max-w-lg mx-auto"
           >
-            <div className="rounded-2xl border border-white/10 bg-[#1A0A2E]/80 backdrop-blur-sm p-8 space-y-6 text-center">
-              <div className="w-16 h-16 rounded-2xl bg-white/10 flex items-center justify-center mx-auto">
-                <Clock className="h-8 w-8 text-white" />
-              </div>
+            <motion.div variants={fadeUp} className="rounded-2xl border border-white/10 bg-[#1A0A2E]/80 backdrop-blur-sm p-8 space-y-6 text-center">
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ type: 'spring', stiffness: 200, delay: 0.3 }}
+                className="w-16 h-16 rounded-2xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center mx-auto"
+              >
+                <Check className="h-8 w-8 text-white" />
+              </motion.div>
 
               <div className="space-y-2">
-                <h2 className="font-heading text-xl text-white">Formularz ratalny</h2>
+                <h2 className="font-heading text-xl text-white">
+                  Dziękujemy, {order.klient?.imie || 'Kliencie'}!
+                </h2>
                 <p className="text-sm text-muted-foreground">
-                  Integracja z partnerem finansowym zostanie uruchomiona w Fazie 4.
+                  Zamówienie nr <strong className="text-white font-mono">{order.numer}</strong> zostało zarejestrowane.
+                  Nasz doradca skontaktuje się z Tobą w ciągu 24h.
                 </p>
               </div>
 
+              {/* Installment breakdown */}
               <div className="bg-white/5 rounded-xl p-4 space-y-3">
+                <div className="flex items-center gap-2 mb-2">
+                  <Banknote className="h-4 w-4 text-[#B5005D]" />
+                  <span className="text-sm font-medium text-white">Finansowanie ratalne</span>
+                </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Kwota do sfinansowania</span>
                   <span className="text-white font-bold">{formatCurrency(order.finanse.po_dotacjach)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Kwota brutto</span>
-                  <span className="text-white">{formatCurrency(order.finanse.razem_brutto)}</span>
+                  <span className="text-muted-foreground">Szacunkowa rata (120 mies.)</span>
+                  <span className="text-white">od {formatCurrency(Math.round(order.finanse.po_dotacjach / 120))}/mies.</span>
                 </div>
               </div>
 
+              {/* Status checks */}
               <div className="space-y-2">
                 <div className="flex items-center gap-2 justify-center text-xs text-green-400">
                   <Check className="h-3.5 w-3.5" />
@@ -105,14 +123,45 @@ export default function RatyPage() {
                 </div>
                 <div className="flex items-center gap-2 justify-center text-xs text-green-400">
                   <Check className="h-3.5 w-3.5" />
+                  Potwierdzenie wysłane na email
+                </div>
+                <div className="flex items-center gap-2 justify-center text-xs text-green-400">
+                  <Check className="h-3.5 w-3.5" />
                   Zamówienie {order.numer} zarejestrowane
                 </div>
               </div>
 
-              <p className="text-xs text-muted-foreground">
-                Skontaktujemy się z Tobą na <strong className="text-white">{order.klient?.email}</strong> z wnioskiem ratalnym.
-              </p>
-            </div>
+              {/* Next steps */}
+              <div className="text-left bg-white/5 rounded-xl p-4 space-y-3">
+                <p className="text-xs font-medium text-white/60 uppercase tracking-wider">Co dalej?</p>
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-start gap-2">
+                    <Phone className="h-4 w-4 text-[#B5005D] mt-0.5 shrink-0" />
+                    <span className="text-muted-foreground">Doradca zadzwoni w ciągu <strong className="text-white">24h</strong></span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Mail className="h-4 w-4 text-[#B5005D] mt-0.5 shrink-0" />
+                    <span className="text-muted-foreground">Wniosek ratalny wyślemy na <strong className="text-white">{order.klient?.email}</strong></span>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Trust signals */}
+            <motion.div variants={fadeUp} className="flex flex-wrap items-center justify-center gap-4 text-xs text-muted-foreground mt-6">
+              <span className="flex items-center gap-1.5">
+                <Lock className="h-3.5 w-3.5" />
+                Szyfrowanie SSL
+              </span>
+              <span className="flex items-center gap-1.5">
+                <Shield className="h-3.5 w-3.5" />
+                Zgodne z RODO
+              </span>
+              <span className="flex items-center gap-1.5">
+                <Check className="h-3.5 w-3.5" />
+                38 000+ projektów
+              </span>
+            </motion.div>
           </motion.div>
         </div>
       </main>

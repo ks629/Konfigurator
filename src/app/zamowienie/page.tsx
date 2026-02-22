@@ -4,8 +4,10 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Header } from '@/components/layout/Header';
+import { OrderProgressBar } from '@/components/configurator/OrderProgressBar';
 import { useOrder } from '@/hooks/useOrder';
 import { formatCurrency } from '@/lib/calculations';
+import { staggerContainer, fadeUp } from '@/lib/animations';
 import {
   Battery,
   Zap,
@@ -16,8 +18,8 @@ import {
   CreditCard,
   Banknote,
   ArrowRight,
+  ArrowDown,
 } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -64,7 +66,7 @@ export default function ZamowieniePage() {
         <div className="energy-orb energy-orb-1" />
         <div className="energy-orb energy-orb-2" />
 
-        <div className="container mx-auto px-4 py-8 md:py-12 relative z-10">
+        <div className="container mx-auto px-4 py-8 md:py-12 pb-24 lg:pb-12 relative z-10">
           {/* Back link */}
           <Link
             href="/konfigurator"
@@ -78,12 +80,12 @@ export default function ZamowieniePage() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center space-y-3 mb-10"
+            className="text-center space-y-3 mb-6"
           >
-            <Badge className="bg-white/10 text-white/90 border-white/20 backdrop-blur-sm">
-              <ShoppingCart className="h-3.5 w-3.5 mr-1.5" />
-              Krok 6 z 10
-            </Badge>
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-white/90 border border-white/20 backdrop-blur-sm text-xs font-medium">
+              <ShoppingCart className="h-3.5 w-3.5" />
+              Zamówienie online
+            </div>
             <h1 className="font-heading text-3xl md:text-4xl text-white">
               PODSUMOWANIE ZAMÓWIENIA
             </h1>
@@ -92,12 +94,18 @@ export default function ZamowieniePage() {
             </p>
           </motion.div>
 
-          <div className="max-w-4xl mx-auto grid gap-8 lg:grid-cols-5">
+          {/* Order Progress Bar */}
+          <OrderProgressBar currentStep={1} />
+
+          <motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            animate="visible"
+            className="max-w-4xl mx-auto grid gap-8 lg:grid-cols-5"
+          >
             {/* Product card — 3 cols */}
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
+              variants={fadeUp}
               className="lg:col-span-3 rounded-2xl border border-white/10 bg-[#1A0A2E]/80 backdrop-blur-sm p-6 space-y-6"
             >
               <div className="flex items-start gap-4">
@@ -133,6 +141,29 @@ export default function ZamowieniePage() {
                       {produkt.gwarancja_lat} lat gwarancji
                     </span>
                   </div>
+                  {produkt.falownik_nazwa && (
+                    <p className="text-xs text-muted-foreground/70 mt-1.5">
+                      Falownik: {produkt.falownik_nazwa}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              {/* What's included */}
+              <div className="space-y-2 border-t border-white/10 pt-4">
+                <p className="text-xs font-medium text-white/60 uppercase tracking-wider">W cenie</p>
+                <div className="grid grid-cols-2 gap-2">
+                  {[
+                    { icon: Battery, label: 'Magazyn energii' },
+                    { icon: Zap, label: 'Montaż i uruchomienie' },
+                    { icon: Shield, label: 'Konfiguracja systemu' },
+                    { icon: Check, label: 'Obsługa dotacji gratis' },
+                  ].map(({ icon: Icon, label }) => (
+                    <div key={label} className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <Icon className="h-3.5 w-3.5 text-green-400 shrink-0" />
+                      <span>{label}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
 
@@ -142,14 +173,18 @@ export default function ZamowieniePage() {
                   <span className="text-muted-foreground">Zestaw z montażem (brutto)</span>
                   <span className="text-white">{formatCurrency(finanse.razem_brutto)}</span>
                 </div>
-                <div className="flex justify-between text-sm text-green-400">
-                  <span>Dotacja Mój Prąd 7.0</span>
-                  <span>-{formatCurrency(finanse.dotacja_moj_prad)}</span>
-                </div>
-                <div className="flex justify-between text-sm text-green-400">
-                  <span>Ulga termomodernizacyjna</span>
-                  <span>-{formatCurrency(finanse.ulga_termo)}</span>
-                </div>
+                {finanse.dotacja_moj_prad > 0 && (
+                  <div className="flex justify-between text-sm text-green-400">
+                    <span>Dotacja Mój Prąd 7.0</span>
+                    <span>-{formatCurrency(finanse.dotacja_moj_prad)}</span>
+                  </div>
+                )}
+                {finanse.ulga_termo > 0 && (
+                  <div className="flex justify-between text-sm text-green-400">
+                    <span>Ulga termomodernizacyjna</span>
+                    <span>-{formatCurrency(finanse.ulga_termo)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between text-lg font-bold border-t border-white/10 pt-3">
                   <span className="text-white">TWÓJ KOSZT</span>
                   <span className="text-white">{formatCurrency(finanse.po_dotacjach)}</span>
@@ -157,7 +192,7 @@ export default function ZamowieniePage() {
               </div>
 
               {/* ROI info */}
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div className="bg-white/5 rounded-xl p-3 text-center">
                   <p className="text-xs text-muted-foreground">Oszczędność roczna</p>
                   <p className="font-heading text-lg text-white">
@@ -181,16 +216,17 @@ export default function ZamowieniePage() {
 
             {/* Payment selection — 2 cols */}
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
+              variants={fadeUp}
               className="lg:col-span-2 space-y-4"
+              id="payment-section"
             >
               <h3 className="font-heading text-lg text-white">Wybierz sposób płatności</h3>
 
               {/* Deposit option */}
-              <button
+              <motion.button
                 onClick={() => handleSelectPayment('zaliczka_p24')}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
                 className="w-full text-left rounded-2xl border-2 border-white/10 hover:border-[#B5005D]/50 bg-[#1A0A2E]/80 hover:bg-[#1A0A2E] backdrop-blur-sm p-5 space-y-3 transition-all group"
               >
                 <div className="flex items-center justify-between">
@@ -213,11 +249,13 @@ export default function ZamowieniePage() {
                     Resztę ({formatCurrency(finanse.reszta_przy_montazu)}) płacisz przy montażu
                   </p>
                 </div>
-              </button>
+              </motion.button>
 
               {/* Installment option */}
-              <button
+              <motion.button
                 onClick={() => handleSelectPayment('raty')}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
                 className="w-full text-left rounded-2xl border-2 border-white/10 hover:border-[#B5005D]/50 bg-[#1A0A2E]/80 hover:bg-[#1A0A2E] backdrop-blur-sm p-5 space-y-3 transition-all group"
               >
                 <div className="flex items-center justify-between">
@@ -232,7 +270,15 @@ export default function ZamowieniePage() {
                   </div>
                   <ArrowRight className="h-5 w-5 text-muted-foreground group-hover:text-white transition-colors" />
                 </div>
-              </button>
+                <div className="bg-white/5 rounded-xl p-3">
+                  <p className="text-2xl font-bold text-white">
+                    od {formatCurrency(Math.round(finanse.po_dotacjach / 120))}/mies.
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    120 rat — kwota {formatCurrency(finanse.po_dotacjach)}
+                  </p>
+                </div>
+              </motion.button>
 
               {/* Subsidy note */}
               <div className="flex items-start gap-2 p-3 rounded-xl bg-green-500/10 border border-green-500/20 text-sm">
@@ -242,13 +288,30 @@ export default function ZamowieniePage() {
                 </span>
               </div>
             </motion.div>
-          </div>
+          </motion.div>
 
           {/* Order number */}
           <div className="max-w-4xl mx-auto mt-6 text-center">
             <p className="text-xs text-muted-foreground">
               Nr zamówienia: {order.numer}
             </p>
+          </div>
+        </div>
+
+        {/* Mobile sticky CTA */}
+        <div className="fixed bottom-0 left-0 right-0 z-50 lg:hidden bg-[#0f0520]/95 backdrop-blur-md border-t border-white/10 px-4 py-3">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <p className="text-xs text-muted-foreground">Twój koszt</p>
+              <p className="text-lg font-bold text-white">{formatCurrency(finanse.po_dotacjach)}</p>
+            </div>
+            <button
+              onClick={() => document.getElementById('payment-section')?.scrollIntoView({ behavior: 'smooth' })}
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#350066] via-[#B5005D] to-[#FF004E] text-white text-sm font-medium shadow-lg shadow-[#B5005D]/30"
+            >
+              Wybierz płatność
+              <ArrowDown className="h-4 w-4" />
+            </button>
           </div>
         </div>
       </main>

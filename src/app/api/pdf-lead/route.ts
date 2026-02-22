@@ -6,7 +6,7 @@ const resend = process.env.RESEND_API_KEY
   : null;
 
 const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'Nexbe <onboarding@resend.dev>';
-const NEXBE_LEAD_EMAIL = process.env.NEXBE_LEAD_EMAIL || 'ks@nexbe.pl';
+const NEXBE_LEAD_EMAIL = process.env.NEXBE_LEAD_EMAIL || 'kontakt@nexbe.pl';
 
 export async function POST(req: NextRequest) {
   try {

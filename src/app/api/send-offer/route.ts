@@ -33,6 +33,7 @@ interface ClientEmailData {
   roiYears: number | null;
   lowestInstallment: number;
   installmentPeriod: number;
+  hasPdf: boolean;
 }
 
 function buildClientEmailHtml(d: ClientEmailData): string {
@@ -59,7 +60,7 @@ function buildClientEmailHtml(d: ClientEmailData): string {
     <div style="padding:32px 24px;">
       <h2 style="color:#230045;font-size:22px;margin:0 0 16px;">Cześć${d.name ? ', ' + d.name : ''}!</h2>
       <p style="color:#555;font-size:15px;line-height:1.6;margin:0 0 20px;">
-        Dziękujemy za zainteresowanie magazynem energii. W załączniku znajdziesz szczegółową ofertę z kalkulacją oszczędności, dofinansowaniem i analizą zwrotu inwestycji.
+        Dziękujemy za zainteresowanie magazynem energii. ${d.hasPdf ? 'W załączniku znajdziesz szczegółową ofertę z kalkulacją oszczędności, dofinansowaniem i analizą zwrotu inwestycji.' : 'Poniżej znajdziesz podsumowanie oferty z kalkulacją oszczędności, dofinansowaniem i analizą zwrotu inwestycji.'}
       </p>
 
       <!-- Product highlight -->
@@ -351,6 +352,7 @@ export async function POST(req: NextRequest) {
             roiYears: calculation?.roi_years ?? null,
             lowestInstallment: calculation?.monthly_installment?.[120] || calculation?.monthly_installment?.[84] || 0,
             installmentPeriod: calculation?.monthly_installment?.[120] ? 120 : 84,
+            hasPdf: !!pdfBuffer,
           }),
           attachments,
         });

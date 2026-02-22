@@ -254,7 +254,7 @@ export default function KonfiguratorPage() {
           </AnimatePresence>
 
           {/* Navigation */}
-          <div className="max-w-4xl mx-auto mt-8 flex items-center justify-between no-print">
+          <div className="max-w-4xl mx-auto mt-8 flex items-center justify-between pr-28 sm:pr-0 no-print">
             {currentStep > 1 ? (
               <Button variant="outline" onClick={prevStep} size="lg" className="border-white/20 text-white hover:bg-white/5">
                 <ArrowLeft className="h-4 w-4 mr-2" />
