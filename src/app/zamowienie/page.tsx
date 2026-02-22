@@ -149,6 +149,24 @@ export default function ZamowieniePage() {
                 </div>
               </div>
 
+              {/* What's included */}
+              <div className="space-y-2 border-t border-white/10 pt-4">
+                <p className="text-xs font-medium text-white/60 uppercase tracking-wider">W cenie</p>
+                <div className="grid grid-cols-2 gap-2">
+                  {[
+                    { icon: Battery, label: 'Magazyn energii' },
+                    { icon: Zap, label: 'Montaż i uruchomienie' },
+                    { icon: Shield, label: 'Konfiguracja systemu' },
+                    { icon: Check, label: 'Obsługa dotacji gratis' },
+                  ].map(({ icon: Icon, label }) => (
+                    <div key={label} className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <Icon className="h-3.5 w-3.5 text-green-400 shrink-0" />
+                      <span>{label}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
               {/* Price breakdown */}
               <div className="space-y-3 border-t border-white/10 pt-4">
                 <div className="flex justify-between text-sm">
@@ -251,6 +269,14 @@ export default function ZamowieniePage() {
                     </div>
                   </div>
                   <ArrowRight className="h-5 w-5 text-muted-foreground group-hover:text-white transition-colors" />
+                </div>
+                <div className="bg-white/5 rounded-xl p-3">
+                  <p className="text-2xl font-bold text-white">
+                    od {formatCurrency(Math.round(finanse.po_dotacjach / 120))}/mies.
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    120 rat — kwota {formatCurrency(finanse.po_dotacjach)}
+                  </p>
                 </div>
               </motion.button>
 

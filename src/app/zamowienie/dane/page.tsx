@@ -307,15 +307,20 @@ export default function DaneKlientaPage() {
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="telefon" className="text-sm text-muted-foreground">Telefon *</Label>
-                      <Input
-                        id="telefon"
-                        type="tel"
-                        inputMode="tel"
-                        autoComplete="tel"
-                        {...form.register('telefon')}
-                        placeholder="123 456 789"
-                        className="bg-white/5 border-white/10 text-white placeholder:text-white/30 focus:border-[#B5005D]"
-                      />
+                      <div className="flex">
+                        <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-white/10 bg-white/10 text-sm text-white/70">
+                          +48
+                        </span>
+                        <Input
+                          id="telefon"
+                          type="tel"
+                          inputMode="tel"
+                          autoComplete="tel"
+                          {...form.register('telefon')}
+                          placeholder="123 456 789"
+                          className="rounded-l-none bg-white/5 border-white/10 text-white placeholder:text-white/30 focus:border-[#B5005D]"
+                        />
+                      </div>
                       {form.formState.errors.telefon && (
                         <p className="text-xs text-red-400">{form.formState.errors.telefon.message}</p>
                       )}

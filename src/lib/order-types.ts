@@ -138,7 +138,7 @@ export const customerSchema = z.object({
   imie: z.string().min(2, 'Imie jest wymagane'),
   nazwisko: z.string().min(2, 'Nazwisko jest wymagane'),
   email: z.string().email('Podaj prawidlowy e-mail'),
-  telefon: z.string().transform((v) => v.replace(/\s/g, '')).pipe(z.string().regex(/^\+?48?\d{9}$/, 'Podaj prawidlowy numer telefonu')),
+  telefon: z.string().transform((v) => v.replace(/\s/g, '')).pipe(z.string().regex(/^\+?(?:48)?\d{9}$/, 'Podaj prawidłowy numer telefonu (9 cyfr)')),
   ulica: z.string().min(3, 'Ulica jest wymagana'),
   kod: z.string().regex(/^\d{2}-\d{3}$/, 'Format: XX-XXX'),
   miasto: z.string().min(2, 'Miasto jest wymagane'),
