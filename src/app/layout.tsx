@@ -11,7 +11,7 @@ const geist = Geist({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://dotacjenamagazyny.nexbe.pl'),
+  metadataBase: new URL('https://konfigurator.nexbe.pl'),
   title: 'Konfigurator Magazynu Energii | Nexbe',
   description:
     'Dobierz magazyn energii do swojej instalacji PV. Kalkulator oszczędności, dotacje Mój Prąd do 16 000 zł, raty. Bezpłatny audyt.',
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     type: 'website',
   },
   alternates: {
-    canonical: 'https://dotacjenamagazyny.nexbe.pl',
+    canonical: 'https://konfigurator.nexbe.pl',
   },
 };
 

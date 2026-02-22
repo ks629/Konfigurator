@@ -30,7 +30,7 @@ export default function RegulaminPage() {
           <div>
             <h2 className="text-lg font-semibold text-white mb-3">1. Postanowienia ogólne</h2>
             <p>
-              Regulamin określa zasady korzystania z serwisu dotacjenamagazyny.nexbe.pl,
+              Regulamin określa zasady korzystania z serwisu konfigurator.nexbe.pl,
               prowadzonego przez NEXBE Sp. z o.o., ul. Sadowa 19D, 05-850 Jawczyce,
               NIP: 1182267842, KRS: 0001082041.
             </p>

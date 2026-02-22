@@ -34,7 +34,7 @@ export const konfiguratorPersona: PersonaConfig = {
   enableScrollTo: true,
   enableSuggestConfigurator: true,
   phoneNumber: '732 080 101',
-  configuratorUrl: 'https://dotacjenamagazyny.nexbe.pl',
+  configuratorUrl: 'https://konfigurator.nexbe.pl',
   enableAiFallback: true,
   apiEndpoint: '/api/nexbi/chat',
   confidenceThreshold: 4,

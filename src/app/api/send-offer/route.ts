@@ -159,7 +159,7 @@ function buildClientEmailHtml(d: ClientEmailData): string {
 
       <!-- CTA -->
       <div style="text-align:center;margin:24px 0;">
-        <a href="https://dotacjenamagazyny.nexbe.pl" style="background:#B5005D;color:#ffffff;text-decoration:none;padding:14px 32px;border-radius:10px;font-weight:600;font-size:15px;display:inline-block;">
+        <a href="https://konfigurator.nexbe.pl" style="background:#B5005D;color:#ffffff;text-decoration:none;padding:14px 32px;border-radius:10px;font-weight:600;font-size:15px;display:inline-block;">
           Umów bezpłatny audyt
         </a>
       </div>

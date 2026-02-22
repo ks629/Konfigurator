@@ -60,7 +60,7 @@ function buildLeadNotificationEmail(lead: {
       <a href="tel:${lead.phone}" style="display:inline-block;background:#B5005D;color:#fff;text-decoration:none;padding:10px 24px;border-radius:8px;font-weight:600;font-size:15px;">${lead.phone || 'Brak numeru'}</a>
     </div>
 
-    <p style="color:#aaa;font-size:11px;margin:20px 0 0;text-align:center;">Wygenerowano automatycznie — dotacjenamagazyny.nexbe.pl</p>
+    <p style="color:#aaa;font-size:11px;margin:20px 0 0;text-align:center;">Wygenerowano automatycznie — konfigurator.nexbe.pl</p>
   </div>
 </body>
 </html>`;

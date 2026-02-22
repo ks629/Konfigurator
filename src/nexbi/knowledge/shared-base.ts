@@ -57,7 +57,7 @@ export const SHARED_KNOWLEDGE: KnowledgeEntry[] = [
   {
     keywords: ['kontakt', 'telefon', 'zadzwon', 'numer', 'mail', 'email', 'napisz', 'połącz'],
     question: 'Kontakt',
-    answer: 'Zadzwoń: 732 080 101 (pon-pt, 8:00-16:00)\nNapisz: magazyny@nexbe.pl\nKonfigurator: dotacjenamagazyny.nexbe.pl',
+    answer: 'Zadzwoń: 732 080 101 (pon-pt, 8:00-16:00)\nNapisz: magazyny@nexbe.pl\nKonfigurator: konfigurator.nexbe.pl',
     emotion: 'waving',
     followUp: 'Albo zostaw numer — oddzwonimy w ciągu 24h.',
     scrollTarget: '#kontakt',

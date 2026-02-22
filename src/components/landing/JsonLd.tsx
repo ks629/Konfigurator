@@ -3,8 +3,8 @@ export default function JsonLd() {
     '@context': 'https://schema.org',
     '@type': 'Organization',
     name: 'NEXBE Sp. z o.o.',
-    url: 'https://dotacjenamagazyny.nexbe.pl',
-    logo: 'https://dotacjenamagazyny.nexbe.pl/logo-white.svg',
+    url: 'https://konfigurator.nexbe.pl',
+    logo: 'https://konfigurator.nexbe.pl/logo-white.svg',
     description: 'Integrator 360 magazynów energii — sprzedaż bezpośrednia, ceny dystrybucyjne, montaż w 14 dni.',
     address: {
       '@type': 'PostalAddress',
@@ -26,9 +26,9 @@ export default function JsonLd() {
     '@context': 'https://schema.org',
     '@type': 'LocalBusiness',
     name: 'NEXBE',
-    image: 'https://dotacjenamagazyny.nexbe.pl/logo-white.svg',
-    '@id': 'https://dotacjenamagazyny.nexbe.pl',
-    url: 'https://dotacjenamagazyny.nexbe.pl',
+    image: 'https://konfigurator.nexbe.pl/logo-white.svg',
+    '@id': 'https://konfigurator.nexbe.pl',
+    url: 'https://konfigurator.nexbe.pl',
     telephone: '+48732080101',
     email: 'kontakt@nexbe.pl',
     address: {

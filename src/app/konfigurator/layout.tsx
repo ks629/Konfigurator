@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   alternates: {
-    canonical: 'https://dotacjenamagazyny.nexbe.pl/konfigurator',
+    canonical: 'https://konfigurator.nexbe.pl/konfigurator',
   },
 };
 
