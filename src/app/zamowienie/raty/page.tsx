@@ -4,10 +4,11 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Header } from '@/components/layout/Header';
+import { OrderProgressBar } from '@/components/configurator/OrderProgressBar';
 import { useOrder } from '@/hooks/useOrder';
 import { formatCurrency } from '@/lib/calculations';
-import { Badge } from '@/components/ui/badge';
-import { Banknote, ArrowLeft, Clock, Check } from 'lucide-react';
+import { staggerContainer, fadeUp } from '@/lib/animations';
+import { Banknote, ArrowLeft, Clock, Check, Shield, Lock } from 'lucide-react';
 import Link from 'next/link';
 
 export default function RatyPage() {
@@ -55,12 +56,12 @@ export default function RatyPage() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center space-y-3 mb-10"
+            className="text-center space-y-3 mb-6"
           >
-            <Badge className="bg-white/10 text-white/90 border-white/20 backdrop-blur-sm">
-              <Banknote className="h-3.5 w-3.5 mr-1.5" />
-              Krok 8 z 10
-            </Badge>
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-white/90 border border-white/20 backdrop-blur-sm text-xs font-medium">
+              <Banknote className="h-3.5 w-3.5" />
+              Raty
+            </div>
             <h1 className="font-heading text-3xl md:text-4xl text-white">
               WNIOSEK O RATY
             </h1>
@@ -69,16 +70,23 @@ export default function RatyPage() {
             </p>
           </motion.div>
 
+          {/* Order Progress Bar */}
+          <OrderProgressBar currentStep={3} paymentLabel="Wniosek o raty" />
+
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
+            variants={staggerContainer}
+            initial="hidden"
+            animate="visible"
             className="max-w-lg mx-auto"
           >
-            <div className="rounded-2xl border border-white/10 bg-[#1A0A2E]/80 backdrop-blur-sm p-8 space-y-6 text-center">
-              <div className="w-16 h-16 rounded-2xl bg-white/10 flex items-center justify-center mx-auto">
+            <motion.div variants={fadeUp} className="rounded-2xl border border-white/10 bg-[#1A0A2E]/80 backdrop-blur-sm p-8 space-y-6 text-center">
+              <motion.div
+                animate={{ scale: [1, 1.05, 1] }}
+                transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                className="w-16 h-16 rounded-2xl bg-white/10 flex items-center justify-center mx-auto"
+              >
                 <Clock className="h-8 w-8 text-white" />
-              </div>
+              </motion.div>
 
               <div className="space-y-2">
                 <h2 className="font-heading text-xl text-white">Formularz ratalny</h2>
@@ -112,7 +120,23 @@ export default function RatyPage() {
               <p className="text-xs text-muted-foreground">
                 Skontaktujemy się z Tobą na <strong className="text-white">{order.klient?.email}</strong> z wnioskiem ratalnym.
               </p>
-            </div>
+            </motion.div>
+
+            {/* Trust signals */}
+            <motion.div variants={fadeUp} className="flex flex-wrap items-center justify-center gap-4 text-xs text-muted-foreground mt-6">
+              <span className="flex items-center gap-1.5">
+                <Lock className="h-3.5 w-3.5" />
+                Szyfrowanie SSL
+              </span>
+              <span className="flex items-center gap-1.5">
+                <Shield className="h-3.5 w-3.5" />
+                Zgodne z RODO
+              </span>
+              <span className="flex items-center gap-1.5">
+                <Check className="h-3.5 w-3.5" />
+                38 000+ projektów
+              </span>
+            </motion.div>
           </motion.div>
         </div>
       </main>
