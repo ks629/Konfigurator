@@ -2,11 +2,12 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import type { NexbiEmotion } from '../engine/types';
+import type { NexbiEmotion, NexbiCostume } from '../engine/types';
 
 interface Props {
   size?: number;
   emotion?: NexbiEmotion;
+  costume?: NexbiCostume;
   className?: string;
   enableEyeTracking?: boolean;
 }
@@ -22,6 +23,7 @@ const EMOTIONS: Record<NexbiEmotion, {
   excited: { mouth: 'M115,188 Q130,208 145,188', eyeScale: 1.2, blush: 0.25 },
   sleeping: { mouth: 'M122,196 Q130,194 138,196', eyeScale: 0.08, blush: 0.15 },
   waving: { mouth: 'M116,189 Q130,205 144,189', eyeScale: 1.1, blush: 0.2 },
+  thinking: { mouth: 'M122,194 Q130,192 138,196', eyeScale: 1.05, blush: 0.05 },
 };
 
 let globalCounter = 0;
@@ -34,6 +36,7 @@ function useStableId() {
 export default function NexbiCharacter({
   size = 80,
   emotion = 'happy',
+  costume,
   className = '',
   enableEyeTracking = false,
 }: Props) {

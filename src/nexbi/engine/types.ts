@@ -1,4 +1,6 @@
-export type NexbiEmotion = 'happy' | 'curious' | 'teaching' | 'excited' | 'sleeping' | 'waving';
+export type NexbiEmotion = 'happy' | 'curious' | 'teaching' | 'excited' | 'sleeping' | 'waving' | 'thinking';
+
+export type NexbiCostume = 'none' | 'doradca' | 'naukowiec' | 'inzynier' | 'superhero' | 'ekolog' | 'nauczyciel';
 
 export type PersonaId = 'konfigurator' | 'handlowiec' | 'contract' | 'arkusz' | 'landing' | 'mojprad';
 
@@ -18,6 +20,7 @@ export interface ChatMessage {
   text: string;
   sender: 'nexbi' | 'user';
   emotion?: NexbiEmotion;
+  costume?: NexbiCostume;
   followUp?: string;
   scrollTarget?: string;
   suggestions?: QuickSuggestion[];
@@ -66,6 +69,8 @@ export interface NexbiConfig {
   confidenceThreshold?: number;
   maxAiCallsPerSession?: number;
   systemPrompt?: string;
+  dynamicCostumes?: boolean;
+  defaultCostume?: NexbiCostume;
   onLeadSubmit?: (lead: LeadData) => Promise<void>;
   onMessage?: (message: ChatMessage) => void;
   onOpen?: () => void;

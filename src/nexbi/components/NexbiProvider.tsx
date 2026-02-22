@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
-import type { NexbiConfig, ChatMessage, NexbiEmotion, PersonaId } from '../engine/types';
+import type { NexbiConfig, ChatMessage, NexbiEmotion, NexbiCostume } from '../engine/types';
 
 interface NexbiContextValue {
   config: NexbiConfig;
@@ -13,6 +13,8 @@ interface NexbiContextValue {
   addMessage: (msg: ChatMessage) => void;
   currentEmotion: NexbiEmotion;
   setEmotion: (emotion: NexbiEmotion) => void;
+  currentCostume: NexbiCostume;
+  setCostume: (costume: NexbiCostume) => void;
   isTyping: boolean;
   setIsTyping: (v: boolean) => void;
   hasInteracted: boolean;
@@ -42,6 +44,7 @@ export default function NexbiProvider({ config, children }: Props) {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [currentEmotion, setCurrentEmotion] = useState<NexbiEmotion>('happy');
+  const [currentCostume, setCurrentCostume] = useState<NexbiCostume>(config.defaultCostume ?? 'none');
   const [isTyping, setIsTyping] = useState(false);
   const [hasInteracted, setHasInteracted] = useState(false);
   const [showLeadForm, setShowLeadForm] = useState(false);
@@ -73,6 +76,10 @@ export default function NexbiProvider({ config, children }: Props) {
     setCurrentEmotion(emotion);
   }, []);
 
+  const setCostume = useCallback((costume: NexbiCostume) => {
+    setCurrentCostume(costume);
+  }, []);
+
   const incrementAiCalls = useCallback(() => {
     setAiCallCount(prev => prev + 1);
   }, []);
@@ -88,6 +95,8 @@ export default function NexbiProvider({ config, children }: Props) {
       addMessage,
       currentEmotion,
       setEmotion,
+      currentCostume,
+      setCostume,
       isTyping,
       setIsTyping,
       hasInteracted,

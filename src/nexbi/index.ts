@@ -11,6 +11,7 @@ export { callAiFallback } from './engine/ai-fallback';
 // Types
 export type {
   NexbiEmotion,
+  NexbiCostume,
   PersonaId,
   NexbiConfig,
   PersonaConfig,

@@ -1,6 +1,6 @@
 import { findBestMatch } from './rule-matcher';
 import { callAiFallback } from './ai-fallback';
-import type { KnowledgeEntry, ChatMessage, PersonaId, AiChatResponse } from './types';
+import type { KnowledgeEntry, ChatMessage, PersonaId, AiChatResponse, NexbiCostume } from './types';
 
 interface ProcessOptions {
   knowledge: KnowledgeEntry[];
@@ -15,6 +15,7 @@ interface ProcessOptions {
 interface ProcessResult {
   answer: string;
   emotion: KnowledgeEntry['emotion'];
+  costume?: NexbiCostume;
   followUp?: string;
   scrollTarget?: string;
   showLeadPrompt?: boolean;
