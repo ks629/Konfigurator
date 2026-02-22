@@ -15,15 +15,15 @@ import {
   Check,
   CreditCard,
   Banknote,
+  ArrowRight,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
 import Link from 'next/link';
 
 export default function ZamowieniePage() {
   const router = useRouter();
-  const { order } = useOrder();
+  const { order, updatePaymentMethod } = useOrder();
 
   useEffect(() => {
     if (!order) {
@@ -45,6 +45,11 @@ export default function ZamowieniePage() {
   }
 
   const { produkt, finanse } = order;
+
+  const handleSelectPayment = (metoda: 'zaliczka_p24' | 'raty') => {
+    updatePaymentMethod(metoda);
+    router.push('/zamowienie/dane');
+  };
 
   return (
     <div className="nexbe-dark dark min-h-screen flex flex-col bg-[#0f0520]">
@@ -114,7 +119,7 @@ export default function ZamowieniePage() {
                 <div>
                   <p className="text-xs text-muted-foreground">{produkt.marka}</p>
                   <h2 className="font-heading text-xl text-white">{produkt.nazwa}</h2>
-                  <div className="flex items-center gap-3 mt-2 text-sm text-muted-foreground">
+                  <div className="flex flex-wrap items-center gap-3 mt-2 text-sm text-muted-foreground">
                     <span className="flex items-center gap-1">
                       <Battery className="h-3.5 w-3.5" />
                       {produkt.pojemnosc_kwh} kWh
@@ -185,17 +190,20 @@ export default function ZamowieniePage() {
 
               {/* Deposit option */}
               <button
-                disabled
-                className="w-full text-left rounded-2xl border-2 border-white/10 bg-[#1A0A2E]/80 backdrop-blur-sm p-5 space-y-3 opacity-60 cursor-not-allowed transition-all"
+                onClick={() => handleSelectPayment('zaliczka_p24')}
+                className="w-full text-left rounded-2xl border-2 border-white/10 hover:border-[#B5005D]/50 bg-[#1A0A2E]/80 hover:bg-[#1A0A2E] backdrop-blur-sm p-5 space-y-3 transition-all group"
               >
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#B5005D] to-[#FF004E] flex items-center justify-center">
-                    <CreditCard className="h-5 w-5 text-white" />
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#B5005D] to-[#FF004E] flex items-center justify-center">
+                      <CreditCard className="h-5 w-5 text-white" />
+                    </div>
+                    <div>
+                      <p className="font-heading text-white">Zaliczka 30%</p>
+                      <p className="text-xs text-muted-foreground">BLIK / przelew / karta</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="font-heading text-white">Zaliczka 30%</p>
-                    <p className="text-xs text-muted-foreground">BLIK / przelew / karta</p>
-                  </div>
+                  <ArrowRight className="h-5 w-5 text-muted-foreground group-hover:text-white transition-colors" />
                 </div>
                 <div className="bg-white/5 rounded-xl p-3">
                   <p className="text-2xl font-bold text-white">
@@ -205,28 +213,25 @@ export default function ZamowieniePage() {
                     Resztę ({formatCurrency(finanse.reszta_przy_montazu)}) płacisz przy montażu
                   </p>
                 </div>
-                <Badge variant="outline" className="border-white/20 text-muted-foreground text-xs">
-                  Dostępne wkrótce
-                </Badge>
               </button>
 
               {/* Installment option */}
               <button
-                disabled
-                className="w-full text-left rounded-2xl border-2 border-white/10 bg-[#1A0A2E]/80 backdrop-blur-sm p-5 space-y-3 opacity-60 cursor-not-allowed transition-all"
+                onClick={() => handleSelectPayment('raty')}
+                className="w-full text-left rounded-2xl border-2 border-white/10 hover:border-[#B5005D]/50 bg-[#1A0A2E]/80 hover:bg-[#1A0A2E] backdrop-blur-sm p-5 space-y-3 transition-all group"
               >
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
-                    <Banknote className="h-5 w-5 text-white" />
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
+                      <Banknote className="h-5 w-5 text-white" />
+                    </div>
+                    <div>
+                      <p className="font-heading text-white">Raty</p>
+                      <p className="text-xs text-muted-foreground">Wniosek online — decyzja 24h</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="font-heading text-white">Raty</p>
-                    <p className="text-xs text-muted-foreground">Wniosek online — decyzja 24h</p>
-                  </div>
+                  <ArrowRight className="h-5 w-5 text-muted-foreground group-hover:text-white transition-colors" />
                 </div>
-                <Badge variant="outline" className="border-white/20 text-muted-foreground text-xs">
-                  Dostępne wkrótce
-                </Badge>
               </button>
 
               {/* Subsidy note */}
