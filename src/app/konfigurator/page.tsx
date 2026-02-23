@@ -1,10 +1,8 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { AnimatePresence } from 'framer-motion';
 import { useConfigurator } from '@/hooks/useConfigurator';
-import { useOrder } from '@/hooks/useOrder';
 import { Header } from '@/components/layout/Header';
 import { ProgressBar } from '@/components/configurator/ProgressBar';
 import { StepInstallationType } from '@/components/configurator/StepInstallationType';
@@ -24,20 +22,18 @@ import { ContactForm } from '@/components/forms/ContactForm';
 import { Button } from '@/components/ui/button';
 import { ResumeProgressBanner } from '@/components/ui/ResumeProgressBanner';
 import { NexbeIcon } from '@nexbe/icons';
-import { ArrowLeft, ArrowRight, FileText, CalendarCheck, Zap, ShoppingCart, AlertTriangle } from 'lucide-react';
-import { calculateROI, calculateMonthlyFromBill, formatCurrency } from '@/lib/calculations';
-import { allProducts } from '@/data/products';
-import { inverters } from '@/data/products';
+import { ArrowLeft, ArrowRight, FileText, CalendarCheck, AlertTriangle } from 'lucide-react';
+import { toast } from 'sonner';
+import { calculateROI, calculateMonthlyFromBill } from '@/lib/calculations';
+import { allProducts, inverters } from '@/data/products';
+import { getPanelById } from '@/data/pv-panels';
 import { ContactFormData } from '@/lib/validations';
 import { generateOfferPdfBlob, type PdfOfferData } from '@/lib/pdf-generator';
-import { toast } from 'sonner';
 
 const TOTAL_STEPS = 5;
 
 export default function KonfiguratorPage() {
-  const router = useRouter();
   const store = useConfigurator();
-  const { createFromConfigurator } = useOrder();
   const { currentStep, nextStep, prevStep, setStep, selectedProductId, selectedInverterId } = store;
   const isFullPV = store.installationType === 'full_pv';
   const [contactFormOpen, setContactFormOpen] = useState(false);
@@ -107,17 +103,16 @@ export default function KonfiguratorPage() {
         ? selectedProduct.price_gross_b
         : selectedProduct.price_gross;
 
-      const result = calculateROI({
+      return calculateROI({
         pv_power_kwp: store.pvPowerKwp,
         annual_consumption_kwh: annualConsumption,
         billing_system: store.billingSystem,
         battery_capacity_kwh: selectedProduct.capacity_kwh,
         battery_price_gross: batteryPrice,
         installation_type: store.installationType,
-        needs_inverter_upgrade: false, // falownik wliczony w cenę zestawu
-        inverter_price_gross: 0, // falownik wliczony w cenę zestawu
-        needs_backup: store.backupVariant === 'B', // backup SZR tylko w wariancie B
-        // Nowe pola
+        needs_inverter_upgrade: false,
+        inverter_price_gross: 0,
+        needs_backup: store.backupVariant === 'B',
         user_profile: store.userProfile,
         energy_operator: store.energyOperator,
         tariff: store.tariff,
@@ -126,9 +121,8 @@ export default function KonfiguratorPage() {
         thermomodernization_used_percent: store.thermomodernizationUsedPercent,
         tax_bracket: store.taxBracket,
       });
-      return result;
     } catch (err) {
-      console.error('Błąd kalkulacji ROI:', err);
+      console.error('Calculation error:', err);
       setCalculationError(true);
       return null;
     }
@@ -170,7 +164,7 @@ export default function KonfiguratorPage() {
         tax_bracket: store.taxBracket,
       });
     } catch (err) {
-      console.error('Błąd kalkulacji dynamicznej:', err);
+      console.error('Dynamic calculation error:', err);
       return null;
     }
   }, [selectedProduct, selectedInverter, store]);
@@ -192,7 +186,6 @@ export default function KonfiguratorPage() {
           return false;
       }
     }
-
     switch (currentStep) {
       case 1:
         return store.installationType !== null;
@@ -261,7 +254,7 @@ export default function KonfiguratorPage() {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
     } catch (err) {
-      console.error('Błąd generowania PDF:', err);
+      console.error('PDF generation error:', err);
       toast.error('Nie udało się wygenerować PDF. Spróbuj ponownie.');
     }
   };
@@ -283,7 +276,6 @@ export default function KonfiguratorPage() {
           return null;
       }
     }
-
     switch (currentStep) {
       case 1:
         return <StepInstallationType />;
@@ -348,21 +340,8 @@ export default function KonfiguratorPage() {
             <div key={currentStep}>{renderStep()}</div>
           </AnimatePresence>
 
-          {/* Calculation Error */}
-          {currentStep === 5 && calculationError && (
-            <div className="max-w-3xl mx-auto mt-6 rounded-xl border border-amber-400/30 bg-amber-400/5 p-4 flex items-start gap-3">
-              <AlertTriangle className="h-5 w-5 text-amber-400 flex-shrink-0 mt-0.5" />
-              <div>
-                <p className="text-sm font-medium text-amber-300">Nie udało się obliczyć oszczędności</p>
-                <p className="text-xs text-amber-300/70 mt-1">
-                  Możesz nadal wysłać zapytanie — skontaktujemy się z indywidualną wyceną. Zadzwoń: 732 080 101
-                </p>
-              </div>
-            </div>
-          )}
-
           {/* Navigation */}
-          <div className="max-w-4xl mx-auto mt-8 flex items-center justify-between pr-28 sm:pr-0 no-print">
+          <div className="max-w-4xl mx-auto mt-8 flex items-center justify-between no-print">
             {currentStep > 1 ? (
               <Button variant="outline" onClick={prevStep} size="lg" className="border-white/20 text-white hover:bg-white/5">
                 <ArrowLeft className="h-4 w-4 mr-2" />
@@ -379,6 +358,20 @@ export default function KonfiguratorPage() {
               </Button>
             )}
           </div>
+
+          {/* Calculation Error */}
+          {currentStep === 5 && selectedProductId && !calculation && calculationError && (
+            <div className="max-w-3xl mx-auto mt-8 rounded-xl border border-amber-400/30 bg-amber-400/5 p-5 flex items-start gap-3">
+              <AlertTriangle className="h-5 w-5 text-amber-400 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="text-sm text-amber-200 font-medium">Nie udało się obliczyć oszczędności</p>
+                <p className="text-xs text-amber-200/70 mt-1">
+                  Możesz nadal wysłać zapytanie — nasz doradca przygotuje kalkulację indywidualnie.
+                  Zadzwoń: <a href="tel:+48732080101" className="underline">732 080 101</a>
+                </p>
+              </div>
+            </div>
+          )}
 
           {/* Calculation Results */}
           {showCalculation && calculation && (
@@ -402,6 +395,7 @@ export default function KonfiguratorPage() {
                   pvKwp={isFullPV ? store.pvCalculatedKwp : undefined}
                   pvPanelCount={isFullPV ? store.pvCalculatedPanelCount : undefined}
                   pvPrice={isFullPV ? store.pvPrice : undefined}
+                  pvPanelName={isFullPV ? getPanelById(store.selectedPanelId).name : undefined}
                 />
                 <div className="space-y-8">
                   <FinancingSimulator result={calculation} />
@@ -473,50 +467,24 @@ export default function KonfiguratorPage() {
               <ProjectionTable projection={calculation.projection} horizonYears={calculation.horizon_years} />
 
               {/* CTA */}
-              <div className="flex flex-col items-center gap-4 pt-8 pb-4 no-print">
-                {/* Primary CTA — KUP ONLINE */}
+              <div className="flex flex-col sm:flex-row gap-4 items-center justify-center pt-8 pb-4 no-print">
                 <Button
                   size="lg"
-                  className="text-lg px-10 h-16 bg-gradient-to-r from-[#350066] via-[#B5005D] to-[#FF004E] hover:from-[#4a0080] hover:via-[#D4006E] hover:to-[#FF1A5E] text-white shadow-xl shadow-[#B5005D]/30 rounded-2xl w-full sm:w-auto"
-                  onClick={() => {
-                    if (!selectedProduct || !calculation) return;
-                    createFromConfigurator({
-                      config: store,
-                      product: selectedProduct,
-                      inverter: selectedInverter,
-                      calculation,
-                    });
-                    router.push('/zamowienie');
-                  }}
+                  className="text-lg px-8 h-14 bg-gradient-to-r from-[#B5005D] to-[#8B0048] hover:from-[#D4006E] hover:to-[#9A0050] text-white shadow-lg shadow-[#B5005D]/20"
+                  onClick={() => setContactFormOpen(true)}
                 >
-                  <ShoppingCart className="h-5 w-5 mr-2" />
-                  KUP ONLINE — od {formatCurrency(Math.round((calculation?.investment.net_cost ?? 0) * 0.3))}
+                  <FileText className="h-5 w-5 mr-2" />
+                  Pobierz szczegółową ofertę
                 </Button>
-                <p className="text-xs text-muted-foreground -mt-1">
-                  Zaliczka 30% online. Resztę płacisz przy montażu.
-                </p>
-
-                {/* Secondary CTAs */}
-                <div className="flex flex-col sm:flex-row gap-3 items-center">
-                  <Button
-                    variant="outline"
-                    size="lg"
-                    className="text-sm px-6 h-12 border-white/20 text-white hover:bg-white/5"
-                    onClick={() => setContactFormOpen(true)}
-                  >
-                    <FileText className="h-4 w-4 mr-2" />
-                    Pobierz ofertę PDF
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="lg"
-                    className="text-sm px-6 h-12 border-white/20 text-white hover:bg-white/5"
-                    onClick={() => setContactFormOpen(true)}
-                  >
-                    <CalendarCheck className="h-4 w-4 mr-2" />
-                    Umów bezpłatny audyt
-                  </Button>
-                </div>
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="text-lg px-8 h-14 border-white/20 text-white hover:bg-white/5"
+                  onClick={() => setContactFormOpen(true)}
+                >
+                  <CalendarCheck className="h-5 w-5 mr-2" />
+                  Umów bezpłatny audyt
+                </Button>
               </div>
             </div>
           )}

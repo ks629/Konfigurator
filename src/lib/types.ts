@@ -13,11 +13,33 @@ export type PVAzimuthPreset =
 
 export type PVVariantTier = 'economic' | 'recommended' | 'premium';
 
+export type PVPanelSegment = 'STANDARD' | 'HIGH_EFFICIENCY' | 'PREMIUM';
+
+export interface PVPanel {
+  id: string;
+  name: string;
+  brand: string;
+  model: string;
+  wattPeak: number;
+  widthMm: number;
+  heightMm: number;
+  image: string;
+  warranty_product_years: number;
+  warranty_linear_years: number;
+  efficiency_percent: number;
+  price_per_panel: number;
+  segment: PVPanelSegment;
+  bifacial: boolean;
+}
+
 export interface PVVariant {
   tier: PVVariantTier;
   label: string;
   pvKwp: number;
   panelCount: number;
+  panelId: string;
+  roofLimited: boolean;
+  maxRoofPanels: number | null;
   inverterKw: number;
   batteryKwh: number;
   batteryProductId: string;
@@ -37,6 +59,9 @@ export interface PVSizingInput {
   mountType: PVMountType;
   roofWidth?: number;
   roofLength?: number;
+  panelWattPeak?: number;
+  panelWidthMm?: number;
+  panelHeightMm?: number;
   plansEV: boolean;
   evExtraKwh: number;
   plansHeatPump: boolean;
@@ -184,6 +209,7 @@ export interface ConfiguratorState {
   plansHeatPump: boolean;
   heatPumpExtraKwh: number;
   otherExtraKwh: number;
+  selectedPanelId: string;
   selectedPvVariant: PVVariantTier | null;
   pvCalculatedKwp: number;
   pvCalculatedPanelCount: number;

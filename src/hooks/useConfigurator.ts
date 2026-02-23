@@ -57,6 +57,7 @@ interface ConfiguratorStore extends ConfiguratorState {
   setPlansHeatPump: (val: boolean) => void;
   setHeatPumpExtraKwh: (kwh: number) => void;
   setOtherExtraKwh: (kwh: number) => void;
+  setSelectedPanelId: (id: string) => void;
   setSelectedPvVariant: (tier: PVVariantTier | null) => void;
   setPvCalculatedKwp: (kwp: number) => void;
   setPvCalculatedPanelCount: (count: number) => void;
@@ -102,6 +103,7 @@ const initialState: ConfiguratorState = {
   plansHeatPump: false,
   heatPumpExtraKwh: 5000,
   otherExtraKwh: 0,
+  selectedPanelId: 'keno-455',
   selectedPvVariant: null,
   pvCalculatedKwp: 0,
   pvCalculatedPanelCount: 0,
@@ -160,6 +162,7 @@ export const useConfigurator = create<ConfiguratorStore>()(
       setPlansHeatPump: (val) => set({ plansHeatPump: val }),
       setHeatPumpExtraKwh: (kwh) => set({ heatPumpExtraKwh: kwh }),
       setOtherExtraKwh: (kwh) => set({ otherExtraKwh: kwh }),
+      setSelectedPanelId: (id) => set({ selectedPanelId: id }),
       setSelectedPvVariant: (tier) => set({ selectedPvVariant: tier }),
       setPvCalculatedKwp: (kwp) => set({ pvCalculatedKwp: kwp }),
       setPvCalculatedPanelCount: (count) => set({ pvCalculatedPanelCount: count }),
@@ -169,12 +172,13 @@ export const useConfigurator = create<ConfiguratorStore>()(
     }),
     {
       name: 'nexbe-configurator',
-      version: 3,
+      version: 4,
       migrate: (persistedState, version) => {
-        if (version < 3) {
+        if (version < 4) {
           return {
             ...initialState,
             ...(persistedState as Partial<ConfiguratorState>),
+            selectedPanelId: 'keno-455',
           };
         }
         return persistedState as ConfiguratorState;

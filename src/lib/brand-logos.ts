@@ -5,6 +5,8 @@ const BRAND_LOGOS: Record<string, string> = {
   Huawei: '/brands/huawei.png',
   GoodWe: '/brands/goodwe.png',
   Dyness: '/brands/dyness.png',
+  'Keno Energy': '/brands/keno.png',
+  Keno: '/brands/keno.png',
 };
 
 /**

@@ -16,12 +16,13 @@ interface SavingsSummaryProps {
   pvKwp?: number;
   pvPanelCount?: number;
   pvPrice?: number;
+  pvPanelName?: string;
 }
 
 // Marki z wbudowanym EMS — nie potrzebują dodatkowego
 const BRANDS_WITH_BUILTIN_EMS = ['Huawei', 'Sigenergy'];
 
-export function SavingsSummary({ result, product, inverter, backupVariant = 'A', isFullPV, pvKwp, pvPanelCount, pvPrice }: SavingsSummaryProps) {
+export function SavingsSummary({ result, product, inverter, backupVariant = 'A', isFullPV, pvKwp, pvPanelCount, pvPrice, pvPanelName }: SavingsSummaryProps) {
   const { investment, annual_savings, roi_years, total_savings, horizon_years } = result;
 
   const needsEms = product ? !BRANDS_WITH_BUILTIN_EMS.includes(product.brand.split('/')[0]) : false;
@@ -45,7 +46,7 @@ export function SavingsSummary({ result, product, inverter, backupVariant = 'A',
                   <Sun className="h-4 w-4 text-amber-400 mt-0.5 shrink-0" />
                   <div>
                     <p className="font-medium text-white">Instalacja fotowoltaiczna</p>
-                    <p className="text-xs text-muted-foreground">{pvKwp} kWp · {pvPanelCount} paneli 455Wp</p>
+                    <p className="text-xs text-muted-foreground">{pvKwp} kWp · {pvPanelCount}x {pvPanelName || 'paneli'}</p>
                     {pvPrice !== undefined && (
                       <p className="text-xs text-muted-foreground">{formatCurrency(pvPrice)}</p>
                     )}

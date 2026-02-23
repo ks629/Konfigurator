@@ -6,16 +6,22 @@ import { motion } from 'framer-motion';
 import { useConfigurator } from '@/hooks/useConfigurator';
 import { calculatePVSizing, generatePVVariants } from '@/lib/pv-calculator';
 import { getOrientationMultiplier } from '@/data/pv-orientation';
+import { getPanelById } from '@/data/pv-panels';
 import { calculateMonthlyFromBill, formatCurrency, calculateMonthlyRate } from '@/lib/calculations';
 import { allProducts, inverters } from '@/data/products';
 import { getBrandLogos } from '@/lib/brand-logos';
 import { cn } from '@/lib/utils';
 import { NexbeIcon } from '@nexbe/icons';
-import { Calendar, Check, Crown, Shield, Zap, Sun, Battery } from 'lucide-react';
+import { Calendar, Check, Crown, Info, Shield, Zap, Sun, Battery } from 'lucide-react';
 import type { PVVariant } from '@/lib/types';
 
 export function StepPVSystemRecommendation() {
   const store = useConfigurator();
+
+  const selectedPanel = useMemo(
+    () => getPanelById(store.selectedPanelId),
+    [store.selectedPanelId]
+  );
 
   const orientationMultiplier = useMemo(
     () => getOrientationMultiplier(store.pvAzimuthPreset, store.pvTiltAngle),
@@ -36,19 +42,25 @@ export function StepPVSystemRecommendation() {
       mountType: store.pvMountType,
       roofWidth: store.roofWidth,
       roofLength: store.roofLength,
+      panelWattPeak: selectedPanel.wattPeak,
+      panelWidthMm: selectedPanel.widthMm,
+      panelHeightMm: selectedPanel.heightMm,
       plansEV: store.plansEV,
       evExtraKwh: store.evExtraKwh,
       plansHeatPump: store.plansHeatPump,
       heatPumpExtraKwh: store.heatPumpExtraKwh,
       otherExtraKwh: store.otherExtraKwh,
     }),
-    [effectiveConsumption, orientationMultiplier, store.pvMountType, store.roofWidth, store.roofLength, store.plansEV, store.evExtraKwh, store.plansHeatPump, store.heatPumpExtraKwh, store.otherExtraKwh]
+    [effectiveConsumption, orientationMultiplier, store.pvMountType, store.roofWidth, store.roofLength, selectedPanel, store.plansEV, store.evExtraKwh, store.plansHeatPump, store.heatPumpExtraKwh, store.otherExtraKwh]
   );
 
   const variants = useMemo(
-    () => generatePVVariants(sizing, orientationMultiplier, store.pvMountType),
-    [sizing, orientationMultiplier, store.pvMountType]
+    () => generatePVVariants(sizing, orientationMultiplier, store.pvMountType, store.selectedPanelId),
+    [sizing, orientationMultiplier, store.pvMountType, store.selectedPanelId]
   );
+
+  // Check if any variant is roof-limited
+  const anyRoofLimited = variants.some((v) => v.roofLimited);
 
   const handleSelect = (variant: PVVariant) => {
     store.setSelectedPvVariant(variant.tier);
@@ -75,15 +87,16 @@ export function StepPVSystemRecommendation() {
         <p className="text-muted-foreground">
           Roczne zapotrzebowanie: {sizing.totalDemandKwh.toLocaleString('pl-PL')} kWh
           {' · '}Rekomendowana moc: {sizing.requiredKwp} kWp
+          {' · '}{selectedPanel.name}
         </p>
       </div>
 
-      {/* Roof size warning */}
-      {sizing.maxRoofPanels !== null && sizing.panelCount > sizing.maxRoofPanels && (
-        <div className="max-w-4xl mx-auto flex items-start gap-2 p-3 rounded-lg bg-amber-400/10 border border-amber-400/20">
-          <NexbeIcon name="fotowoltaika" size={16} variant="inherit" className="text-amber-400 mt-0.5 shrink-0" />
-          <p className="text-sm text-amber-300">
-            Potrzebujesz {sizing.panelCount} paneli, ale na dachu mieści się max {sizing.maxRoofPanels}. Rozważ montaż na gruncie lub wróć i zmień wymiary.
+      {/* Roof limit info */}
+      {anyRoofLimited && sizing.maxRoofPanels !== null && (
+        <div className="max-w-4xl mx-auto flex items-start gap-2 p-3 rounded-lg bg-blue-400/10 border border-blue-400/20">
+          <Info className="h-4 w-4 text-blue-400 mt-0.5 shrink-0" />
+          <p className="text-sm text-blue-300">
+            Twój dach mieści max {sizing.maxRoofPanels} paneli {selectedPanel.name}. Warianty zostały ograniczone do pojemności dachu.
           </p>
         </div>
       )}
@@ -95,6 +108,10 @@ export function StepPVSystemRecommendation() {
             variant={variant}
             isSelected={store.selectedPvVariant === variant.tier}
             onSelect={() => handleSelect(variant)}
+            panelName={selectedPanel.name}
+            panelEfficiency={selectedPanel.efficiency_percent}
+            panelWarrantyLinear={selectedPanel.warranty_linear_years}
+            panelBifacial={selectedPanel.bifacial}
           />
         ))}
       </div>
@@ -106,10 +123,18 @@ function VariantCard({
   variant,
   isSelected,
   onSelect,
+  panelName,
+  panelEfficiency,
+  panelWarrantyLinear,
+  panelBifacial,
 }: {
   variant: PVVariant;
   isSelected: boolean;
   onSelect: () => void;
+  panelName: string;
+  panelEfficiency: number;
+  panelWarrantyLinear: number;
+  panelBifacial: boolean;
 }) {
   const isRecommended = variant.tier === 'recommended';
   const isPremium = variant.tier === 'premium';
@@ -246,13 +271,24 @@ function VariantCard({
           </div>
         )}
 
-        {/* PV + features */}
+        {/* PV + panel identity */}
         <div className="space-y-2 flex-1">
           <div className="flex items-center gap-2 text-sm">
             <Sun className="h-4 w-4 text-amber-400 shrink-0" />
             <span className="text-white font-medium">{variant.pvKwp} kWp</span>
-            <span className="text-muted-foreground">· {variant.panelCount} paneli</span>
+            <span className="text-muted-foreground">· {variant.panelCount}x {panelName}</span>
           </div>
+          <div className="text-[10px] text-muted-foreground pl-6">
+            {panelEfficiency}% spr. · Gwar. {panelWarrantyLinear} lat{panelBifacial ? ' · Bifacial' : ''}
+          </div>
+
+          {/* Roof limited badge */}
+          {variant.roofLimited && variant.maxRoofPanels !== null && (
+            <div className="flex items-center gap-1.5 text-[10px] text-blue-300 bg-blue-500/10 px-2 py-1 rounded-md w-fit">
+              <Info className="h-3 w-3" />
+              Ograniczone przez dach (max {variant.maxRoofPanels} paneli)
+            </div>
+          )}
 
           <div className="border-t border-white/10 pt-2 space-y-1.5">
             <div className="flex items-center gap-2 text-xs">

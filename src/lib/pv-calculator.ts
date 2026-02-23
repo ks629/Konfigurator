@@ -4,7 +4,7 @@ import type {
   PVVariant,
   PVVariantTier,
 } from './types';
-import { PV_PANEL, AVAILABLE_INVERTER_POWERS_KW, calculatePVPrice, maxPanelsOnRoof } from '@/data/pv-panels';
+import { PV_PANEL, AVAILABLE_INVERTER_POWERS_KW, calculatePVPrice, maxPanelsOnRoof, getPanelById } from '@/data/pv-panels';
 import { allProducts, inverters } from '@/data/products';
 
 /**
@@ -31,17 +31,22 @@ export function calculatePVSizing(input: PVSizingInput): PVSizingResult {
   const orientationMul = Math.max(input.orientationMultiplier, 0.1);
   const requiredKwp = totalDemandKwh / (KWH_PER_KWP_PER_YEAR * orientationMul);
 
+  // Wymiary panelu — z inputu lub domyslne
+  const panelWattPeak = input.panelWattPeak ?? PV_PANEL.wattPeak;
+  const panelWidthMm = input.panelWidthMm ?? PV_PANEL.widthMm;
+  const panelHeightMm = input.panelHeightMm ?? PV_PANEL.heightMm;
+
   // Liczba paneli
-  const panelCount = Math.ceil((requiredKwp * 1000) / PV_PANEL.wattPeak);
+  const panelCount = Math.ceil((requiredKwp * 1000) / panelWattPeak);
 
   // Max paneli na dachu
   let maxRoofPanels: number | null = null;
   if (input.roofWidth && input.roofLength && input.mountType !== 'ground') {
-    maxRoofPanels = maxPanelsOnRoof(input.roofWidth, input.roofLength);
+    maxRoofPanels = maxPanelsOnRoof(input.roofWidth, input.roofLength, panelWidthMm, panelHeightMm);
   }
 
   // Rekomendowany magazyn: min. 2x moc PV, minimum 10 kWh (wymog MP7)
-  const actualKwp = (panelCount * PV_PANEL.wattPeak) / 1000;
+  const actualKwp = (panelCount * panelWattPeak) / 1000;
   const recommendedBatteryKwh = Math.max(actualKwp * 2, MP7_MIN_BATTERY_KWH);
 
   // Rekomendowany falownik: najblizszy dostepny >= moc PV
@@ -82,13 +87,28 @@ const VARIANT_CONFIGS: VariantConfig[] = [
 export function generatePVVariants(
   sizing: PVSizingResult,
   orientationMultiplier: number,
-  mountType: 'roof_angled' | 'roof_flat' | 'ground' = 'roof_angled'
+  mountType: 'roof_angled' | 'roof_flat' | 'ground' = 'roof_angled',
+  panelId: string = 'keno-455'
 ): PVVariant[] {
+  const panel = getPanelById(panelId);
+
+  // Oblicz max paneli na dachu dla tego konkretnego panelu
+  // (sizing.maxRoofPanels moze byc dla innego panelu, wiec przeliczamy)
+  const maxRoofPanels = sizing.maxRoofPanels; // juz przeliczone w calculatePVSizing
+
   return VARIANT_CONFIGS.map((config) => {
     // Skaluj moc PV
     const scaledKwp = sizing.requiredKwp * config.multiplier;
-    const panelCount = Math.ceil((scaledKwp * 1000) / PV_PANEL.wattPeak);
-    const actualKwp = (panelCount * PV_PANEL.wattPeak) / 1000;
+    let panelCount = Math.ceil((scaledKwp * 1000) / panel.wattPeak);
+
+    // TWARDY CAP: dach ogranicza liczbe paneli
+    let roofLimited = false;
+    if (maxRoofPanels !== null && panelCount > maxRoofPanels) {
+      panelCount = maxRoofPanels;
+      roofLimited = true;
+    }
+
+    const actualKwp = (panelCount * panel.wattPeak) / 1000;
 
     // Magazyn: 2x PV kWp, min 10 kWh
     const targetBatteryKwh = Math.max(actualKwp * 2, MP7_MIN_BATTERY_KWH);
@@ -117,6 +137,9 @@ export function generatePVVariants(
       label: config.label,
       pvKwp: Math.round(actualKwp * 100) / 100,
       panelCount,
+      panelId: panel.id,
+      roofLimited,
+      maxRoofPanels,
       inverterKw,
       batteryKwh: batteryProduct?.capacity_kwh ?? Math.round(targetBatteryKwh),
       batteryProductId: batteryProduct?.id ?? '',

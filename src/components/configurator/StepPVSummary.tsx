@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { useConfigurator } from '@/hooks/useConfigurator';
 import { formatCurrency, calculateMonthlyRate } from '@/lib/calculations';
 import { allProducts, inverters } from '@/data/products';
+import { getPanelById } from '@/data/pv-panels';
 import { getBrandLogos } from '@/lib/brand-logos';
 import { cn } from '@/lib/utils';
 import { NexbeIcon } from '@nexbe/icons';
@@ -23,6 +24,11 @@ export function StepPVSummary() {
   const selectedInverter = useMemo(
     () => inverters.find((i) => i.id === store.selectedInverterId) || null,
     [store.selectedInverterId]
+  );
+
+  const selectedPanel = useMemo(
+    () => getPanelById(store.selectedPanelId),
+    [store.selectedPanelId]
   );
 
   const tierLabel = store.selectedPvVariant === 'economic' ? 'Ekonomiczny'
@@ -65,15 +71,46 @@ export function StepPVSummary() {
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2">
-          {/* PV */}
-          <div className="bg-muted/30 rounded-lg p-4 space-y-1">
+          {/* PV — z identyfikacją panelu */}
+          <div className="bg-muted/30 rounded-lg p-4 space-y-2">
             <div className="flex items-center gap-2">
               <Sun className="h-4 w-4 text-amber-400" />
               <span className="text-sm font-medium text-white">Instalacja PV</span>
             </div>
-            <p className="text-xs text-muted-foreground">
-              {store.pvCalculatedKwp} kWp · {store.pvCalculatedPanelCount} paneli 455Wp
-            </p>
+            <div className="flex items-start gap-3">
+              {/* Panel thumbnail */}
+              <div className="relative w-16 h-16 rounded bg-muted/50 shrink-0 flex items-center justify-center overflow-hidden">
+                <Image
+                  src={selectedPanel.image}
+                  alt={selectedPanel.name}
+                  fill
+                  className="object-contain p-1"
+                  sizes="64px"
+                />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-medium text-white">
+                  {store.pvCalculatedPanelCount}x {selectedPanel.name}
+                </p>
+                <div className="flex items-center gap-1.5 mt-0.5">
+                  {getBrandLogos(selectedPanel.brand).map((logo) => (
+                    <Image key={logo.alt} src={logo.src} alt={logo.alt} width={48} height={14} className="h-3 w-auto brightness-0 invert" />
+                  ))}
+                </div>
+                <div className="grid grid-cols-2 gap-x-3 gap-y-0.5 mt-1.5 text-[10px]">
+                  <span className="text-muted-foreground">{store.pvCalculatedKwp} kWp</span>
+                  <span className="text-muted-foreground">{selectedPanel.wattPeak}Wp/panel</span>
+                  <span className="text-muted-foreground">{selectedPanel.efficiency_percent}% spr.</span>
+                  <span className="text-muted-foreground">
+                    <Calendar className="h-2.5 w-2.5 inline mr-0.5 -mt-px" />
+                    {selectedPanel.warranty_linear_years} lat gwar.
+                  </span>
+                  {selectedPanel.bifacial && (
+                    <span className="text-amber-400">Bifacial</span>
+                  )}
+                </div>
+              </div>
+            </div>
             <p className="text-sm font-heading text-primary mt-1">
               {formatCurrency(store.pvPrice)}
             </p>
