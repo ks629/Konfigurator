@@ -12,6 +12,9 @@ import {
   EnergyOperator,
   PVOrientation,
   TaxBracket,
+  PVMountType,
+  PVAzimuthPreset,
+  PVVariantTier,
 } from '@/lib/types';
 
 interface ConfiguratorStore extends ConfiguratorState {
@@ -43,6 +46,22 @@ interface ConfiguratorStore extends ConfiguratorState {
   setWantsSubsidy: (val: boolean) => void;
   setThermomodernizationUsedPercent: (percent: number) => void;
   setTaxBracket: (bracket: TaxBracket) => void;
+  // Settery PV (full_pv flow)
+  setPvMountType: (type: PVMountType) => void;
+  setPvAzimuthPreset: (preset: PVAzimuthPreset) => void;
+  setPvTiltAngle: (angle: number) => void;
+  setRoofWidth: (width: number) => void;
+  setRoofLength: (length: number) => void;
+  setPlansEV: (val: boolean) => void;
+  setEvExtraKwh: (kwh: number) => void;
+  setPlansHeatPump: (val: boolean) => void;
+  setHeatPumpExtraKwh: (kwh: number) => void;
+  setOtherExtraKwh: (kwh: number) => void;
+  setSelectedPvVariant: (tier: PVVariantTier | null) => void;
+  setPvCalculatedKwp: (kwp: number) => void;
+  setPvCalculatedPanelCount: (count: number) => void;
+  setPvCalculatedBatteryKwh: (kwh: number) => void;
+  setPvPrice: (price: number) => void;
   reset: () => void;
 }
 
@@ -72,6 +91,22 @@ const initialState: ConfiguratorState = {
   wantsSubsidy: true,
   thermomodernizationUsedPercent: 0,
   taxBracket: 12,
+  // Pola PV (full_pv flow)
+  pvMountType: 'roof_angled',
+  pvAzimuthPreset: 'S',
+  pvTiltAngle: 35,
+  roofWidth: 10,
+  roofLength: 6,
+  plansEV: false,
+  evExtraKwh: 3500,
+  plansHeatPump: false,
+  heatPumpExtraKwh: 5000,
+  otherExtraKwh: 0,
+  selectedPvVariant: null,
+  pvCalculatedKwp: 0,
+  pvCalculatedPanelCount: 0,
+  pvCalculatedBatteryKwh: 0,
+  pvPrice: 0,
 };
 
 export const useConfigurator = create<ConfiguratorStore>()(
@@ -114,14 +149,29 @@ export const useConfigurator = create<ConfiguratorStore>()(
       setThermomodernizationUsedPercent: (percent) =>
         set({ thermomodernizationUsedPercent: percent }),
       setTaxBracket: (bracket) => set({ taxBracket: bracket }),
+      // Settery PV (full_pv flow)
+      setPvMountType: (type) => set({ pvMountType: type }),
+      setPvAzimuthPreset: (preset) => set({ pvAzimuthPreset: preset }),
+      setPvTiltAngle: (angle) => set({ pvTiltAngle: angle }),
+      setRoofWidth: (width) => set({ roofWidth: width }),
+      setRoofLength: (length) => set({ roofLength: length }),
+      setPlansEV: (val) => set({ plansEV: val }),
+      setEvExtraKwh: (kwh) => set({ evExtraKwh: kwh }),
+      setPlansHeatPump: (val) => set({ plansHeatPump: val }),
+      setHeatPumpExtraKwh: (kwh) => set({ heatPumpExtraKwh: kwh }),
+      setOtherExtraKwh: (kwh) => set({ otherExtraKwh: kwh }),
+      setSelectedPvVariant: (tier) => set({ selectedPvVariant: tier }),
+      setPvCalculatedKwp: (kwp) => set({ pvCalculatedKwp: kwp }),
+      setPvCalculatedPanelCount: (count) => set({ pvCalculatedPanelCount: count }),
+      setPvCalculatedBatteryKwh: (kwh) => set({ pvCalculatedBatteryKwh: kwh }),
+      setPvPrice: (price) => set({ pvPrice: price }),
       reset: () => set(initialState),
     }),
     {
       name: 'nexbe-configurator',
-      version: 2,
+      version: 3,
       migrate: (persistedState, version) => {
-        if (version < 2) {
-          // Merge nowych domyślnych pól ze starym stanem
+        if (version < 3) {
           return {
             ...initialState,
             ...(persistedState as Partial<ConfiguratorState>),

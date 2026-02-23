@@ -10,18 +10,16 @@ import { Slider } from '@/components/ui/slider';
 import { cn } from '@/lib/utils';
 import { NexbeIcon } from '@nexbe/icons';
 import {
-  Wallet,
   Leaf,
-  Gift,
   Info,
 } from 'lucide-react';
 
 const priorityOptions: { value: Priority; label: string; renderIcon: (cls: string) => React.ReactNode }[] = [
-  { value: 'savings', label: 'Maksymalne oszczędności na rachunkach', renderIcon: (cls) => <Wallet className={cls} /> },
+  { value: 'savings', label: 'Maksymalne oszczędności na rachunkach', renderIcon: (cls) => <NexbeIcon name="oszczednosci" size={16} variant="inherit" className={cls} aria-label="Oszczędności" /> },
   { value: 'independence', label: 'Niezależność energetyczna', renderIcon: (cls) => <NexbeIcon name="smart-ems" size={16} variant="inherit" className={cls} /> },
   { value: 'blackout', label: 'Ochrona przed blackoutem', renderIcon: (cls) => <NexbeIcon name="blackout-ochrona" size={16} variant="inherit" className={cls} /> },
   { value: 'ecology', label: 'Ekologia i slad weglowy', renderIcon: (cls) => <Leaf className={cls} /> },
-  { value: 'subsidy', label: 'Wykorzystanie dotacji', renderIcon: (cls) => <Gift className={cls} /> },
+  { value: 'subsidy', label: 'Wykorzystanie dotacji', renderIcon: (cls) => <NexbeIcon name="dotacja" size={16} variant="inherit" className={cls} aria-label="Dotacja" /> },
 ];
 
 export function StepAdditionalNeeds() {
@@ -193,7 +191,7 @@ export function StepAdditionalNeeds() {
       {/* Dotacje i ulgi */}
       <div className="space-y-6">
         <div className="flex items-center gap-2">
-          <Gift className="h-5 w-5 text-primary" />
+          <NexbeIcon name="dotacja" size={20} variant="inherit" className="text-primary" aria-label="Dotacje i ulgi" />
           <Label className="text-base font-medium">Dotacje i ulgi</Label>
         </div>
 

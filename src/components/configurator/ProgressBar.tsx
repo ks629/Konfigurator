@@ -3,6 +3,7 @@
 import { cn } from '@/lib/utils';
 import { Check, Clock } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useConfigurator } from '@/hooks/useConfigurator';
 
 interface ProgressBarProps {
   currentStep: number;
@@ -10,7 +11,7 @@ interface ProgressBarProps {
   onStepClick?: (step: number) => void;
 }
 
-const stepLabels = [
+const defaultStepLabels = [
   'Typ instalacji',
   'Dane PV',
   'Zużycie energii',
@@ -18,7 +19,18 @@ const stepLabels = [
   'Rekomendacja',
 ];
 
+const fullPvStepLabels = [
+  'Typ instalacji',
+  'Zużycie energii',
+  'Lokalizacja paneli',
+  'Dobór systemu',
+  'Podsumowanie',
+];
+
 export function ProgressBar({ currentStep, totalSteps, onStepClick }: ProgressBarProps) {
+  const installationType = useConfigurator((s) => s.installationType);
+  const stepLabels = installationType === 'full_pv' ? fullPvStepLabels : defaultStepLabels;
+
   return (
     <div className="w-full">
       <div className="flex items-center justify-between mb-2">

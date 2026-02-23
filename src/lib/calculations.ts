@@ -179,6 +179,13 @@ function calculateMonthlyInstallment(
   return Math.round(annuity + monthlyFee);
 }
 
+// ─────────────── Guard helpers ───────────────
+
+/** Zwraca 0 jeśli wartość to NaN lub Infinity */
+function safeFinite(value: number): number {
+  return Number.isFinite(value) ? value : 0;
+}
+
 // ─────────────── Główna funkcja ───────────────
 
 export function calculateROI(
@@ -243,6 +250,7 @@ export function calculateROI(
   }
 
   // 5. OSZCZĘDNOŚCI ROCZNE (rok 1)
+  // Guard: jeśli brak produkcji PV, oszczędności z autokonsumpcji = 0
   const energyConsumedWithBattery = annualProduction * selfConsumptionRate;
   const energyConsumedWithout = annualProduction * selfConsumptionRateWithout;
 
@@ -254,7 +262,8 @@ export function calculateROI(
   const savingsWithout =
     energyConsumedWithout * buyPrice + energySoldWithout * sellPrice;
 
-  const annualSavingsFromBattery = (savingsWithBattery - savingsWithout) + baseArbitrageSavings;
+  const rawAnnualSavings = (savingsWithBattery - savingsWithout) + baseArbitrageSavings;
+  const annualSavingsFromBattery = safeFinite(rawAnnualSavings);
 
   // 6. PROJEKCJA (do max(horizon, 20) lat dla backward compat)
   const maxYears = Math.max(horizon, 20);
@@ -274,9 +283,11 @@ export function calculateROI(
     const effectiveCapacity =
       input.battery_capacity_kwh * batteryDegradation;
 
+    const capacityRatio = input.battery_capacity_kwh > 0
+      ? effectiveCapacity / input.battery_capacity_kwh
+      : 0;
     const adjustedSelfConsumption =
-      selfConsumptionRate *
-      (0.7 + 0.3 * (effectiveCapacity / input.battery_capacity_kwh));
+      selfConsumptionRate * (0.7 + 0.3 * capacityRatio);
 
     const yearlyConsumed = yearlyProduction * adjustedSelfConsumption;
     const yearlySold = yearlyProduction - yearlyConsumed;
@@ -298,7 +309,7 @@ export function calculateROI(
     // Arbitraż cenowy (taryfa dynamiczna) — skalowany degradacją baterii i wzrostem cen
     const yearlyArbitrage = baseArbitrageSavings * batteryDegradation * priceGrowth;
 
-    const netYearlySavings = (yearlySavings - yearlySavingsWithout) + yearlyArbitrage;
+    const netYearlySavings = safeFinite((yearlySavings - yearlySavingsWithout) + yearlyArbitrage);
     cumulativeSavings += netYearlySavings;
 
     if (cumulativeSavings >= 0 && roiYear === null) {
@@ -356,10 +367,10 @@ export function calculateROI(
       net_cost: Math.round(netInvestment),
       thermomodernization_details: thermoResult.details,
     },
-    annual_savings: Math.round(annualSavingsFromBattery),
+    annual_savings: Math.round(safeFinite(annualSavingsFromBattery)),
     roi_years: roiYear,
-    total_savings_20y: Math.round(totalSavings20y),
-    total_savings: Math.round(totalSavingsHorizon),
+    total_savings_20y: Math.round(safeFinite(totalSavings20y)),
+    total_savings: Math.round(safeFinite(totalSavingsHorizon)),
     horizon_years: horizon,
     projection: horizonProjection,
     monthly_installment: monthlyInstallment,
@@ -373,10 +384,25 @@ export function calculateMonthlyFromBill(
   buyPrice?: number
 ): number {
   const price = buyPrice || 1.12;
+  if (price <= 0 || !Number.isFinite(monthlyBill)) return 0;
   return Math.round((monthlyBill / price) * 12);
 }
 
+/** Simple monthly installment calculator (Inbank: 8.99% nominal, 10 zl/month fee, 120 months) */
+export function calculateMonthlyRate(priceGross: number): number {
+  const nominalRate = 0.0899;
+  const monthlyFee = 10;
+  const months = 120;
+  const monthlyRate = nominalRate / 12;
+  if (priceGross <= 0) return 0;
+  const annuity =
+    (priceGross * monthlyRate * Math.pow(1 + monthlyRate, months)) /
+    (Math.pow(1 + monthlyRate, months) - 1);
+  return Math.round(annuity + monthlyFee);
+}
+
 export function formatCurrency(amount: number): string {
+  if (!Number.isFinite(amount)) return '— zł';
   return new Intl.NumberFormat('pl-PL', {
     style: 'currency',
     currency: 'PLN',
@@ -386,5 +412,6 @@ export function formatCurrency(amount: number): string {
 }
 
 export function formatNumber(num: number): string {
+  if (!Number.isFinite(num)) return '—';
   return new Intl.NumberFormat('pl-PL').format(num);
 }

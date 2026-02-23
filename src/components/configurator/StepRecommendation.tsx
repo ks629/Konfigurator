@@ -5,9 +5,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useConfigurator } from '@/hooks/useConfigurator';
 import { getRecommendedProducts, getBrandProducts } from '@/lib/compatibility';
 import { inverters } from '@/data/products';
+import Image from 'next/image';
 import { ProductCard } from './ProductCard';
 import { NexbeIcon } from '@nexbe/icons';
 import { Info, ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react';
+import { getBrandLogos } from '@/lib/brand-logos';
 
 const CARDS_PER_PAGE = 3;
 
@@ -94,8 +96,11 @@ export function StepRecommendation() {
           </button>
 
           <div className="text-center space-y-2 mb-6">
-            <h2 className="font-heading text-2xl md:text-3xl text-white">
-              Konfiguracje {selectedBrand}
+            <h2 className="font-heading text-2xl md:text-3xl text-white flex items-center justify-center gap-3 flex-wrap">
+              <span>Konfiguracje</span>
+              {getBrandLogos(selectedBrand).map((logo) => (
+                <Image key={logo.alt} src={logo.src} alt={logo.alt} width={140} height={32} className="h-7 md:h-8 w-auto brightness-0 invert inline-block" />
+              ))}
             </h2>
             <p className="text-muted-foreground">
               {brandProducts.length} {brandProducts.length === 1 ? 'konfiguracja' : brandProducts.length < 5 ? 'konfiguracje' : 'konfiguracji'} spełniających warunki dofinansowania

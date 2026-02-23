@@ -1,21 +1,27 @@
 'use client';
 
+import Image from 'next/image';
 import { CalculationResult, Product, Inverter, BackupVariant } from '@/lib/types';
 import { formatCurrency, formatNumber } from '@/lib/calculations';
 import { NexbeIcon } from '@nexbe/icons';
-import { Wallet, Target, Percent, ArrowDown, Settings } from 'lucide-react';
+import { ArrowDown, Settings, Sun } from 'lucide-react';
+import { getBrandLogos } from '@/lib/brand-logos';
 
 interface SavingsSummaryProps {
   result: CalculationResult;
   product?: Product | null;
   inverter?: Inverter | null;
   backupVariant?: BackupVariant;
+  isFullPV?: boolean;
+  pvKwp?: number;
+  pvPanelCount?: number;
+  pvPrice?: number;
 }
 
 // Marki z wbudowanym EMS — nie potrzebują dodatkowego
 const BRANDS_WITH_BUILTIN_EMS = ['Huawei', 'Sigenergy'];
 
-export function SavingsSummary({ result, product, inverter, backupVariant = 'A' }: SavingsSummaryProps) {
+export function SavingsSummary({ result, product, inverter, backupVariant = 'A', isFullPV, pvKwp, pvPanelCount, pvPrice }: SavingsSummaryProps) {
   const { investment, annual_savings, roi_years, total_savings, horizon_years } = result;
 
   const needsEms = product ? !BRANDS_WITH_BUILTIN_EMS.includes(product.brand.split('/')[0]) : false;
@@ -25,7 +31,7 @@ export function SavingsSummary({ result, product, inverter, backupVariant = 'A' 
       {/* Koszt inwestycji */}
       <div className="rounded-xl border bg-card p-6 space-y-4">
         <div className="flex items-center gap-2">
-          <Wallet className="h-5 w-5 text-primary" />
+          <NexbeIcon name="oszczednosci" size={20} variant="inherit" className="text-primary" aria-label="Koszt inwestycji" />
           <h3 className="font-heading text-lg text-white">Koszt inwestycji</h3>
         </div>
 
@@ -34,10 +40,27 @@ export function SavingsSummary({ result, product, inverter, backupVariant = 'A' 
           <div className="bg-muted/30 rounded-lg p-4 space-y-3">
             <p className="text-xs text-muted-foreground uppercase tracking-wide">W zestawie</p>
             <div className="space-y-2.5 text-sm">
+              {isFullPV && pvKwp && pvPanelCount && (
+                <div className="flex items-start gap-2.5">
+                  <Sun className="h-4 w-4 text-amber-400 mt-0.5 shrink-0" />
+                  <div>
+                    <p className="font-medium text-white">Instalacja fotowoltaiczna</p>
+                    <p className="text-xs text-muted-foreground">{pvKwp} kWp · {pvPanelCount} paneli 455Wp</p>
+                    {pvPrice !== undefined && (
+                      <p className="text-xs text-muted-foreground">{formatCurrency(pvPrice)}</p>
+                    )}
+                  </div>
+                </div>
+              )}
               <div className="flex items-start gap-2.5">
                 <NexbeIcon name="magazyn-energii" size={16} variant="inherit" className="text-primary mt-0.5 shrink-0" />
                 <div>
-                  <p className="font-medium text-white">Magazyn energii {product.brand.split('/')[0]}</p>
+                  <p className="font-medium text-white flex items-center gap-2 flex-wrap">
+                    <span>Magazyn energii</span>
+                    {getBrandLogos(product.brand).map((logo) => (
+                      <Image key={logo.alt} src={logo.src} alt={logo.alt} width={80} height={18} className="h-4 w-auto inline-block" />
+                    ))}
+                  </p>
                   <p className="text-xs text-muted-foreground">{product.name} · {product.capacity_kwh} kWh</p>
                 </div>
               </div>
@@ -45,7 +68,12 @@ export function SavingsSummary({ result, product, inverter, backupVariant = 'A' 
                 <div className="flex items-start gap-2.5">
                   <NexbeIcon name="falownik" size={16} variant="inherit" className="text-primary mt-0.5 shrink-0" />
                   <div>
-                    <p className="font-medium text-white">Falownik hybrydowy {inverter.brand}</p>
+                    <p className="font-medium text-white flex items-center gap-2 flex-wrap">
+                      <span>Falownik hybrydowy</span>
+                      {getBrandLogos(inverter.brand).map((logo) => (
+                        <Image key={logo.alt} src={logo.src} alt={logo.alt} width={80} height={18} className="h-4 w-auto inline-block" />
+                      ))}
+                    </p>
                     <p className="text-xs text-muted-foreground">{inverter.name} · {inverter.power_kw} kW</p>
                   </div>
                 </div>
@@ -159,7 +187,7 @@ export function SavingsSummary({ result, product, inverter, backupVariant = 'A' 
         {/* ROI */}
         <div className="bg-primary/10 rounded-lg p-4 space-y-3">
           <div className="flex items-center gap-2">
-            <Target className="h-5 w-5 text-primary" />
+            <NexbeIcon name="bezplatna-wycena" size={20} variant="inherit" className="text-primary" aria-label="Zwrot inwestycji" />
             <span className="font-heading text-lg text-white">Zwrot inwestycji</span>
           </div>
 

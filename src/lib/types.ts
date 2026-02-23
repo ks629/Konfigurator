@@ -1,6 +1,57 @@
 // ───────────────────────── Istniejące typy ─────────────────────────
 
-export type InstallationType = 'retrofit' | 'hybrid' | 'upgrade';
+export type InstallationType = 'retrofit' | 'hybrid' | 'upgrade' | 'full_pv';
+
+// ───────────────────────── Typy PV (full_pv flow) ─────────────────────────
+
+export type PVMountType = 'roof_angled' | 'roof_flat' | 'ground';
+
+export type PVAzimuthPreset =
+  | 'S' | 'SE' | 'SW'
+  | 'E' | 'W' | 'EW'
+  | 'NE' | 'NW' | 'N';
+
+export type PVVariantTier = 'economic' | 'recommended' | 'premium';
+
+export interface PVVariant {
+  tier: PVVariantTier;
+  label: string;
+  pvKwp: number;
+  panelCount: number;
+  inverterKw: number;
+  batteryKwh: number;
+  batteryProductId: string;
+  inverterId: string;
+  hasEMS: boolean;
+  hasSZR: boolean;
+  mp7Eligible: boolean;
+  selfConsumptionPercent: number;
+  pvPrice: number;
+  batteryPrice: number;
+  totalPrice: number;
+}
+
+export interface PVSizingInput {
+  annualConsumptionKwh: number;
+  orientationMultiplier: number;
+  mountType: PVMountType;
+  roofWidth?: number;
+  roofLength?: number;
+  plansEV: boolean;
+  evExtraKwh: number;
+  plansHeatPump: boolean;
+  heatPumpExtraKwh: number;
+  otherExtraKwh: number;
+}
+
+export interface PVSizingResult {
+  totalDemandKwh: number;
+  requiredKwp: number;
+  panelCount: number;
+  maxRoofPanels: number | null;
+  recommendedBatteryKwh: number;
+  recommendedInverterKw: number;
+}
 
 export type BillingSystem = 'net-billing' | 'net-metering' | 'unknown';
 
@@ -122,6 +173,22 @@ export interface ConfiguratorState {
   wantsSubsidy: boolean;
   thermomodernizationUsedPercent: number;
   taxBracket: TaxBracket;
+  // Pola PV (full_pv flow)
+  pvMountType: PVMountType;
+  pvAzimuthPreset: PVAzimuthPreset;
+  pvTiltAngle: number;
+  roofWidth: number;
+  roofLength: number;
+  plansEV: boolean;
+  evExtraKwh: number;
+  plansHeatPump: boolean;
+  heatPumpExtraKwh: number;
+  otherExtraKwh: number;
+  selectedPvVariant: PVVariantTier | null;
+  pvCalculatedKwp: number;
+  pvCalculatedPanelCount: number;
+  pvCalculatedBatteryKwh: number;
+  pvPrice: number;
 }
 
 export interface RecommendedOption {
@@ -153,6 +220,9 @@ export interface CalcInput {
   wants_subsidy?: boolean;
   thermomodernization_used_percent?: number;
   tax_bracket?: TaxBracket;
+  // PV full flow
+  is_full_pv?: boolean;
+  pv_price?: number;
 }
 
 export interface ThermomodernizationDetails {

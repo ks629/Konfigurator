@@ -4,7 +4,6 @@ import { motion } from 'framer-motion';
 import { useConfigurator } from '@/hooks/useConfigurator';
 import { InstallationType } from '@/lib/types';
 import { NexbeIcon } from '@nexbe/icons';
-import { RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const options: {
@@ -29,7 +28,13 @@ const options: {
     type: 'upgrade',
     title: 'Chcę wymienić falownik na hybrydowy i dodać magazyn',
     description: 'Modernizacja istniejącej instalacji do systemu hybrydowego',
-    renderIcon: (cls) => <RefreshCw className={cls} />,
+    renderIcon: (cls) => <NexbeIcon name="retrofit" size={32} variant="inherit" className={cls} aria-label="Modernizacja instalacji" />,
+  },
+  {
+    type: 'full_pv',
+    title: 'Nie mam PV — kupuję kompletny zestaw',
+    description: 'Panele + falownik hybrydowy + magazyn w jednym pakiecie',
+    renderIcon: (cls) => <NexbeIcon name="fotowoltaika" size={32} variant="inherit" className={cls} aria-label="Kompletny zestaw PV + magazyn" />,
   },
 ];
 
@@ -57,7 +62,7 @@ export function StepInstallationType() {
         </p>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-3 max-w-4xl mx-auto">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 max-w-5xl mx-auto">
         {options.map(({ type, title, description, renderIcon }) => (
           <button
             key={type}

@@ -12,6 +12,10 @@ import { StepPVData } from '@/components/configurator/StepPVData';
 import { StepConsumption } from '@/components/configurator/StepConsumption';
 import { StepAdditionalNeeds } from '@/components/configurator/StepAdditionalNeeds';
 import { StepRecommendation } from '@/components/configurator/StepRecommendation';
+import { StepPVConsumption } from '@/components/configurator/StepPVConsumption';
+import { StepPVLocation } from '@/components/configurator/StepPVLocation';
+import { StepPVSystemRecommendation } from '@/components/configurator/StepPVSystemRecommendation';
+import { StepPVSummary } from '@/components/configurator/StepPVSummary';
 import { SavingsSummary } from '@/components/calculator/SavingsSummary';
 import { ROIChart } from '@/components/calculator/ROIChart';
 import { ProjectionTable } from '@/components/calculator/ProjectionTable';
@@ -35,6 +39,7 @@ export default function KonfiguratorPage() {
   const store = useConfigurator();
   const { createFromConfigurator } = useOrder();
   const { currentStep, nextStep, prevStep, setStep, selectedProductId, selectedInverterId } = store;
+  const isFullPV = store.installationType === 'full_pv';
   const [contactFormOpen, setContactFormOpen] = useState(false);
   const [contactData, setContactData] = useState<ContactFormData | null>(null);
   const [calculationError, setCalculationError] = useState(false);
@@ -53,11 +58,48 @@ export default function KonfiguratorPage() {
     if (!selectedProduct || !store.installationType) return null;
 
     try {
+      setCalculationError(false);
+
+      // Full PV flow — inny sposob kalkulacji
+      if (store.installationType === 'full_pv') {
+        let totalConsumption =
+          store.consumptionMode === 'bill'
+            ? calculateMonthlyFromBill(store.monthlyBill)
+            : store.annualConsumptionKwh;
+        if (store.plansEV) totalConsumption += store.evExtraKwh;
+        if (store.plansHeatPump) totalConsumption += store.heatPumpExtraKwh;
+        totalConsumption += store.otherExtraKwh;
+
+        const batteryPrice = store.selectedPvVariant === 'premium'
+          ? selectedProduct.price_gross_b
+          : selectedProduct.price_gross;
+
+        return calculateROI({
+          pv_power_kwp: store.pvCalculatedKwp,
+          annual_consumption_kwh: totalConsumption,
+          billing_system: 'net-billing',
+          battery_capacity_kwh: selectedProduct.capacity_kwh,
+          battery_price_gross: batteryPrice + store.pvPrice,
+          installation_type: 'full_pv',
+          needs_inverter_upgrade: false,
+          inverter_price_gross: 0,
+          needs_backup: store.selectedPvVariant === 'premium',
+          user_profile: store.userProfile,
+          energy_operator: store.energyOperator,
+          tariff: store.tariff,
+          wants_subsidy: store.wantsSubsidy,
+          thermomodernization_used_percent: store.thermomodernizationUsedPercent,
+          tax_bracket: store.taxBracket,
+          is_full_pv: true,
+          pv_price: store.pvPrice,
+        });
+      }
+
+      // Istniejacy flow (retrofit/hybrid/upgrade)
       let annualConsumption =
         store.consumptionMode === 'bill'
           ? calculateMonthlyFromBill(store.monthlyBill)
           : store.annualConsumptionKwh;
-      // Pompa ciepła i EV zwiększają zapotrzebowanie na energię
       if (store.hasHeatPump) annualConsumption += 3000;
       if (store.hasEV) annualConsumption += 3000;
 
@@ -84,7 +126,6 @@ export default function KonfiguratorPage() {
         thermomodernization_used_percent: store.thermomodernizationUsedPercent,
         tax_bracket: store.taxBracket,
       });
-      setCalculationError(false);
       return result;
     } catch (err) {
       console.error('Błąd kalkulacji ROI:', err);
@@ -135,6 +176,23 @@ export default function KonfiguratorPage() {
   }, [selectedProduct, selectedInverter, store]);
 
   const canGoNext = useMemo(() => {
+    if (isFullPV) {
+      switch (currentStep) {
+        case 1:
+          return store.installationType !== null;
+        case 2:
+          return true; // consumption always valid
+        case 3:
+          return true; // location always valid
+        case 4:
+          return store.selectedPvVariant !== null; // variant must be selected (auto-advances)
+        case 5:
+          return selectedProductId !== null;
+        default:
+          return false;
+      }
+    }
+
     switch (currentStep) {
       case 1:
         return store.installationType !== null;
@@ -149,7 +207,7 @@ export default function KonfiguratorPage() {
       default:
         return false;
     }
-  }, [currentStep, store, selectedProductId]);
+  }, [currentStep, store, selectedProductId, isFullPV]);
 
   const handleContactSubmit = async (data: ContactFormData) => {
     try {
@@ -209,6 +267,23 @@ export default function KonfiguratorPage() {
   };
 
   const renderStep = () => {
+    if (isFullPV) {
+      switch (currentStep) {
+        case 1:
+          return <StepInstallationType />;
+        case 2:
+          return <StepPVConsumption />;
+        case 3:
+          return <StepPVLocation />;
+        case 4:
+          return <StepPVSystemRecommendation />;
+        case 5:
+          return <StepPVSummary />;
+        default:
+          return null;
+      }
+    }
+
     switch (currentStep) {
       case 1:
         return <StepInstallationType />;
@@ -297,7 +372,7 @@ export default function KonfiguratorPage() {
               <div />
             )}
 
-            {currentStep < TOTAL_STEPS && currentStep !== 1 && (
+            {currentStep < TOTAL_STEPS && currentStep !== 1 && !(isFullPV && currentStep === 4) && (
               <Button onClick={nextStep} disabled={!canGoNext} size="lg" className="bg-gradient-to-r from-[#B5005D] to-[#8B0048] hover:from-[#D4006E] hover:to-[#9A0050] text-white shadow-lg shadow-[#B5005D]/20">
                 Dalej
                 <ArrowRight className="h-4 w-4 ml-2" />
@@ -318,7 +393,16 @@ export default function KonfiguratorPage() {
               </div>
 
               <div className="grid gap-8 lg:grid-cols-2">
-                <SavingsSummary result={calculation} product={selectedProduct} inverter={selectedInverter} backupVariant={store.backupVariant} />
+                <SavingsSummary
+                  result={calculation}
+                  product={selectedProduct}
+                  inverter={selectedInverter}
+                  backupVariant={isFullPV ? (store.selectedPvVariant === 'premium' ? 'B' : 'A') : store.backupVariant}
+                  isFullPV={isFullPV}
+                  pvKwp={isFullPV ? store.pvCalculatedKwp : undefined}
+                  pvPanelCount={isFullPV ? store.pvCalculatedPanelCount : undefined}
+                  pvPrice={isFullPV ? store.pvPrice : undefined}
+                />
                 <div className="space-y-8">
                   <FinancingSimulator result={calculation} />
                 </div>

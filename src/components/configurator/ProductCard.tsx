@@ -6,22 +6,10 @@ import { allProducts } from '@/data/products';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { NexbeIcon } from '@nexbe/icons';
-import { Calendar, Check, Crown, ArrowUpCircle } from 'lucide-react';
+import { Calendar, Check, Crown } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { formatCurrency } from '@/lib/calculations';
-
-/** Simple monthly installment calculator (Inbank: 8.99% nominal, 10 zl/month fee, 120 months) */
-function calcLowestRate(priceGross: number): number {
-  const nominalRate = 0.0899;
-  const monthlyFee = 10;
-  const months = 120;
-  const monthlyRate = nominalRate / 12;
-  if (priceGross <= 0) return 0;
-  const annuity =
-    (priceGross * monthlyRate * Math.pow(1 + monthlyRate, months)) /
-    (Math.pow(1 + monthlyRate, months) - 1);
-  return Math.round(annuity + monthlyFee);
-}
+import { formatCurrency, calculateMonthlyRate } from '@/lib/calculations';
+import { getBrandLogos } from '@/lib/brand-logos';
 
 interface ProductCardProps {
   product: Product;
@@ -54,7 +42,7 @@ export function ProductCard({
 }: ProductCardProps) {
   // Wariant B (pełny backup SZR) lub A (EPS / bez backup) — cena brutto za cały zestaw
   const totalPrice = useBackupPrice ? product.price_gross_b : product.price_gross;
-  const monthlyRate = calcLowestRate(totalPrice);
+  const monthlyRate = calculateMonthlyRate(totalPrice);
 
   // Znajdź wariant z większym falownikiem (ta sama marka, zbliżona pojemność)
   const upgradeOption = allProducts.find(p =>
@@ -109,13 +97,18 @@ export function ProductCard({
           {onBrandClick ? (
             <button
               onClick={(e) => { e.stopPropagation(); onBrandClick(); }}
-              className="text-xs bg-black/50 text-white px-2 py-1 rounded hover:bg-primary/80 transition-colors"
+              className="flex items-center gap-1.5 bg-black/50 px-2 py-1 rounded hover:bg-primary/80 transition-colors"
             >
-              {product.brand} — więcej ›
+              {getBrandLogos(product.brand).map((logo) => (
+                <Image key={logo.alt} src={logo.src} alt={logo.alt} width={60} height={16} className="h-3.5 w-auto brightness-0 invert" />
+              ))}
+              <span className="text-xs text-white">— więcej ›</span>
             </button>
           ) : (
-            <span className="text-xs bg-black/50 text-white px-2 py-1 rounded">
-              {product.brand}
+            <span className="flex items-center gap-1.5 bg-black/50 px-2 py-1 rounded">
+              {getBrandLogos(product.brand).map((logo) => (
+                <Image key={logo.alt} src={logo.src} alt={logo.alt} width={60} height={16} className="h-3.5 w-auto brightness-0 invert" />
+              ))}
             </span>
           )}
         </div>
@@ -200,7 +193,7 @@ export function ProductCard({
             onClick={() => onUpgradeInverter(upgradeOption.id)}
             className="flex items-center gap-1.5 text-xs text-primary hover:text-primary/80 transition-colors py-1"
           >
-            <ArrowUpCircle className="h-3.5 w-3.5" />
+            <NexbeIcon name="roi" size={14} variant="inherit" aria-label="Ulepszenie falownika" />
             <span>Zwiększ falownik do {upgradeOption.inverter_power_kw} kW</span>
             <span className="text-muted-foreground">(+{formatCurrency(upgradeDiff)})</span>
           </button>
