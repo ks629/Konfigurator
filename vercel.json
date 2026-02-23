@@ -1,0 +1,5 @@
+{
+  "installCommand": "npm install --prefer-offline --no-audit || true",
+  "buildCommand": "sed -i 's|\\.\\./shared/|./shared/|g' tsconfig.json && mkdir -p shared/icons && cp -r .vercel_shared/icons/* shared/icons/ && npm run build",
+  "framework": "nextjs"
+}
