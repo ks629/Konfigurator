@@ -20,12 +20,13 @@ import { ContactForm } from '@/components/forms/ContactForm';
 import { Button } from '@/components/ui/button';
 import { ResumeProgressBanner } from '@/components/ui/ResumeProgressBanner';
 import { NexbeIcon } from '@nexbe/icons';
-import { ArrowLeft, ArrowRight, FileText, CalendarCheck, Zap, ShoppingCart } from 'lucide-react';
+import { ArrowLeft, ArrowRight, FileText, CalendarCheck, Zap, ShoppingCart, AlertTriangle } from 'lucide-react';
 import { calculateROI, calculateMonthlyFromBill, formatCurrency } from '@/lib/calculations';
 import { allProducts } from '@/data/products';
 import { inverters } from '@/data/products';
 import { ContactFormData } from '@/lib/validations';
 import { generateOfferPdfBlob, type PdfOfferData } from '@/lib/pdf-generator';
+import { toast } from 'sonner';
 
 const TOTAL_STEPS = 5;
 
@@ -36,6 +37,7 @@ export default function KonfiguratorPage() {
   const { currentStep, nextStep, prevStep, setStep, selectedProductId, selectedInverterId } = store;
   const [contactFormOpen, setContactFormOpen] = useState(false);
   const [contactData, setContactData] = useState<ContactFormData | null>(null);
+  const [calculationError, setCalculationError] = useState(false);
 
   const selectedProduct = useMemo(
     () => allProducts.find((p) => p.id === selectedProductId) || null,
@@ -50,37 +52,45 @@ export default function KonfiguratorPage() {
   const calculation = useMemo(() => {
     if (!selectedProduct || !store.installationType) return null;
 
-    let annualConsumption =
-      store.consumptionMode === 'bill'
-        ? calculateMonthlyFromBill(store.monthlyBill)
-        : store.annualConsumptionKwh;
-    // Pompa ciepła i EV zwiększają zapotrzebowanie na energię
-    if (store.hasHeatPump) annualConsumption += 3000;
-    if (store.hasEV) annualConsumption += 3000;
+    try {
+      let annualConsumption =
+        store.consumptionMode === 'bill'
+          ? calculateMonthlyFromBill(store.monthlyBill)
+          : store.annualConsumptionKwh;
+      // Pompa ciepła i EV zwiększają zapotrzebowanie na energię
+      if (store.hasHeatPump) annualConsumption += 3000;
+      if (store.hasEV) annualConsumption += 3000;
 
-    const batteryPrice = store.backupVariant === 'B'
-      ? selectedProduct.price_gross_b
-      : selectedProduct.price_gross;
+      const batteryPrice = store.backupVariant === 'B'
+        ? selectedProduct.price_gross_b
+        : selectedProduct.price_gross;
 
-    return calculateROI({
-      pv_power_kwp: store.pvPowerKwp,
-      annual_consumption_kwh: annualConsumption,
-      billing_system: store.billingSystem,
-      battery_capacity_kwh: selectedProduct.capacity_kwh,
-      battery_price_gross: batteryPrice,
-      installation_type: store.installationType,
-      needs_inverter_upgrade: false, // falownik wliczony w cenę zestawu
-      inverter_price_gross: 0, // falownik wliczony w cenę zestawu
-      needs_backup: store.backupVariant === 'B', // backup SZR tylko w wariancie B
-      // Nowe pola
-      user_profile: store.userProfile,
-      energy_operator: store.energyOperator,
-      tariff: store.tariff,
-      pv_orientation: store.pvOrientation,
-      wants_subsidy: store.wantsSubsidy,
-      thermomodernization_used_percent: store.thermomodernizationUsedPercent,
-      tax_bracket: store.taxBracket,
-    });
+      const result = calculateROI({
+        pv_power_kwp: store.pvPowerKwp,
+        annual_consumption_kwh: annualConsumption,
+        billing_system: store.billingSystem,
+        battery_capacity_kwh: selectedProduct.capacity_kwh,
+        battery_price_gross: batteryPrice,
+        installation_type: store.installationType,
+        needs_inverter_upgrade: false, // falownik wliczony w cenę zestawu
+        inverter_price_gross: 0, // falownik wliczony w cenę zestawu
+        needs_backup: store.backupVariant === 'B', // backup SZR tylko w wariancie B
+        // Nowe pola
+        user_profile: store.userProfile,
+        energy_operator: store.energyOperator,
+        tariff: store.tariff,
+        pv_orientation: store.pvOrientation,
+        wants_subsidy: store.wantsSubsidy,
+        thermomodernization_used_percent: store.thermomodernizationUsedPercent,
+        tax_bracket: store.taxBracket,
+      });
+      setCalculationError(false);
+      return result;
+    } catch (err) {
+      console.error('Błąd kalkulacji ROI:', err);
+      setCalculationError(true);
+      return null;
+    }
   }, [selectedProduct, selectedInverter, store]);
 
   // Kalkulacja z taryfą dynamiczną (do porównania)
@@ -88,35 +98,40 @@ export default function KonfiguratorPage() {
     if (!selectedProduct || !store.installationType) return null;
     if (store.tariff === 'dynamic') return null; // już jest dynamiczna
 
-    let annualConsumption =
-      store.consumptionMode === 'bill'
-        ? calculateMonthlyFromBill(store.monthlyBill)
-        : store.annualConsumptionKwh;
-    if (store.hasHeatPump) annualConsumption += 3000;
-    if (store.hasEV) annualConsumption += 3000;
+    try {
+      let annualConsumption =
+        store.consumptionMode === 'bill'
+          ? calculateMonthlyFromBill(store.monthlyBill)
+          : store.annualConsumptionKwh;
+      if (store.hasHeatPump) annualConsumption += 3000;
+      if (store.hasEV) annualConsumption += 3000;
 
-    const batteryPriceDyn = store.backupVariant === 'B'
-      ? selectedProduct.price_gross_b
-      : selectedProduct.price_gross;
+      const batteryPriceDyn = store.backupVariant === 'B'
+        ? selectedProduct.price_gross_b
+        : selectedProduct.price_gross;
 
-    return calculateROI({
-      pv_power_kwp: store.pvPowerKwp,
-      annual_consumption_kwh: annualConsumption,
-      billing_system: store.billingSystem,
-      battery_capacity_kwh: selectedProduct.capacity_kwh,
-      battery_price_gross: batteryPriceDyn,
-      installation_type: store.installationType,
-      needs_inverter_upgrade: false,
-      inverter_price_gross: 0,
-      needs_backup: store.backupVariant === 'B',
-      user_profile: store.userProfile,
-      energy_operator: store.energyOperator,
-      tariff: 'dynamic',
-      pv_orientation: store.pvOrientation,
-      wants_subsidy: store.wantsSubsidy,
-      thermomodernization_used_percent: store.thermomodernizationUsedPercent,
-      tax_bracket: store.taxBracket,
-    });
+      return calculateROI({
+        pv_power_kwp: store.pvPowerKwp,
+        annual_consumption_kwh: annualConsumption,
+        billing_system: store.billingSystem,
+        battery_capacity_kwh: selectedProduct.capacity_kwh,
+        battery_price_gross: batteryPriceDyn,
+        installation_type: store.installationType,
+        needs_inverter_upgrade: false,
+        inverter_price_gross: 0,
+        needs_backup: store.backupVariant === 'B',
+        user_profile: store.userProfile,
+        energy_operator: store.energyOperator,
+        tariff: 'dynamic',
+        pv_orientation: store.pvOrientation,
+        wants_subsidy: store.wantsSubsidy,
+        thermomodernization_used_percent: store.thermomodernizationUsedPercent,
+        tax_bracket: store.taxBracket,
+      });
+    } catch (err) {
+      console.error('Błąd kalkulacji dynamicznej:', err);
+      return null;
+    }
   }, [selectedProduct, selectedInverter, store]);
 
   const canGoNext = useMemo(() => {
@@ -165,27 +180,32 @@ export default function KonfiguratorPage() {
   const handleDownloadPdf = async () => {
     if (!selectedProduct || !calculation || !contactData) return;
 
-    const pdfData: PdfOfferData = {
-      clientName: contactData.name,
-      clientEmail: contactData.email,
-      clientPhone: contactData.phone,
-      clientPostalCode: contactData.postalCode || '',
-      product: selectedProduct,
-      inverter: selectedInverter || undefined,
-      calculation,
-      config: store,
-      offerNumber: `NEXBE-${Date.now()}`,
-    };
+    try {
+      const pdfData: PdfOfferData = {
+        clientName: contactData.name,
+        clientEmail: contactData.email,
+        clientPhone: contactData.phone,
+        clientPostalCode: contactData.postalCode || '',
+        product: selectedProduct,
+        inverter: selectedInverter || undefined,
+        calculation,
+        config: store,
+        offerNumber: `NEXBE-${Date.now()}`,
+      };
 
-    const blob = await generateOfferPdfBlob(pdfData);
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `oferta-nexbe-${selectedProduct.brand}-${selectedProduct.capacity_kwh}kWh.pdf`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+      const blob = await generateOfferPdfBlob(pdfData);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `oferta-nexbe-${selectedProduct.brand}-${selectedProduct.capacity_kwh}kWh.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error('Błąd generowania PDF:', err);
+      toast.error('Nie udało się wygenerować PDF. Spróbuj ponownie.');
+    }
   };
 
   const renderStep = () => {
@@ -252,6 +272,19 @@ export default function KonfiguratorPage() {
           <AnimatePresence mode="wait">
             <div key={currentStep}>{renderStep()}</div>
           </AnimatePresence>
+
+          {/* Calculation Error */}
+          {currentStep === 5 && calculationError && (
+            <div className="max-w-3xl mx-auto mt-6 rounded-xl border border-amber-400/30 bg-amber-400/5 p-4 flex items-start gap-3">
+              <AlertTriangle className="h-5 w-5 text-amber-400 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="text-sm font-medium text-amber-300">Nie udało się obliczyć oszczędności</p>
+                <p className="text-xs text-amber-300/70 mt-1">
+                  Możesz nadal wysłać zapytanie — skontaktujemy się z indywidualną wyceną. Zadzwoń: 732 080 101
+                </p>
+              </div>
+            </div>
+          )}
 
           {/* Navigation */}
           <div className="max-w-4xl mx-auto mt-8 flex items-center justify-between pr-28 sm:pr-0 no-print">

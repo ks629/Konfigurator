@@ -1,6 +1,9 @@
 'use client';
 
 import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { landingContactSchema, type LandingContactData } from '@/lib/validations';
 import { motion } from 'framer-motion';
 import { NexbeIcon } from '@nexbe/icons';
 import { Send, Check, Clock, Users, ArrowRight, Loader2 } from 'lucide-react';
@@ -35,16 +38,19 @@ export default function ContactForm() {
   const [submitted, setSubmitted] = useState(false);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState('');
-  const [formData, setFormData] = useState({
-    name: '',
-    phone: '',
-    email: '',
-    capacity: '',
-    hasPV: '',
+
+  const { register, handleSubmit: hookFormSubmit, formState: { errors } } = useForm<LandingContactData>({
+    resolver: zodResolver(landingContactSchema),
+    defaultValues: {
+      name: '',
+      phone: '',
+      email: '',
+      capacity: '',
+      hasPV: '',
+    },
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (data: LandingContactData) => {
     setSending(true);
     setError('');
 
@@ -53,19 +59,19 @@ export default function ContactForm() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-          phone: formData.phone,
+          name: data.name,
+          email: data.email,
+          phone: data.phone,
           source: 'landing-contact-form',
           formData: {
-            capacity: formData.capacity,
-            hasPV: formData.hasPV,
+            capacity: data.capacity,
+            hasPV: data.hasPV,
           },
           config: {
-            installationType: formData.hasPV === 'tak' ? 'retrofit' : formData.hasPV === 'planuje' ? 'nowa' : 'nieznany',
+            installationType: data.hasPV === 'tak' ? 'retrofit' : data.hasPV === 'planuje' ? 'nowa' : 'nieznany',
           },
           product: {
-            name: formData.capacity ? `Zapytanie ${formData.capacity} kWh` : 'Zapytanie ogólne',
+            name: data.capacity ? `Zapytanie ${data.capacity} kWh` : 'Zapytanie ogólne',
           },
           calculation: {},
         }),
@@ -79,10 +85,6 @@ export default function ContactForm() {
     } finally {
       setSending(false);
     }
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   return (
@@ -147,7 +149,7 @@ export default function ContactForm() {
               viewport={{ once: true }}
             >
               {!submitted ? (
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <form onSubmit={hookFormSubmit(onSubmit)} className="space-y-4">
                   {/* Name */}
                   <div>
                     <label htmlFor="name" className="text-xs font-semibold text-nexbe-text-muted uppercase tracking-[2px] mb-2 block">
@@ -155,14 +157,12 @@ export default function ContactForm() {
                     </label>
                     <input
                       id="name"
-                      name="name"
                       type="text"
-                      required
-                      value={formData.name}
-                      onChange={handleChange}
+                      {...register('name')}
                       className="w-full px-4 py-3.5 rounded-xl bg-nexbe-bg/80 border border-nexbe-border text-nexbe-text placeholder:text-nexbe-text-muted focus:outline-none focus:border-nexbe-raspberry/50 focus:ring-1 focus:ring-nexbe-raspberry/20 transition-colors text-sm"
                       placeholder="Jan Kowalski"
                     />
+                    {errors.name && <p className="text-xs text-red-400 mt-1">{errors.name.message}</p>}
                   </div>
 
                   {/* Phone */}
@@ -172,14 +172,12 @@ export default function ContactForm() {
                     </label>
                     <input
                       id="phone"
-                      name="phone"
                       type="tel"
-                      required
-                      value={formData.phone}
-                      onChange={handleChange}
+                      {...register('phone')}
                       className="w-full px-4 py-3.5 rounded-xl bg-nexbe-bg/80 border border-nexbe-border text-nexbe-text placeholder:text-nexbe-text-muted focus:outline-none focus:border-nexbe-raspberry/50 focus:ring-1 focus:ring-nexbe-raspberry/20 transition-colors text-sm"
                       placeholder="+48 xxx xxx xxx"
                     />
+                    {errors.phone && <p className="text-xs text-red-400 mt-1">{errors.phone.message}</p>}
                   </div>
 
                   {/* Email */}
@@ -189,14 +187,12 @@ export default function ContactForm() {
                     </label>
                     <input
                       id="email"
-                      name="email"
                       type="email"
-                      required
-                      value={formData.email}
-                      onChange={handleChange}
+                      {...register('email')}
                       className="w-full px-4 py-3.5 rounded-xl bg-nexbe-bg/80 border border-nexbe-border text-nexbe-text placeholder:text-nexbe-text-muted focus:outline-none focus:border-nexbe-raspberry/50 focus:ring-1 focus:ring-nexbe-raspberry/20 transition-colors text-sm"
                       placeholder="jan@email.pl"
                     />
+                    {errors.email && <p className="text-xs text-red-400 mt-1">{errors.email.message}</p>}
                   </div>
 
                   {/* Selects row */}
@@ -207,9 +203,7 @@ export default function ContactForm() {
                       </label>
                       <select
                         id="capacity"
-                        name="capacity"
-                        value={formData.capacity}
-                        onChange={handleChange}
+                        {...register('capacity')}
                         className="w-full px-4 py-3.5 rounded-xl bg-nexbe-bg/80 border border-nexbe-border text-nexbe-text focus:outline-none focus:border-nexbe-raspberry/50 focus:ring-1 focus:ring-nexbe-raspberry/20 transition-colors text-sm appearance-none"
                       >
                         {capacityOptions.map((opt) => (
@@ -223,9 +217,7 @@ export default function ContactForm() {
                       </label>
                       <select
                         id="hasPV"
-                        name="hasPV"
-                        value={formData.hasPV}
-                        onChange={handleChange}
+                        {...register('hasPV')}
                         className="w-full px-4 py-3.5 rounded-xl bg-nexbe-bg/80 border border-nexbe-border text-nexbe-text focus:outline-none focus:border-nexbe-raspberry/50 focus:ring-1 focus:ring-nexbe-raspberry/20 transition-colors text-sm appearance-none"
                       >
                         {pvOptions.map((opt) => (

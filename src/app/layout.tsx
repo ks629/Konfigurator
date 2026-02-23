@@ -12,7 +12,10 @@ const geist = Geist({
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://konfigurator.nexbe.pl'),
-  title: 'Konfigurator Magazynu Energii | Nexbe',
+  title: {
+    default: 'Konfigurator Magazynu Energii | NEXBE',
+    template: '%s | NEXBE',
+  },
   description:
     'Dobierz magazyn energii do swojej instalacji PV. Kalkulator oszczędności, dotacje Mój Prąd do 16 000 zł, raty. Bezpłatny audyt.',
   openGraph: {
@@ -20,9 +23,14 @@ export const metadata: Metadata = {
     description:
       'Konfigurator magazynu energii Nexbe — dobierz system, oblicz oszczędności, uzyskaj dotacje.',
     type: 'website',
+    siteName: 'NEXBE',
   },
   alternates: {
     canonical: 'https://konfigurator.nexbe.pl',
+  },
+  robots: {
+    index: true,
+    follow: true,
   },
 };
 

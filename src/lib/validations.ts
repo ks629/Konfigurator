@@ -14,3 +14,12 @@ export const contactFormSchema = z.object({
 });
 
 export type ContactFormData = z.infer<typeof contactFormSchema>;
+
+export const landingContactSchema = z.object({
+  name: z.string().min(2, 'Imię jest wymagane'),
+  phone: z.string().min(9, 'Podaj prawidłowy numer telefonu'),
+  email: z.string().email('Podaj prawidłowy adres e-mail'),
+  capacity: z.string().optional(),
+  hasPV: z.string().optional(),
+});
+export type LandingContactData = z.infer<typeof landingContactSchema>;
